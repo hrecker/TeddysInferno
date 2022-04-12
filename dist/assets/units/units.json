@@ -1,0 +1,21 @@
+{
+    "player": {
+        "name": "player",
+        "maxSpeed": 100,
+        "maxAcceleration": 500,
+        "health": 5,
+        "bodyType": "circle",
+        "bodySize": 10,
+        "bodyOffset": 6
+    },
+    "chaser": {
+        "name": "chaser",
+        "movement": "homing",
+        "maxSpeed": 100,
+        "maxAcceleration": 500,
+        "health": 1,
+        "bodyType": "circle",
+        "bodySize": 14,
+        "bodyOffset": 2
+    }
+}
