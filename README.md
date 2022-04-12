@@ -1,5 +1,5 @@
 # Teddy's Inferno
-Teddy's Inferno is an in-development bullet hell game (shocker) built using [Phaser 3.55.2](https://phaser.io/) .
+Teddy's Inferno is an in-development bullet hell game built using [Phaser 3.55.2](https://phaser.io/) .
 
 # Game Overview
 TBD
