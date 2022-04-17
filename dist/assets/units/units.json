@@ -1,8 +1,8 @@
 {
     "player": {
         "name": "player",
-        "maxSpeed": 100,
-        "maxAcceleration": 500,
+        "maxSpeed": 250,
+        "maxAcceleration": 600,
         "health": 5,
         "bodyType": "circle",
         "bodySize": 10,

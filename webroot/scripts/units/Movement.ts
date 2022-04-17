@@ -1,5 +1,26 @@
 import { Unit } from "../model/Units";
 
+export const unitDrag = 250;
+export const playerRotationSpeed = 0.10;
+
+export function movePlayerUnit(player: Unit, thrustActive: boolean, leftActive: boolean, rightActive: boolean) {
+    if (leftActive && !rightActive) {
+        player.gameObj.setRotation(player.gameObj.rotation - playerRotationSpeed);
+    }
+    if (!leftActive && rightActive) {
+        player.gameObj.setRotation(player.gameObj.rotation + playerRotationSpeed);
+    }
+
+    if (thrustActive) {
+        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj.rotation)
+        player.gameObj.setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
+    } else {
+        player.gameObj.setAcceleration(0, 0);
+    }
+    
+    clampUnitSpeed(player);
+}
+
 /** Move a unit for one frame (call each frame in the update method of a scene) */
 export function moveUnit(unit: Unit, targetUnit: Unit, debugGraphics: Phaser.GameObjects.Graphics) {
     if (targetUnit) {

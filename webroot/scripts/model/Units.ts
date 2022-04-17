@@ -1,8 +1,7 @@
 import { getNewId } from "../state/IdState";
+import { unitDrag } from "../units/Movement";
 
 let unitCache: { [name: string]: Unit };
-
-const defaultUnitDrag = 500;
 
 /** A Unit in the main scene */
 export type Unit = {
@@ -87,7 +86,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     } else { // Default to square
         unitImage.setBodySize(unitJson["bodySize"], unitJson["bodySize"]);
     }
-    unitImage.setDrag(defaultUnitDrag);
+    unitImage.setDrag(unitDrag);
     
     unit.id = unitId;
     unit.gameObj = unitImage;
