@@ -5,8 +5,8 @@ import { MainScene } from "./scenes/MainScene";
 import { MainUIScene } from "./scenes/MainUIScene";
 
 var config: Phaser.Types.Core.GameConfig = {
-    width: 800,
-    height: 608,
+    width: 960,
+    height: 640,
     physics: {
         default: 'arcade',
         arcade: {

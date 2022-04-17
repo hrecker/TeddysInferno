@@ -1,5 +1,3 @@
-export const backgroundColor = "#315c82";
-
 export function vector2Str(vector: Phaser.Types.Math.Vector2Like) {
     return "(" + vector.x + ", " + vector.y + ")";
 }

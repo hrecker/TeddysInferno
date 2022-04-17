@@ -22,13 +22,11 @@ export function movePlayerUnit(player: Unit, thrustActive: boolean, leftActive: 
 }
 
 /** Move a unit for one frame (call each frame in the update method of a scene) */
-export function moveUnit(unit: Unit, targetUnit: Unit, debugGraphics: Phaser.GameObjects.Graphics) {
-    if (targetUnit) {
-        switch (unit.movement) {
-            case "homing":
-                moveHomingUnit(unit, targetUnit.gameObj.body.center, debugGraphics);
-                break;
-        }
+export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics) {
+    switch (unit.movement) {
+        case "homing":
+            moveHomingUnit(unit, targetPos, debugGraphics);
+            break;
     }
 
     clampUnitSpeed(unit);
