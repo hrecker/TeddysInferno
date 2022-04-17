@@ -13,6 +13,8 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("chaser", "assets/sprites/units/chaser.png");
         this.load.image("player", "assets/sprites/units/player.png");
 
+        this.load.image("bullet", "assets/sprites/bullet.png");
+
         // Load background
         this.load.image("background", "assets/background/background.png");
 

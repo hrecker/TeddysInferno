@@ -1,14 +1,22 @@
 import * as move from "../units/Movement";
+import { fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
+import { handleBulletHit, handleUnitHit } from "../units/Collision";
 
 const backgroundColor = "#821603";
 
 let enemyUnits: { [id: number]: Unit } = {};
 let player: Unit;
 
+let playerPhysicsGroup : Phaser.Physics.Arcade.Group;
+let unitsPhysicsGroup : Phaser.Physics.Arcade.Group;
+let bulletsPhysicsGroup : Phaser.Physics.Arcade.Group;
+
 let thrustKey : Phaser.Input.Keyboard.Key;
 let leftTurnKey : Phaser.Input.Keyboard.Key;
 let rightTurnKey : Phaser.Input.Keyboard.Key;
+let streamWeaponKey : Phaser.Input.Keyboard.Key;
+let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 
 let killZoneMinX, killZoneMinY, killZoneMaxX, killZoneMaxY;
 
@@ -22,6 +30,14 @@ export class MainScene extends Phaser.Scene {
         super({
             key: "MainScene"
         });
+    }
+    
+    // Create a physics group for units that does not reset drag when adding to the group
+    createUnitPhysicsGroup() {
+        let group = this.physics.add.group();
+        delete group.defaults.setDragX;
+        delete group.defaults.setDragY;
+        return group;
     }
 
     create() {
@@ -43,11 +59,23 @@ export class MainScene extends Phaser.Scene {
         thrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         leftTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         rightTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        streamWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
+        shotgunWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+
+        playerPhysicsGroup = this.createUnitPhysicsGroup();
+        playerPhysicsGroup.add(player.gameObj);
+        unitsPhysicsGroup = this.createUnitPhysicsGroup();
+        unitsPhysicsGroup.add(unit.gameObj);
+        bulletsPhysicsGroup = this.createUnitPhysicsGroup();
+        
+        // Handle bullet hit on units
+        this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
+        // Handle units hitting player
+        this.physics.add.overlap(playerPhysicsGroup, unitsPhysicsGroup, handleUnitHit, null, this);
     }
 
     createPlayerUnit() {
         player = createUnit("player", new Phaser.Math.Vector2(300, 300), this);
-        //TODO make player collision a circle probably
     }
 
     getUnit(id: number) {
@@ -55,6 +83,19 @@ export class MainScene extends Phaser.Scene {
             return null;
         }
         return enemyUnits[id];
+    }
+
+    destroyUnit(id: number) {
+        enemyUnits[id].gameObj.destroy();
+        delete enemyUnits[id];
+    }
+
+    destroyPlayer() {
+        if (player.gameObj) {
+            finalPlayerPos = player.gameObj.body.center;
+            player.gameObj.destroy();
+            player.gameObj = null;
+        }
     }
 
     moveUnits(targetPos: Phaser.Math.Vector2) {
@@ -73,14 +114,13 @@ export class MainScene extends Phaser.Scene {
             move.movePlayerUnit(player, thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown);
             if (player.gameObj.x < killZoneMinX || player.gameObj.x > killZoneMaxX || 
                     player.gameObj.y < killZoneMinY || player.gameObj.y > killZoneMaxY) {
-                finalPlayerPos = player.gameObj.body.center;
-                player.gameObj.destroy();
-                player.gameObj = null;
+                this.destroyPlayer();
             }
+            // Player weapons
+            fireWeapon(this, bulletsPhysicsGroup, delta, player, streamWeaponKey.isDown, shotgunWeaponKey.isDown);
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos);
         }
-        //TODO player weapons
     }
 }

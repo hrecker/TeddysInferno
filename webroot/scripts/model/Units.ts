@@ -1,5 +1,6 @@
 import { getNewId } from "../state/IdState";
 import { unitDrag } from "../units/Movement";
+import { MainScene } from "../scenes/MainScene";
 
 let unitCache: { [name: string]: Unit };
 
@@ -20,6 +21,8 @@ export type Unit = {
     // Health props
     health: number;
     maxHealth: number;
+    // Weapon props
+    cooldownRemainingMs: number;
 }
 
 /** Store unit json data for creating units */
@@ -41,6 +44,7 @@ export function loadUnitJson(unitJson) {
             bodyType: unitProps["bodyType"],
             bodySize: unitProps["bodySize"],
             bodyOffset: unitProps["bodyOffset"],
+            cooldownRemainingMs: 0
         };
     };
 }
@@ -99,21 +103,21 @@ export function destroyUnit(unit: Unit) {
 }
 
 /** Update the health/max health of a given unit */
-export function updateHealth(unit: Unit, newHealth: number, newMaxHealth?: number) {
+export function updateHealth(scene: MainScene, unit: Unit, newHealth: number, newMaxHealth?: number) {
     unit.health = newHealth;
     if (newMaxHealth) {
         unit.maxHealth = newMaxHealth;
     }
 
     if (unit.health <= 0) {
-        destroyUnit(unit);
+        scene.destroyUnit(unit.id);
     }
 }
 
 /** Cause the unit to take a certain amount of damage, and destroy it if health reaches zero. */
-export function takeDamage(unit: Unit, damage: number) {
+export function takeDamage(scene: MainScene, unit: Unit, damage: number) {
     if (damage <= 0) {
         return;
     }
-    updateHealth(unit, unit.health - damage);
+    updateHealth(scene, unit, unit.health - damage);
 }
