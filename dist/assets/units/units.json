@@ -8,14 +8,34 @@
         "bodySize": 10,
         "bodyOffset": 6
     },
-    "chaser": {
-        "name": "chaser",
-        "movement": "homing",
-        "maxSpeed": 100,
+    "lazyChaser": {
+        "name": "lazyChaser",
+        "movement": "lazyHoming",
+        "maxSpeed": 70,
         "maxAcceleration": 500,
         "health": 1,
         "bodyType": "circle",
         "bodySize": 14,
         "bodyOffset": 2
+    },
+    "accurateChaser": {
+        "name": "accurateChaser",
+        "movement": "homing",
+        "maxSpeed": 100,
+        "maxAcceleration": 500,
+        "health": 2,
+        "bodyType": "circle",
+        "bodySize": 14,
+        "bodyOffset": 2
+    },
+    "perfectChaser": {
+        "name": "perfectChaser",
+        "movement": "perfectHoming",
+        "maxSpeed": 150,
+        "maxAcceleration": 600,
+        "health": 4,
+        "bodyType": "circle",
+        "bodySize": 26,
+        "bodyOffset": 4
     }
 }

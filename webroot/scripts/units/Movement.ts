@@ -25,7 +25,13 @@ export function movePlayerUnit(player: Unit, thrustActive: boolean, leftActive: 
 export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics) {
     switch (unit.movement) {
         case "homing":
-            moveHomingUnit(unit, targetPos, debugGraphics);
+            moveHomingUnit(unit, targetPos, debugGraphics, false);
+            break;
+        case "lazyHoming":
+            moveHomingUnit(unit, targetPos, debugGraphics, true);
+            break;
+        case "perfectHoming":
+            moveHomingUnit(unit, targetPos, debugGraphics, false, true);
             break;
     }
 
@@ -33,13 +39,14 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
 }
 
 /** Move a homing unit for one frame */
-function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics) {
+function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, isLazy?: boolean, isPerfect?: boolean) {
+    //TODO add some slight randomness?
     if (debugGraphics) {
         debugGraphics.clear();
     }
 
     // Get direction unit should move to hit target
-    let homingDir = homingDirection(unit.gameObj.body, target, unit.maxAcceleration);
+    let homingDir = homingDirection(unit.gameObj.body, target, unit.maxAcceleration, isLazy, isPerfect);
     let targetRotationAngle = homingDir.angle();
 
     if (unit.rotation) {
@@ -65,8 +72,21 @@ function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: 
  * Based on a (possibly moving) body, a stationary target, and the max acceleration of the body, 
  * calculate the direction the body should accelerate to hit the target.
  */
-export function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.Vector2, maxAcc: number): Phaser.Math.Vector2 {
-    let dirToImpact = target.clone().subtract(body.center);
+const missRange = [-200, 200];
+export function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.Vector2, maxAcc: number, isLazy?: boolean, isPerfect?: boolean): Phaser.Math.Vector2 {
+    let realTarget = target.clone();
+    
+    if (!isPerfect) {
+        let xDiff = Math.random() * (missRange[1] - missRange[0]) + missRange[0];
+        let yDiff = Math.random() * (missRange[1] - missRange[0]) + missRange[0];
+        realTarget.add({ x: xDiff, y: yDiff });
+    }
+
+    if (isLazy) {
+        return realTarget.clone().subtract(body.center).normalize();
+    }
+
+    let dirToImpact = realTarget.clone().subtract(body.center);
     let dirtoImpactNorm = dirToImpact.clone().normalize();
     if (body.velocity.equals(Phaser.Math.Vector2.ZERO)) {
         return dirtoImpactNorm;
@@ -81,7 +101,7 @@ export function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phase
     let eta = (-v / maxAcc) + Math.sqrt(Math.pow(v, 2) / Math.pow(maxAcc, 2) + (2 * dirToImpact.length() / maxAcc));
 
     // Estimate impact position, and aim towards it
-    let impactPos = relativeTargetVel.scale(eta).add(target);
+    let impactPos = relativeTargetVel.scale(eta).add(realTarget);
     return impactPos.subtract(body.center).normalize();
 }
 

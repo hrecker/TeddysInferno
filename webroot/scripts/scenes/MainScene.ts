@@ -52,8 +52,6 @@ export class MainScene extends Phaser.Scene {
 
         graphics = this.add.graphics();
         this.createPlayerUnit();
-        let unit = createUnit("chaser", new Phaser.Math.Vector2(500, 500), this);
-        enemyUnits[unit.id] = unit;
         this.cameras.main.startFollow(player.gameObj);
 
         thrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -65,13 +63,28 @@ export class MainScene extends Phaser.Scene {
         playerPhysicsGroup = this.createUnitPhysicsGroup();
         playerPhysicsGroup.add(player.gameObj);
         unitsPhysicsGroup = this.createUnitPhysicsGroup();
-        unitsPhysicsGroup.add(unit.gameObj);
         bulletsPhysicsGroup = this.createUnitPhysicsGroup();
+        
+        for (let i = 0; i < 20; i++) {
+            this.addUnit("lazyChaser", new Phaser.Math.Vector2(500, 200 + (i * 5)));
+        }
+        for (let i = 0; i < 5; i++) {
+            this.addUnit("accurateChaser", new Phaser.Math.Vector2(600, 200 + (i * 5)));
+        }
+        for (let i = 0; i < 5; i++) {
+            this.addUnit("perfectChaser", new Phaser.Math.Vector2(700, 200 + (i * 5)));
+        }
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
         // Handle units hitting player
         this.physics.add.overlap(playerPhysicsGroup, unitsPhysicsGroup, handleUnitHit, null, this);
+    }
+
+    addUnit(name: string, location: Phaser.Math.Vector2) {
+        let unit = createUnit(name, location, this);
+        enemyUnits[unit.id] = unit;
+        unitsPhysicsGroup.add(unit.gameObj);
     }
 
     createPlayerUnit() {

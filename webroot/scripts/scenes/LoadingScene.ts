@@ -10,7 +10,9 @@ export class LoadingScene extends Phaser.Scene {
 
     preload() {
         // Load sprites
-        this.load.image("chaser", "assets/sprites/units/chaser.png");
+        this.load.image("lazyChaser", "assets/sprites/units/lazyChaser.png");
+        this.load.image("accurateChaser", "assets/sprites/units/accurateChaser.png");
+        this.load.image("perfectChaser", "assets/sprites/units/perfectChaser.png");
         this.load.image("player", "assets/sprites/units/player.png");
 
         this.load.image("bullet", "assets/sprites/bullet.png");
