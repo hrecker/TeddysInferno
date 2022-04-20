@@ -8,8 +8,8 @@
         "bodySize": 10,
         "bodyOffset": 6
     },
-    "lazyChaser": {
-        "name": "lazyChaser",
+    "chaser1": {
+        "name": "chaser1",
         "movement": "lazyHoming",
         "maxSpeed": 70,
         "maxAcceleration": 500,
@@ -18,8 +18,8 @@
         "bodySize": 14,
         "bodyOffset": 2
     },
-    "accurateChaser": {
-        "name": "accurateChaser",
+    "chaser2": {
+        "name": "chaser2",
         "movement": "homing",
         "maxSpeed": 100,
         "maxAcceleration": 500,
@@ -28,14 +28,59 @@
         "bodySize": 14,
         "bodyOffset": 2
     },
-    "perfectChaser": {
-        "name": "perfectChaser",
+    "chaser3": {
+        "name": "chaser3",
         "movement": "perfectHoming",
         "maxSpeed": 150,
         "maxAcceleration": 600,
         "health": 4,
         "bodyType": "circle",
         "bodySize": 26,
-        "bodyOffset": 4
+        "bodyOffset": 5
+    },
+    "spawner1": {
+        "name": "spawner1",
+        "movement": "none",
+        "maxSpeed": 0,
+        "maxAcceleration": 0,
+        "health": 10,
+        "bodyType": "circle",
+        "bodySize": 20,
+        "bodyOffset": 12,
+        "ai": "spawner",
+        "aiData": {
+            "spawnUnit": "chaser1",
+            "spawnDelay": 2000
+        }
+    },
+    "spawner2": {
+        "name": "spawner2",
+        "movement": "none",
+        "maxSpeed": 0,
+        "maxAcceleration": 0,
+        "health": 25,
+        "bodyType": "circle",
+        "bodySize": 20,
+        "bodyOffset": 12,
+        "ai": "spawner",
+        "aiData": {
+            "spawnUnit": "chaser2",
+            "spawnDelay": 2500
+        }
+    },
+    "spawner3": {
+        "name": "spawner3",
+        "movement": "none",
+        "maxSpeed": 0,
+        "maxAcceleration": 0,
+        "health": 25,
+        "bodyType": "circle",
+        "bodySize": 40,
+        "bodyOffset": 24,
+        "ai": "spawner",
+        "aiData": {
+            "spawnUnit": "chaser3",
+            "spawnDelay": 5000
+        }
     }
 }

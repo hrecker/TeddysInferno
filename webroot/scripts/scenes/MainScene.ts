@@ -1,4 +1,5 @@
-import * as move from "../units/Movement";
+import { moveUnit, movePlayerUnit } from "../units/Movement";
+import { updateUnitAI } from "../units/AI";
 import { fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
 import { handleBulletHit, handleUnitHit } from "../units/Collision";
@@ -65,15 +66,9 @@ export class MainScene extends Phaser.Scene {
         unitsPhysicsGroup = this.createUnitPhysicsGroup();
         bulletsPhysicsGroup = this.createUnitPhysicsGroup();
         
-        for (let i = 0; i < 20; i++) {
-            this.addUnit("lazyChaser", new Phaser.Math.Vector2(500, 200 + (i * 5)));
-        }
-        for (let i = 0; i < 5; i++) {
-            this.addUnit("accurateChaser", new Phaser.Math.Vector2(600, 200 + (i * 5)));
-        }
-        for (let i = 0; i < 5; i++) {
-            this.addUnit("perfectChaser", new Phaser.Math.Vector2(700, 200 + (i * 5)));
-        }
+        this.addUnit("spawner1", new Phaser.Math.Vector2(700, 200));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(700, 300));
+        this.addUnit("spawner3", new Phaser.Math.Vector2(700, 500));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -114,17 +109,24 @@ export class MainScene extends Phaser.Scene {
     moveUnits(targetPos: Phaser.Math.Vector2) {
         Object.keys(enemyUnits).forEach(id => {
             // Pass in graphics for some debugging (the arcade physics debug property must be set to true)
-            move.moveUnit(enemyUnits[id], targetPos, graphics);
+            moveUnit(enemyUnits[id], targetPos, graphics);
+        });
+    }
+
+    updateUnitsAI(delta) {
+        Object.keys(enemyUnits).forEach(id => {
+            updateUnitAI(enemyUnits[id], this, delta);
         });
     }
 
 
     update(time, delta) {
         if (player.gameObj) {
-            // Enemy movement
+            // Enemy movement and AI
             this.moveUnits(player.gameObj.body.center);
+            this.updateUnitsAI(delta);
             // Player movement
-            move.movePlayerUnit(player, thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown);
+            movePlayerUnit(player, thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown);
             if (player.gameObj.x < killZoneMinX || player.gameObj.x > killZoneMaxX || 
                     player.gameObj.y < killZoneMinY || player.gameObj.y > killZoneMaxY) {
                 this.destroyPlayer();

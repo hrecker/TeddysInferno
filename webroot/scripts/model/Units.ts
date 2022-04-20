@@ -23,6 +23,9 @@ export type Unit = {
     maxHealth: number;
     // Weapon props
     cooldownRemainingMs: number;
+    // AI props
+    ai: string;
+    aiData;
 }
 
 /** Store unit json data for creating units */
@@ -44,7 +47,9 @@ export function loadUnitJson(unitJson) {
             bodyType: unitProps["bodyType"],
             bodySize: unitProps["bodySize"],
             bodyOffset: unitProps["bodyOffset"],
-            cooldownRemainingMs: 0
+            cooldownRemainingMs: 0,
+            ai: unitProps["ai"],
+            aiData: unitProps["aiData"]
         };
     };
 }

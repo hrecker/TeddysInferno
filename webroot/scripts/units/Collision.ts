@@ -9,7 +9,6 @@ export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamic
 
 /** Should be used as an overlap callback, to handle when a bullet hits a unit */
 export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
-    console.log("bullet hit");
     let bullet: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     let hitUnit: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     if (obj1.getData("isBullet")) {

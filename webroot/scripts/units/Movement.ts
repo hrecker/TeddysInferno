@@ -73,7 +73,7 @@ function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: 
  * calculate the direction the body should accelerate to hit the target.
  */
 const missRange = [-200, 200];
-export function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.Vector2, maxAcc: number, isLazy?: boolean, isPerfect?: boolean): Phaser.Math.Vector2 {
+function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.Vector2, maxAcc: number, isLazy?: boolean, isPerfect?: boolean): Phaser.Math.Vector2 {
     let realTarget = target.clone();
     
     if (!isPerfect) {
