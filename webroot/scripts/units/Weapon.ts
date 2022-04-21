@@ -35,7 +35,7 @@ function createBullet(scene: Phaser.Scene, group: Phaser.Physics.Arcade.Group, p
     let bullet = scene.physics.add.image(position.x, position.y, "bullet");
     group.add(bullet);
     bullet.setData("isBullet", true);
-    bullet.body.setCircle(4);
+    bullet.body.setCircle(6);
     let velocity = new Phaser.Math.Vector2(1, 0).rotate(angle).scale(bulletSpeed);
     bullet.setVelocity(velocity.x, velocity.y);
     // Ensure bullets are eventually destroyed
