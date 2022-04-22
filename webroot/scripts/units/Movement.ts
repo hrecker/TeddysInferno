@@ -5,17 +5,17 @@ export const playerRotationSpeed = 0.10;
 
 export function movePlayerUnit(player: Unit, thrustActive: boolean, leftActive: boolean, rightActive: boolean) {
     if (leftActive && !rightActive) {
-        player.gameObj.setRotation(player.gameObj.rotation - playerRotationSpeed);
+        player.gameObj[0].setRotation(player.gameObj[0].rotation - playerRotationSpeed);
     }
     if (!leftActive && rightActive) {
-        player.gameObj.setRotation(player.gameObj.rotation + playerRotationSpeed);
+        player.gameObj[0].setRotation(player.gameObj[0].rotation + playerRotationSpeed);
     }
 
     if (thrustActive) {
-        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj.rotation)
-        player.gameObj.setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
+        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation)
+        player.gameObj[0].setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
     } else {
-        player.gameObj.setAcceleration(0, 0);
+        player.gameObj[0].setAcceleration(0, 0);
     }
     
     clampUnitSpeed(player);
@@ -33,6 +33,9 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
         case "perfectHoming":
             moveHomingUnit(unit, targetPos, debugGraphics, false, true);
             break;
+        case "worm":
+            moveWormUnit(unit, targetPos, debugGraphics);
+            break;
     }
 
     clampUnitSpeed(unit);
@@ -40,29 +43,28 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
 
 /** Move a homing unit for one frame */
 function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, isLazy?: boolean, isPerfect?: boolean) {
-    //TODO add some slight randomness?
     if (debugGraphics) {
         debugGraphics.clear();
     }
 
     // Get direction unit should move to hit target
-    let homingDir = homingDirection(unit.gameObj.body, target, unit.maxAcceleration, isLazy, isPerfect);
+    let homingDir = homingDirection(unit.gameObj[0].body, target, unit.maxAcceleration, isLazy, isPerfect);
     let targetRotationAngle = homingDir.angle();
 
     if (unit.rotation) {
         // Rotate towards the target        
-        unit.gameObj.setRotation(Phaser.Math.Angle.RotateTo(unit.gameObj.rotation, targetRotationAngle, unit.maxAngularSpeed));
+        unit.gameObj[0].setRotation(Phaser.Math.Angle.RotateTo(unit.gameObj[0].rotation, targetRotationAngle, unit.maxAngularSpeed));
         // Draw line being rotated towards
         if (debugGraphics) {
             let targetStretched = Phaser.Math.Vector2.RIGHT.clone().rotate(targetRotationAngle).scale(50);
-            let debugLine = new Phaser.Geom.Line(unit.gameObj.body.center.x, unit.gameObj.body.center.y, 
-                    unit.gameObj.body.center.x + targetStretched.x, unit.gameObj.body.center.y + targetStretched.y);
+            let debugLine = new Phaser.Geom.Line(unit.gameObj[0].body.center.x, unit.gameObj[0].body.center.y, 
+                    unit.gameObj[0].body.center.x + targetStretched.x, unit.gameObj[0].body.center.y + targetStretched.y);
             debugGraphics.strokeLineShape(debugLine);
         }
     }
 
     // Accelerate towards the target
-    unit.gameObj.setAcceleration(homingDir.x * unit.maxAcceleration, homingDir.y * unit.maxAcceleration);
+    unit.gameObj[0].setAcceleration(homingDir.x * unit.maxAcceleration, homingDir.y * unit.maxAcceleration);
 }
 
 /**
@@ -106,8 +108,48 @@ function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.
 }
 
 function clampUnitSpeed(unit: Unit) {
-    if (unit.gameObj.body.velocity.length() > unit.maxSpeed) {
-        let newVel = unit.gameObj.body.velocity.normalize().scale(unit.maxSpeed);
-        unit.gameObj.setVelocity(newVel.x, newVel.y);
+    if (unit.gameObj[0].body.velocity.length() > unit.maxSpeed) {
+        let newVel = unit.gameObj[0].body.velocity.normalize().scale(unit.maxSpeed);
+        unit.gameObj[0].setVelocity(newVel.x, newVel.y);
+    }
+}
+
+const segmentDistance = 32;
+/** Move a homing unit for one frame */
+function moveWormUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics) {
+    if (debugGraphics) {
+        debugGraphics.clear();
+    }
+
+    // Get direction unit should move to hit target
+    let homingDir = homingDirection(unit.gameObj[0].body, target, unit.maxAcceleration, false, true);
+    let targetRotationAngle = homingDir.angle();
+
+    if (unit.rotation) {
+        // Rotate towards the target        
+        unit.gameObj[0].setRotation(Phaser.Math.Angle.RotateTo(unit.gameObj[0].rotation, targetRotationAngle, unit.maxAngularSpeed));
+        // Draw line being rotated towards
+        if (debugGraphics) {
+            let targetStretched = Phaser.Math.Vector2.RIGHT.clone().rotate(targetRotationAngle).scale(50);
+            let debugLine = new Phaser.Geom.Line(unit.gameObj[0].body.center.x, unit.gameObj[0].body.center.y, 
+                    unit.gameObj[0].body.center.x + targetStretched.x, unit.gameObj[0].body.center.y + targetStretched.y);
+            debugGraphics.strokeLineShape(debugLine);
+        }
+        // Limit to moving the direction the worm is actually facing, so it has to take slow turns
+        homingDir = Phaser.Math.Vector2.RIGHT.clone().rotate(unit.gameObj[0].rotation);
+    }
+
+    // Accelerate towards the target
+    unit.gameObj[0].setAcceleration(homingDir.x * unit.maxAcceleration, homingDir.y * unit.maxAcceleration);
+
+    // Now move all the segments of the worm one by one
+    for (let i = 1; i < unit.gameObj.length; i++) {
+        // Segments need to maintain their distance between one another always. So they won't be accelerating themselves
+        // but will be moving to a precise spot
+        let targetPosition = unit.gameObj[i - 1].body.center.clone();
+        let followAngle = unit.gameObj[i].body.center.clone().subtract(targetPosition);
+        followAngle.normalize().scale(segmentDistance);
+        let newPosition = targetPosition.add(followAngle);
+        unit.gameObj[i].setPosition(newPosition.x, newPosition.y);
     }
 }

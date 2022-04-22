@@ -82,5 +82,17 @@
             "spawnUnit": "chaser3",
             "spawnDelay": 5000
         }
+    },
+    "worm": {
+        "name": "worm",
+        "movement": "worm",
+        "maxSpeed": 100,
+        "maxAcceleration": 500,
+        "maxAngularSpeed": 0.02,
+        "health": 20,
+        "bodyType": "circle",
+        "bodySize": 14,
+        "bodyOffset": 2,
+        "rotation": "true"
     }
 }

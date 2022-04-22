@@ -16,11 +16,11 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
     }
 
     if (streamWeaponKeyDown) {
-        createBullet(scene, physicsGroup, player.gameObj.body.center, randomBulletAngle(player.gameObj.rotation, streamAngleRange));
+        createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, streamAngleRange));
         player.cooldownRemainingMs = streamCooldownMs;
     } else if (shotgunWeaponKeyDown) {
         for (let i = 0; i < 5; i++) {
-            createBullet(scene, physicsGroup, player.gameObj.body.center, randomBulletAngle(player.gameObj.rotation, shotgunAngleRange));
+            createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, shotgunAngleRange));
         }
         player.cooldownRemainingMs = shotgunCooldownMs;
     }

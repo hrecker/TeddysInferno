@@ -16,6 +16,6 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
         return;
     }
 
-    scene.addUnit(spawnedUnitName, spawner.gameObj.body.center);
+    scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
     spawner.aiData["spawnCooldownRemainingMs"] = spawner.aiData["spawnDelay"];
 }

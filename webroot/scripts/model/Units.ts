@@ -8,7 +8,7 @@ let unitCache: { [name: string]: Unit };
 export type Unit = {
     name: string;
     id: number;
-    gameObj: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    gameObj: Phaser.Types.Physics.Arcade.ImageWithDynamicBody[];
     bodyType: string;
     bodySize: number;
     bodyOffset: number;
@@ -86,8 +86,26 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     let unit = getUnitJsonProperties(name);
 
     // Create the actual Phaser ImageWithDynamicBody
-    let unitImage = scene.physics.add.image(location.x, location.y, name);
     let unitId = getNewId();
+    let unitImage = createUnitImage(unitJson, name, unitId, location, scene);
+    
+    unit.id = unitId;
+    unit.gameObj = [unitImage];
+
+    // For worm units, need to create the body pieces
+    if (name == "worm") {
+        for (let i = 1; i <= 9; i++) {
+            let segmentLocation = { x: (location.x + (i * -unitImage.width)), y: location.y};
+            let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene);
+            unit.gameObj.push(segment);
+        }
+    }
+
+    return unit;
+}
+
+function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene) {
+    let unitImage = scene.physics.add.image(location.x, location.y, name);
     unitImage.setData("id", unitId);
     unitImage.setName(name);
     if (unitJson["bodyType"] == "circle") {
@@ -96,15 +114,13 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
         unitImage.setBodySize(unitJson["bodySize"], unitJson["bodySize"]);
     }
     unitImage.setDrag(unitDrag);
-    
-    unit.id = unitId;
-    unit.gameObj = unitImage;
-
-    return unit;
+    return unitImage;
 }
 
 export function destroyUnit(unit: Unit) {
-    unit.gameObj.destroy();
+    unit.gameObj.forEach(obj => {
+        obj.destroy();
+    });
 }
 
 /** Update the health/max health of a given unit */
