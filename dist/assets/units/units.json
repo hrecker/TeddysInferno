@@ -94,5 +94,10 @@
         "bodySize": 14,
         "bodyOffset": 2,
         "rotation": "true"
+    },
+    "obstacle": {
+        "name": "obstacle",
+        "health": 1,
+        "bodySize": 32
     }
 }

@@ -71,6 +71,9 @@ export class MainScene extends Phaser.Scene {
         this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
         this.addUnit("spawner2", new Phaser.Math.Vector2(100, 500));
         this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
+
+        this.addUnit("obstacle", new Phaser.Math.Vector2(300, 75));
+        this.addUnit("obstacle", new Phaser.Math.Vector2(500, 75));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
