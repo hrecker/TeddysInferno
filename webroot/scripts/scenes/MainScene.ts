@@ -67,9 +67,10 @@ export class MainScene extends Phaser.Scene {
         bulletsPhysicsGroup = this.createUnitPhysicsGroup();
         
         this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        this.addUnit("worm", new Phaser.Math.Vector2(700, 300));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(700, 300));
         this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
-        this.addUnit("worm", new Phaser.Math.Vector2(100, 500));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 500));
+        this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -102,7 +103,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     destroyPlayer() {
-        if (player.gameObj) {
+        if (player.gameObj && player.gameObj[0]) {
             finalPlayerPos = player.gameObj[0].body.center;
             destroyUnit(player);
             player.gameObj[0] = null;
