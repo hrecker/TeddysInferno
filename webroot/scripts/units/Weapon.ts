@@ -2,6 +2,7 @@ import { Unit } from "../model/Units";
 
 const bulletSpeed = 1000;
 const bulletLifetimeMs = 3000;
+const explosionLifetimeMs = 2000;
 
 const streamAngleRange = [-0.05, 0.05];
 const shotgunAngleRange = [-0.15, 0.15];
@@ -41,4 +42,14 @@ function createBullet(scene: Phaser.Scene, group: Phaser.Physics.Arcade.Group, p
     // Ensure bullets are eventually destroyed
     scene.time.delayedCall(bulletLifetimeMs, () => bullet.destroy());
     return bullet;
+}
+
+export function createExplosion(scene: Phaser.Scene, group: Phaser.Physics.Arcade.Group, position: Phaser.Math.Vector2) {
+    //TODO object pool for explosions rather than destroying them and creating new ones?
+    let explosion = scene.physics.add.image(position.x, position.y, "explosion");
+    group.add(explosion);
+    explosion.body.setCircle(32);
+    // Destroy explosion after delay
+    scene.time.delayedCall(explosionLifetimeMs, () => explosion.destroy());
+    return explosion;
 }

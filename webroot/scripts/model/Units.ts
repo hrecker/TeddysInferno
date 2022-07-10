@@ -1,6 +1,7 @@
 import { getNewId } from "../state/IdState";
 import { unitDrag } from "../units/Movement";
 import { MainScene } from "../scenes/MainScene";
+import { handleUnitDestroy } from "../units/AI";
 
 let unitCache: { [name: string]: Unit };
 
@@ -23,6 +24,7 @@ export type Unit = {
     maxHealth: number;
     // Weapon props
     cooldownRemainingMs: number;
+    harmless: boolean;
     // AI props
     ai: string;
     aiData;
@@ -48,6 +50,7 @@ export function loadUnitJson(unitJson) {
             bodySize: unitProps["bodySize"],
             bodyOffset: unitProps["bodyOffset"],
             cooldownRemainingMs: 0,
+            harmless: unitProps["harmless"],
             ai: unitProps["ai"],
             aiData: unitProps["aiData"]
         };
@@ -117,7 +120,8 @@ function createUnitImage(unitJson, name: string, unitId: number, location: Phase
     return unitImage;
 }
 
-export function destroyUnit(unit: Unit) {
+export function destroyUnit(unit: Unit, scene: MainScene) {
+    handleUnitDestroy(unit, scene);
     unit.gameObj.forEach(obj => {
         obj.destroy();
     });
@@ -131,7 +135,11 @@ export function updateHealth(scene: MainScene, unit: Unit, newHealth: number, ne
     }
 
     if (unit.health <= 0) {
-        scene.destroyUnit(unit.id);
+        if (unit.name == "player") {
+            scene.destroyPlayer();
+        } else {
+            scene.destroyUnit(unit.id);
+        }
     }
 }
 

@@ -99,5 +99,31 @@
         "name": "obstacle",
         "health": 1,
         "bodySize": 32
+    },
+    "bomber": {
+        "name": "bomber",
+        "movement": "bomber",
+        "maxSpeed": 100,
+        "rotation": "true",
+        "health": 10,
+        "bodySize": 15,
+        "bodyType": "circle",
+        "ai": "bomber",
+        "bodyOffset": 17,
+        "aiData": {
+            "spawnDelay": 3000
+        }
+    },
+    "bomb": {
+        "name": "bomb",
+        "health": 1,
+        "bodySize": 16,
+        "harmless": true,
+        "ai": "bomb",
+        "aiData": {
+            "lifetimeRemainingMs": 4000,
+            "flashDelay": 500,
+            "textures": ["bomb", "bombflash"]
+        }
     }
 }

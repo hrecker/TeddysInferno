@@ -1,4 +1,5 @@
 import { Unit } from "../model/Units";
+import { MainScene } from "../scenes/MainScene";
 
 export const unitDrag = 250;
 export const playerRotationSpeed = 0.10;
@@ -22,7 +23,7 @@ export function movePlayerUnit(player: Unit, thrustActive: boolean, leftActive: 
 }
 
 /** Move a unit for one frame (call each frame in the update method of a scene) */
-export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics) {
+export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene) {
     switch (unit.movement) {
         case "homing":
             moveHomingUnit(unit, targetPos, debugGraphics, false);
@@ -36,6 +37,8 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
         case "worm":
             moveWormUnit(unit, targetPos, debugGraphics);
             break;
+        case "bomber":
+            moveBomberUnit(unit, debugGraphics, scene);
     }
 
     clampUnitSpeed(unit);
@@ -152,4 +155,26 @@ function moveWormUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Ph
         let newPosition = targetPosition.add(followAngle);
         unit.gameObj[i].setPosition(newPosition.x, newPosition.y);
     }
+}
+
+function isOutsideBounds(pos: Phaser.Math.Vector2, scene: MainScene) {
+    return pos.x < scene.getKillZoneMinX() || pos.x > scene.getKillZoneMaxX() ||
+           pos.y < scene.getKillZoneMinY() || pos.y > scene.getKillZoneMaxY();
+}
+
+/** Move a bomber unit for one frame */
+function moveBomberUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene) {
+    if (debugGraphics) {
+        debugGraphics.clear();
+    }
+
+    // If the bomber unit is outside of the play area or is not moving, pick a random direction and start
+    if (unit.gameObj[0].body.speed == 0 || isOutsideBounds(unit.gameObj[0].body.center, scene)) {
+        let randomAngle = (Math.random() * 2 * Math.PI) - Math.PI;
+        unit.gameObj[0].setRotation(randomAngle + (Math.PI / 2));
+        unit.aiData["angle"] = randomAngle;
+    }
+
+    let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.aiData["angle"]).scale(unit.maxSpeed);
+    unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
 }
