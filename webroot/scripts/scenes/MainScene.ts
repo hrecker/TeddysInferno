@@ -81,6 +81,7 @@ export class MainScene extends Phaser.Scene {
         rightTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         streamWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
         shotgunWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+        this.input.mouse.disableContextMenu();
 
         playerPhysicsGroup = this.createPhysicsGroup();
         playerPhysicsGroup.add(player.gameObj[0]);
@@ -150,6 +151,13 @@ export class MainScene extends Phaser.Scene {
         });
     }
 
+    isStreamWeaponActive() {
+        return streamWeaponKey.isDown || this.input.activePointer.leftButtonDown();
+    }
+
+    isShotgunWeaponActive() {
+        return shotgunWeaponKey.isDown || this.input.activePointer.rightButtonDown();
+    }
 
     update(time, delta) {
         if (player.gameObj[0]) {
@@ -163,7 +171,7 @@ export class MainScene extends Phaser.Scene {
                 this.destroyPlayer();
             }
             // Player weapons
-            fireWeapon(this, bulletsPhysicsGroup, delta, player, streamWeaponKey.isDown, shotgunWeaponKey.isDown);
+            fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos);
