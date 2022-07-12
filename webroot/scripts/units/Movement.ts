@@ -3,13 +3,25 @@ import { MainScene } from "../scenes/MainScene";
 
 export const unitDrag = 250;
 export const playerRotationSpeed = 0.10;
+export const playerQuickturnCooldownMs = 2000;
 
-export function movePlayerUnit(player: Unit, thrustActive: boolean, leftActive: boolean, rightActive: boolean) {
-    if (leftActive && !rightActive) {
-        player.gameObj[0].setRotation(player.gameObj[0].rotation - playerRotationSpeed);
+export function movePlayerUnit(player: Unit, quickTurnActive: boolean, thrustActive: boolean, leftActive: boolean, rightActive: boolean, delta: number) {
+    let canQuickTurn = true;
+    if ("quickTurnCooldownRemainingMs" in player.aiData && player.aiData["quickTurnCooldownRemainingMs"] > 0) {
+        player.aiData["quickTurnCooldownRemainingMs"] -= delta;
+        canQuickTurn = false;
     }
-    if (!leftActive && rightActive) {
-        player.gameObj[0].setRotation(player.gameObj[0].rotation + playerRotationSpeed);
+
+    if (quickTurnActive && canQuickTurn) {
+        player.gameObj[0].setRotation(player.gameObj[0].rotation + Math.PI);
+        player.aiData["quickTurnCooldownRemainingMs"] = playerQuickturnCooldownMs;
+    } else {
+        if (leftActive && !rightActive) {
+            player.gameObj[0].setRotation(player.gameObj[0].rotation - playerRotationSpeed);
+        }
+        if (!leftActive && rightActive) {
+            player.gameObj[0].setRotation(player.gameObj[0].rotation + playerRotationSpeed);
+        }
     }
 
     if (thrustActive) {

@@ -87,6 +87,9 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
         return null;
     }
     let unit = getUnitJsonProperties(name);
+    if (unit.aiData === undefined) {
+        unit.aiData = {};
+    }
 
     // Create the actual Phaser ImageWithDynamicBody
     let unitId = getNewId();
