@@ -65,6 +65,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
+        enemyUnits = {};
         this.cameras.main.setBackgroundColor(backgroundColor);
         let background = this.add.image(480, 320, "background");
         let backgroundTopLeft = background.getTopLeft();
@@ -140,6 +141,7 @@ export class MainScene extends Phaser.Scene {
             destroyUnit(player, this);
             player.gameObj[0] = null;
         }
+        this.time.delayedCall(2000, () => this.scene.restart());
     }
 
     moveUnits(targetPos: Phaser.Math.Vector2) {
