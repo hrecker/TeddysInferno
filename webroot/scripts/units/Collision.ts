@@ -19,8 +19,11 @@ export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamic
 /** Should be used as an overlap callback, to handle when a bullet hits a unit */
 export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     let hitUnit = destroyBullet(obj1, obj2);
-    let unit: Unit = this.getUnit(hitUnit.getData("id"));
-    takeDamage(this, unit, 1);
+    // Bullets can only hit one enemy. If a bullet hits two enemies the second might be null here.
+    if (hitUnit) {
+        let unit: Unit = this.getUnit(hitUnit.getData("id"));
+        takeDamage(this, unit, 1);
+    }
 }
 
 /** Should be used as an overlap callback, to handle when a bullet hits the player */
