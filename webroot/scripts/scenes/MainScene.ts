@@ -20,6 +20,7 @@ let rightTurnKey : Phaser.Input.Keyboard.Key;
 let streamWeaponKey : Phaser.Input.Keyboard.Key;
 let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 let quickTurnKey : Phaser.Input.Keyboard.Key;
+let boostKey : Phaser.Input.Keyboard.Key;
 
 let killZoneMinX, killZoneMinY, killZoneMaxX, killZoneMaxY;
 
@@ -83,6 +84,7 @@ export class MainScene extends Phaser.Scene {
         streamWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
         shotgunWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         quickTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        boostKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.input.mouse.disableContextMenu();
 
         playerPhysicsGroup = this.createPhysicsGroup();
@@ -167,7 +169,8 @@ export class MainScene extends Phaser.Scene {
             this.moveUnits(player.gameObj[0].body.center);
             this.updateUnitsAI(delta);
             // Player movement
-            movePlayerUnit(player, quickTurnKey.isDown, thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);
+            movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
+                thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);
             if (player.gameObj[0].x < killZoneMinX || player.gameObj[0].x > killZoneMaxX || 
                     player.gameObj[0].y < killZoneMinY || player.gameObj[0].y > killZoneMaxY) {
                 this.destroyPlayer();

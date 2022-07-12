@@ -4,12 +4,21 @@ import { MainScene } from "../scenes/MainScene";
 export const unitDrag = 250;
 export const playerRotationSpeed = 0.10;
 export const playerQuickturnCooldownMs = 2000;
+export const playerBoostCooldownMs = 2000;
+export const playerBoostDurationMs = 150;
+export const playerBoostSpeed = 1000;
 
-export function movePlayerUnit(player: Unit, quickTurnActive: boolean, thrustActive: boolean, leftActive: boolean, rightActive: boolean, delta: number) {
+export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
+                               thrustActive: boolean, leftActive: boolean, rightActive: boolean, delta: number) {
     let canQuickTurn = true;
     if ("quickTurnCooldownRemainingMs" in player.aiData && player.aiData["quickTurnCooldownRemainingMs"] > 0) {
         player.aiData["quickTurnCooldownRemainingMs"] -= delta;
         canQuickTurn = false;
+    }
+    let canBoost = true;
+    if ("boostCooldownRemainingMs" in player.aiData && player.aiData["boostCooldownRemainingMs"] > 0) {
+        player.aiData["boostCooldownRemainingMs"] -= delta;
+        canBoost = false;
     }
 
     if (quickTurnActive && canQuickTurn) {
@@ -24,14 +33,34 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, thrustAct
         }
     }
 
-    if (thrustActive) {
-        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation)
-        player.gameObj[0].setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
-    } else {
+    let isBoosting = false;
+    if ("activeBoostRemainingMs" in player.aiData && player.aiData["activeBoostRemainingMs"] > 0) {
+        player.aiData["activeBoostRemainingMs"] -= delta;
+        isBoosting = true;
         player.gameObj[0].setAcceleration(0, 0);
+        player.gameObj[0].setVelocity(player.aiData["boostDirection"].x, player.aiData["boostDirection"].y);
     }
-    
-    clampUnitSpeed(player);
+
+    if (boostActive && canBoost) {
+        player.aiData["activeBoostRemainingMs"] = playerBoostDurationMs;
+        player.aiData["boostCooldownRemainingMs"] = playerBoostCooldownMs;
+        isBoosting = true;
+        player.gameObj[0].setAcceleration(0, 0);
+        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation).scale(playerBoostSpeed);
+        player.aiData["boostDirection"] = dir;
+        player.gameObj[0].setVelocity(dir.x, dir.y);
+    }
+
+    if (!isBoosting) {
+        if (thrustActive) {
+            let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation);
+            player.gameObj[0].setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
+        } else {
+            player.gameObj[0].setAcceleration(0, 0);
+        }
+        
+        clampUnitSpeed(player);
+    }
 }
 
 /** Move a unit for one frame (call each frame in the update method of a scene) */
