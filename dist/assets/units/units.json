@@ -16,7 +16,9 @@
         "health": 1,
         "bodyType": "circle",
         "bodySize": 14,
-        "bodyOffset": 2
+        "bodyOffset": 2,
+        "maxAngularSpeed": 1,
+        "rotation": "true"
     },
     "chaser2": {
         "name": "chaser2",
@@ -26,7 +28,9 @@
         "health": 2,
         "bodyType": "circle",
         "bodySize": 14,
-        "bodyOffset": 2
+        "bodyOffset": 2,
+        "maxAngularSpeed": 2.5,
+        "rotation": "true"
     },
     "chaser3": {
         "name": "chaser3",
@@ -36,7 +40,9 @@
         "health": 4,
         "bodyType": "circle",
         "bodySize": 26,
-        "bodyOffset": 5
+        "bodyOffset": 5,
+        "maxAngularSpeed": 5,
+        "rotation": "true"
     },
     "spawner1": {
         "name": "spawner1",
@@ -88,7 +94,7 @@
         "movement": "worm",
         "maxSpeed": 100,
         "maxAcceleration": 500,
-        "maxAngularSpeed": 0.02,
+        "maxAngularSpeed": 0.5,
         "health": 20,
         "bodyType": "circle",
         "bodySize": 14,

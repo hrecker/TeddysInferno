@@ -100,8 +100,8 @@ export class MainScene extends Phaser.Scene {
         this.addUnit("spawner2", new Phaser.Math.Vector2(100, 500));
         this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
 
-        this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
-        this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -111,12 +111,13 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, enemyBulletsPhysicsGroup, handleEnemyBulletHit, null, this);
     }
 
-    addUnit(name: string, location: Phaser.Math.Vector2) {
+    addUnit(name: string, location: Phaser.Math.Vector2): Unit {
         let unit = createUnit(name, location, this);
         enemyUnits[unit.id] = unit;
         unit.gameObj.forEach(obj => {
             unitsPhysicsGroup.add(obj);
         });
+        return unit;
     }
 
     createPlayerUnit() {
@@ -137,17 +138,17 @@ export class MainScene extends Phaser.Scene {
 
     destroyPlayer() {
         if (player.gameObj && player.gameObj[0]) {
-            finalPlayerPos = player.gameObj[0].body.center;
+            finalPlayerPos = player.gameObj[0].body.center.clone();
             destroyUnit(player, this);
             player.gameObj[0] = null;
         }
         this.time.delayedCall(2000, () => this.scene.restart());
     }
 
-    moveUnits(targetPos: Phaser.Math.Vector2) {
+    moveUnits(targetPos: Phaser.Math.Vector2, delta: number) {
         Object.keys(enemyUnits).forEach(id => {
             // Pass in graphics for some debugging (the arcade physics debug property must be set to true)
-            moveUnit(enemyUnits[id], targetPos, null, this);
+            moveUnit(enemyUnits[id], targetPos.clone(), null, this, delta);
         });
     }
 
@@ -168,7 +169,7 @@ export class MainScene extends Phaser.Scene {
     update(time, delta) {
         if (player.gameObj[0]) {
             // Enemy movement and AI
-            this.moveUnits(player.gameObj[0].body.center);
+            this.moveUnits(player.gameObj[0].body.center, delta);
             this.updateUnitsAI(delta);
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
@@ -181,7 +182,7 @@ export class MainScene extends Phaser.Scene {
             fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
         } else {
             // Enemy movement
-            this.moveUnits(finalPlayerPos);
+            this.moveUnits(finalPlayerPos, delta);
         }
     }
 }

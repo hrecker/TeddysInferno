@@ -2,6 +2,8 @@ import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 import { createExplosion } from "./Weapon";
 
+const unitInaccuracyRange = 100;
+
 /** Update a unit's AI for one frame (call each frame in the update method of a scene) */
 export function updateUnitAI(unit: Unit, scene: MainScene, delta: number) {
     switch (unit.ai) {
@@ -23,7 +25,11 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
         return;
     }
 
-    scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
+    let randomRotation = Math.random() * 2 * Math.PI;
+    let unit = scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
+    unit.gameObj[0].setRotation(randomRotation);
+    unit.aiData["inaccuracy"] = new Phaser.Math.Vector2((Math.random() * unitInaccuracyRange) - (unitInaccuracyRange / 2), 
+            (Math.random() * unitInaccuracyRange) - (unitInaccuracyRange / 2));
     spawner.aiData["spawnCooldownRemainingMs"] = spawner.aiData["spawnDelay"];
 }
 
