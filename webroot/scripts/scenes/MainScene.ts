@@ -94,11 +94,17 @@ export class MainScene extends Phaser.Scene {
         bulletsPhysicsGroup = this.createPhysicsGroup();
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
         
-        this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(700, 300));
-        this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 500));
-        this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
+        //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(100, 100));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(25, 25));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(850, 100));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(925, 25));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(100, 575));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(25, 650));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(850, 575));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(925, 650));
+        //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
+        //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
 
         //this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
