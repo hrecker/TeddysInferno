@@ -185,10 +185,29 @@ function moveBomberUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, 
     }
 
     // If the bomber unit is outside of the play area or is not moving, pick a random direction and start
-    if (unit.gameObj[0].body.speed == 0 || isOutsideBounds(unit.gameObj[0].body.center, scene)) {
-        let randomAngle = (Math.random() * 2 * Math.PI) - Math.PI;
-        unit.gameObj[0].setRotation(randomAngle + (Math.PI / 2));
-        unit.aiData["angle"] = randomAngle;
+    let pos = unit.gameObj[0].body.center;
+    if (! ("angle" in unit.aiData) || isOutsideBounds(pos, scene)) {
+        let newAngle;
+        if (! ("angle" in unit.aiData)) {
+            // Random starting direction
+            newAngle = (Math.random() * 2 * Math.PI) - Math.PI;
+        } else {
+            let currentVelocity = unit.gameObj[0].body.velocity.clone();
+            // If outside of x bounds and moving away from center, reverse the x component of velocity
+            if ((pos.x < scene.getKillZoneMinX() && currentVelocity.x < 0) || 
+                    (pos.x > scene.getKillZoneMaxX() && currentVelocity.x > 0)) {
+                currentVelocity.x *= -1;
+            }
+            // If outside of y bounds and moving away from center, reverse the y component of velocity
+            if ((pos.y < scene.getKillZoneMinY() && currentVelocity.y < 0) ||
+                    (pos.y > scene.getKillZoneMaxY() && currentVelocity.y > 0)) {
+                currentVelocity.y *= -1;
+            }
+            newAngle = currentVelocity.angle();
+        }
+        
+        unit.gameObj[0].setRotation(newAngle + (Math.PI / 2));
+        unit.aiData["angle"] = newAngle;
     }
 
     let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.aiData["angle"]).scale(unit.maxSpeed);
