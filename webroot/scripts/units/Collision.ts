@@ -1,19 +1,21 @@
+import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { takeDamage } from "./Status";
 
 /** Should be used as an overlap callback, to handle when a unit hits another unit */
 export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     let enemyUnit: Unit;
-    let playerObj;
+    let playerUnit: Unit;
     if (obj1.name == "player") {
-        playerObj = obj1;
+        playerUnit = this.getUnit(obj1.getData("id"));
         enemyUnit = this.getUnit(obj2.getData("id"));
     } else if (obj2.name == "player") {
-        playerObj = obj2;
         enemyUnit = this.getUnit(obj1.getData("id"));
+        playerUnit = this.getUnit(obj2.getData("id"));
     }
-    if (playerObj && !enemyUnit.harmless) {
-        this.destroyPlayer();
+    if (playerUnit && !enemyUnit.harmless && ! config()["invinciblePlayer"]) {
+        // Enemies just do 1 damage - the player always has 1 health
+        takeDamage(this, playerUnit, 1);
     }
 }
 
@@ -23,15 +25,17 @@ export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynam
     // Bullets can only hit one enemy. If a bullet hits two enemies the second might be null here.
     if (hitUnit) {
         let unit: Unit = this.getUnit(hitUnit.getData("id"));
-        takeDamage(this, unit, 1);
+        takeDamage(this, unit, config()["bulletDamage"]);
     }
 }
 
 /** Should be used as an overlap callback, to handle when a bullet hits the player */
 export function handleEnemyBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
-    destroyBullet(obj1, obj2);
-    if (obj1.name == "player" || obj2.name == "player") {
-        this.destroyPlayer();
+    let hitUnit = destroyBullet(obj1, obj2);
+    if (hitUnit && hitUnit.name == "player" && ! config()["invinciblePlayer"]) {
+        let unit: Unit = this.getUnit(hitUnit.getData("id"));
+        // Enemy bullets just do 1 damage - the player always has 1 health
+        takeDamage(this, unit, 1);
     }
 }
 

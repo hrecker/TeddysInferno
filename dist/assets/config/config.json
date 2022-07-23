@@ -6,6 +6,7 @@
         "strokeThickness": 3
     },
 
+    "invinciblePlayer": false,
     "automaticRestart": {
         "enabled": true,
         "restartTime": 2000
@@ -23,6 +24,7 @@
     "playerBoostDurationMs": 150,
     "playerBoostSpeed": 1000,
 
+    "bulletDamage": 1,
     "bulletSpeed": 1000,
     "bulletLifetimeMs": 3000,
     "explosionLifetimeMs": 2000,

@@ -126,6 +126,9 @@ export class MainScene extends Phaser.Scene {
     }
 
     getUnit(id: number) {
+        if (id == player.id) {
+            return player;
+        }
         if (!id || !(id in enemyUnits)) {
             return null;
         }
