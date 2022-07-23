@@ -30,11 +30,11 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("bullet", "assets/sprites/bullet.png");
 
         // Load background
-        this.load.image("background", "assets/background/background.png");
+        this.load.image("background", "assets/sprites/background.png");
 
         // Load json
-        this.load.json("units", "assets/units/units.json");
-        this.load.json("config", "assets/config/config.json");
+        this.load.json("units", "assets/json/units.json");
+        this.load.json("config", "assets/json/config.json");
     }
 
     create() {
