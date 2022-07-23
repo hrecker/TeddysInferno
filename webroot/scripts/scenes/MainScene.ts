@@ -3,8 +3,8 @@ import { updateUnitAI, handleUnitDestroy } from "../units/AI";
 import { fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit } from "../units/Collision";
-import { setTimerText } from "./MainUIScene";
 import { config } from "../model/Config";
+import { incrementTimer, resetTimer } from "../state/TimerState";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -29,7 +29,6 @@ let boostKey : Phaser.Input.Keyboard.Key;
 let killZoneTopLeft, killZoneBottomRight;
 
 let finalPlayerPos : Phaser.Math.Vector2;
-let timer = 0;
 //TODO remove in prod build
 let graphics;
 
@@ -63,7 +62,7 @@ export class MainScene extends Phaser.Scene {
 
     create() {
         enemyUnits = {};
-        timer = 0;
+        resetTimer();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0);
         killZoneTopLeft = background.getTopLeft();
@@ -196,8 +195,7 @@ export class MainScene extends Phaser.Scene {
             // Player weapons
             fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
             // Update timer
-            timer += delta;
-            setTimerText(Math.round(timer / 100.0) / 10);
+            incrementTimer(delta);
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos, delta);
