@@ -1,7 +1,5 @@
 import { getNewId } from "../state/IdState";
-import { unitDrag } from "../units/Movement";
-import { MainScene } from "../scenes/MainScene";
-import { handleUnitDestroy } from "../units/AI";
+import { config } from "./Config";
 
 let unitCache: { [name: string]: Unit };
 
@@ -57,36 +55,13 @@ export function loadUnitJson(unitJson) {
     };
 }
 
-export function getUnitsJsonProperties(filter): Unit[] {
-    let units = [];
-    for (let name in unitCache) {
-        let unit = getUnitJsonProperties(name);
-        if (filter(unit)) {
-            units.push(unit);
-        }
-    }
-    return units;
-}
-
-/** Get a unit with property values defined in json, but don't actually create it in the scene.
- *  This method deep-copies the Unit, so the returned Unit can be modified as needed.
- */
-export function getUnitJsonProperties(name: string) : Unit {
-    let unitProps = unitCache[name];
-    if (!unitProps) {
-        return null;
-    }
-    //TODO ensure this is sufficient - if not, try lodash.deepcopy module
-    return JSON.parse(JSON.stringify(unitProps));
-}
-
 /** Create a Phaser ImageWithDynamicBody for the unit defined with the given name in units.json */
 export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene) : Unit {
     let unitJson = unitCache[name];
     if (!unitJson) {
         return null;
     }
-    let unit = getUnitJsonProperties(name);
+    let unit = JSON.parse(JSON.stringify(unitJson));
     if (unit.aiData === undefined) {
         unit.aiData = {};
     }
@@ -101,6 +76,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     // For worm units, need to create the body pieces
     if (name == "worm") {
         for (let i = 1; i <= 9; i++) {
+            // TODO allow for different spawning for the tail? Not just straight horizontal worm?
             let segmentLocation = { x: (location.x + (i * -unitImage.width)), y: location.y};
             let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene);
             unit.gameObj.push(segment);
@@ -110,6 +86,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     return unit;
 }
 
+/** Create the Phaser ImageWithDynamicBody for the Unit */
 function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene) {
     let unitImage = scene.physics.add.image(location.x, location.y, name);
     unitImage.setData("id", unitId);
@@ -119,37 +96,6 @@ function createUnitImage(unitJson, name: string, unitId: number, location: Phase
     } else { // Default to square
         unitImage.setBodySize(unitJson["bodySize"], unitJson["bodySize"]);
     }
-    unitImage.setDrag(unitDrag);
+    unitImage.setDrag(config()["unitDrag"]);
     return unitImage;
-}
-
-export function destroyUnit(unit: Unit, scene: MainScene) {
-    handleUnitDestroy(unit, scene);
-    unit.gameObj.forEach(obj => {
-        obj.destroy();
-    });
-}
-
-/** Update the health/max health of a given unit */
-export function updateHealth(scene: MainScene, unit: Unit, newHealth: number, newMaxHealth?: number) {
-    unit.health = newHealth;
-    if (newMaxHealth) {
-        unit.maxHealth = newMaxHealth;
-    }
-
-    if (unit.health <= 0) {
-        if (unit.name == "player") {
-            scene.destroyPlayer();
-        } else {
-            scene.destroyUnit(unit.id);
-        }
-    }
-}
-
-/** Cause the unit to take a certain amount of damage, and destroy it if health reaches zero. */
-export function takeDamage(scene: MainScene, unit: Unit, damage: number) {
-    if (damage <= 0) {
-        return;
-    }
-    updateHealth(scene, unit, unit.health - damage);
 }

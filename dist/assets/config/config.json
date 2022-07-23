@@ -1,0 +1,35 @@
+{
+    "backgroundColor": "#821603",
+    "timerFontStyle": { 
+        "font": "36px verdana",
+        "stroke": "black",
+        "strokeThickness": 3
+    },
+
+    "automaticRestart": {
+        "enabled": true,
+        "restartTime": 2000
+    },
+
+    "unitInaccuracyRange": 100,
+    "unitDrag": 250,
+
+    "bulletBodyRadius": 6,
+    "explosionBodyRadius": 32,
+
+    "playerRotationSpeed": 0.10,
+    "playerQuickturnCooldownMs": 2000,
+    "playerBoostCooldownMs": 2000,
+    "playerBoostDurationMs": 150,
+    "playerBoostSpeed": 1000,
+
+    "bulletSpeed": 1000,
+    "bulletLifetimeMs": 3000,
+    "explosionLifetimeMs": 2000,
+
+    "shotgunBulletCount": 5,
+    "streamAngleSpread": 0.1,
+    "shotgunAngleSpread": 0.3,
+    "streamCooldownMs": 100,
+    "shotgunCooldownMs": 500
+}

@@ -1,20 +1,22 @@
 import { moveUnit, movePlayerUnit } from "../units/Movement";
-import { updateUnitAI } from "../units/AI";
+import { updateUnitAI, handleUnitDestroy } from "../units/AI";
 import { fireWeapon } from "../units/Weapon";
-import { Unit, createUnit, destroyUnit } from "../model/Units";
+import { Unit, createUnit } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit } from "../units/Collision";
 import { setTimerText } from "./MainUIScene";
+import { config } from "../model/Config";
 
-const backgroundColor = "#821603";
-
+// Units
 let enemyUnits: { [id: number]: Unit } = {};
 let player: Unit;
 
+// Physics groups
 let playerPhysicsGroup : Phaser.Physics.Arcade.Group;
 let unitsPhysicsGroup : Phaser.Physics.Arcade.Group;
 let bulletsPhysicsGroup : Phaser.Physics.Arcade.Group;
 let enemyBulletsPhysicsGroup : Phaser.Physics.Arcade.Group;
 
+// Input
 let thrustKey : Phaser.Input.Keyboard.Key;
 let leftTurnKey : Phaser.Input.Keyboard.Key;
 let rightTurnKey : Phaser.Input.Keyboard.Key;
@@ -23,15 +25,15 @@ let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 let quickTurnKey : Phaser.Input.Keyboard.Key;
 let boostKey : Phaser.Input.Keyboard.Key;
 
-let killZoneMinX, killZoneMinY, killZoneMaxX, killZoneMaxY;
+// Map bounds
+let killZoneTopLeft, killZoneBottomRight;
 
 let finalPlayerPos : Phaser.Math.Vector2;
-
 let timer = 0;
-
 //TODO remove in prod build
 let graphics;
 
+/** Main game scene */
 export class MainScene extends Phaser.Scene {
     constructor() {
         super({
@@ -39,7 +41,7 @@ export class MainScene extends Phaser.Scene {
         });
     }
     
-    // Create a physics group for units that does not reset drag when adding to the group
+    /** Create a physics group for units that does not reset drag when adding to the group */
     createPhysicsGroup() {
         let group = this.physics.add.group();
         delete group.defaults.setDragX;
@@ -51,33 +53,21 @@ export class MainScene extends Phaser.Scene {
         return enemyBulletsPhysicsGroup;
     }
 
-    getKillZoneMinX() {
-        return killZoneMinX;
+    getKillZoneTopLeft() {
+        return killZoneTopLeft;
     }
 
-    getKillZoneMaxX() {
-        return killZoneMaxX;
-    }
-    
-    getKillZoneMinY() {
-        return killZoneMinY;
-    }
-
-    getKillZoneMaxY() {
-        return killZoneMaxY;
+    getKillZoneBottomRight() {
+        return killZoneBottomRight;
     }
 
     create() {
         enemyUnits = {};
         timer = 0;
-        this.cameras.main.setBackgroundColor(backgroundColor);
-        let background = this.add.image(480, 320, "background");
-        let backgroundTopLeft = background.getTopLeft();
-        let backgroundBottomRight = background.getBottomRight();
-        killZoneMinX = backgroundTopLeft.x;
-        killZoneMinY = backgroundTopLeft.y;
-        killZoneMaxX = backgroundBottomRight.x;
-        killZoneMaxY = backgroundBottomRight.y;
+        this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
+        let background = this.add.image(0, 0, "background").setOrigin(0, 0);
+        killZoneTopLeft = background.getTopLeft();
+        killZoneBottomRight = background.getBottomRight();
 
         graphics = this.add.graphics();
         this.createPlayerUnit();
@@ -98,15 +88,16 @@ export class MainScene extends Phaser.Scene {
         bulletsPhysicsGroup = this.createPhysicsGroup();
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
         
+        // Create units immediately for development
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(100, 100));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(25, 25));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(850, 100));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(925, 25));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(100, 575));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(25, 650));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(850, 575));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(925, 650));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
         //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
 
@@ -131,7 +122,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     createPlayerUnit() {
-        player = createUnit("player", new Phaser.Math.Vector2(300, 300), this);
+        player = createUnit("player", new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2), this);
     }
 
     getUnit(id: number) {
@@ -141,18 +132,28 @@ export class MainScene extends Phaser.Scene {
         return enemyUnits[id];
     }
 
-    destroyUnit(id: number) {
-        destroyUnit(enemyUnits[id], this);
+    destroyUnitById(id: number) {
+        this.destroyUnit(enemyUnits[id]);
         delete enemyUnits[id];
+    }
+
+    destroyUnit(unit: Unit) {
+        handleUnitDestroy(unit, this);
+        unit.gameObj.forEach(obj => {
+            obj.destroy();
+        });
     }
 
     destroyPlayer() {
         if (player.gameObj && player.gameObj[0]) {
             finalPlayerPos = player.gameObj[0].body.center.clone();
-            destroyUnit(player, this);
+            this.destroyUnit(player);
             player.gameObj[0] = null;
         }
-        this.time.delayedCall(2000, () => this.scene.restart());
+        if (config()["automaticRestart"]["enabled"]) {
+            this.time.delayedCall(config()["automaticRestart"]["restartTime"],
+                () => this.scene.restart());
+        }
     }
 
     moveUnits(targetPos: Phaser.Math.Vector2, delta: number) {
@@ -176,6 +177,7 @@ export class MainScene extends Phaser.Scene {
         return shotgunWeaponKey.isDown || this.input.activePointer.rightButtonDown();
     }
 
+    /** Main game update loop */
     update(time, delta) {
         if (player.gameObj[0]) {
             // Enemy movement and AI
@@ -184,8 +186,8 @@ export class MainScene extends Phaser.Scene {
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
                 thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);
-            if (player.gameObj[0].x < killZoneMinX || player.gameObj[0].x > killZoneMaxX || 
-                    player.gameObj[0].y < killZoneMinY || player.gameObj[0].y > killZoneMaxY) {
+            if (player.gameObj[0].x < killZoneTopLeft.x || player.gameObj[0].x > killZoneBottomRight.x || 
+                    player.gameObj[0].y < killZoneTopLeft.y || player.gameObj[0].y > killZoneBottomRight.y) {
                 this.destroyPlayer();
             }
             // Player weapons

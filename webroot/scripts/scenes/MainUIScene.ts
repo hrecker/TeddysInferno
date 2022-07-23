@@ -1,6 +1,8 @@
-// UI displayed over MainScene
+import { config } from "../model/Config";
+
 let timerText: Phaser.GameObjects.Text;
 
+/** UI displayed over MainScene */
 export class MainUIScene extends Phaser.Scene {
     constructor() {
         super({
@@ -12,13 +14,8 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     create() {
-        let timerStyle = { 
-            font: "36px verdana"
-        };
-
-        timerText = this.add.text(480, 25, "0.0", timerStyle);
+        timerText = this.add.text(480, 25, "0.0", config()["timerFontStyle"]);
         timerText.setOrigin(0.5);
-        timerText.setStroke("black", 3);
         timerText.alpha = 0.75;
     }
 }

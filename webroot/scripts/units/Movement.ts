@@ -1,13 +1,8 @@
+import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 
-export const unitDrag = 250;
-export const playerRotationSpeed = 0.10;
-export const playerQuickturnCooldownMs = 2000;
-export const playerBoostCooldownMs = 2000;
-export const playerBoostDurationMs = 150;
-export const playerBoostSpeed = 1000;
-
+/** Move the player unit for a frame based on inputs */
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
                                thrustActive: boolean, leftActive: boolean, rightActive: boolean, delta: number) {
     let canQuickTurn = true;
@@ -23,13 +18,13 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
 
     if (quickTurnActive && canQuickTurn) {
         player.gameObj[0].setRotation(player.gameObj[0].rotation + Math.PI);
-        player.aiData["quickTurnCooldownRemainingMs"] = playerQuickturnCooldownMs;
+        player.aiData["quickTurnCooldownRemainingMs"] = config()["playerQuickturnCooldownMs"];
     } else {
         if (leftActive && !rightActive) {
-            player.gameObj[0].setRotation(player.gameObj[0].rotation - playerRotationSpeed);
+            player.gameObj[0].setRotation(player.gameObj[0].rotation - config()["playerRotationSpeed"]);
         }
         if (!leftActive && rightActive) {
-            player.gameObj[0].setRotation(player.gameObj[0].rotation + playerRotationSpeed);
+            player.gameObj[0].setRotation(player.gameObj[0].rotation + config()["playerRotationSpeed"]);
         }
     }
 
@@ -42,11 +37,11 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
     }
 
     if (boostActive && canBoost) {
-        player.aiData["activeBoostRemainingMs"] = playerBoostDurationMs;
-        player.aiData["boostCooldownRemainingMs"] = playerBoostCooldownMs;
+        player.aiData["activeBoostRemainingMs"] = config()["playerBoostDurationMs"];
+        player.aiData["boostCooldownRemainingMs"] = config()["playerBoostCooldownMs"];
         isBoosting = true;
         player.gameObj[0].setAcceleration(0, 0);
-        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation).scale(playerBoostSpeed);
+        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation).scale(config()["playerBoostSpeed"]);
         player.aiData["boostDirection"] = dir;
         player.gameObj[0].setVelocity(dir.x, dir.y);
     }
@@ -63,7 +58,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
     }
 }
 
-/** Move a unit for one frame (call each frame in the update method of a scene) */
+/** Move a non-player unit for one frame (call each frame in the update method of a scene) */
 export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene, delta: number) {
     switch (unit.movement) {
         case "homing":
@@ -150,6 +145,7 @@ function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.
     return impactPos.subtract(body.center).normalize();
 }
 
+/** Prevent unit from going over max speed */
 function clampUnitSpeed(unit: Unit) {
     if (unit.gameObj[0].body.velocity.length() > unit.maxSpeed) {
         let newVel = unit.gameObj[0].body.velocity.normalize().scale(unit.maxSpeed);
@@ -157,8 +153,8 @@ function clampUnitSpeed(unit: Unit) {
     }
 }
 
-const segmentDistance = 32;
-/** Move a homing unit for one frame */
+const wormSegmentDistance = 32;
+/** Move a worm unit for one frame */
 function moveWormUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, delta: number) {
     moveHomingUnit(unit, target, debugGraphics, delta);
     // Now move all the segments of the worm one by one
@@ -167,15 +163,16 @@ function moveWormUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Ph
         // but will be moving to a precise spot
         let targetPosition = unit.gameObj[i - 1].body.center.clone();
         let followAngle = unit.gameObj[i].body.center.clone().subtract(targetPosition);
-        followAngle.normalize().scale(segmentDistance);
+        followAngle.normalize().scale(wormSegmentDistance);
         let newPosition = targetPosition.add(followAngle);
         unit.gameObj[i].setPosition(newPosition.x, newPosition.y);
     }
 }
 
+/** Check if a unit is outside the bounds of the stage */
 function isOutsideBounds(pos: Phaser.Math.Vector2, scene: MainScene) {
-    return pos.x < scene.getKillZoneMinX() || pos.x > scene.getKillZoneMaxX() ||
-           pos.y < scene.getKillZoneMinY() || pos.y > scene.getKillZoneMaxY();
+    return pos.x < scene.getKillZoneTopLeft().x || pos.x > scene.getKillZoneBottomRight().x ||
+           pos.y < scene.getKillZoneTopLeft().y || pos.y > scene.getKillZoneBottomRight().y;
 }
 
 /** Move a bomber unit for one frame */
@@ -194,13 +191,13 @@ function moveBomberUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, 
         } else {
             let currentVelocity = unit.gameObj[0].body.velocity.clone();
             // If outside of x bounds and moving away from center, reverse the x component of velocity
-            if ((pos.x < scene.getKillZoneMinX() && currentVelocity.x < 0) || 
-                    (pos.x > scene.getKillZoneMaxX() && currentVelocity.x > 0)) {
+            if ((pos.x < scene.getKillZoneTopLeft().x && currentVelocity.x < 0) || 
+                    (pos.x > scene.getKillZoneBottomRight().x && currentVelocity.x > 0)) {
                 currentVelocity.x *= -1;
             }
             // If outside of y bounds and moving away from center, reverse the y component of velocity
-            if ((pos.y < scene.getKillZoneMinY() && currentVelocity.y < 0) ||
-                    (pos.y > scene.getKillZoneMaxY() && currentVelocity.y > 0)) {
+            if ((pos.y < scene.getKillZoneTopLeft().y && currentVelocity.y < 0) ||
+                    (pos.y > scene.getKillZoneBottomRight().y && currentVelocity.y > 0)) {
                 currentVelocity.y *= -1;
             }
             newAngle = currentVelocity.angle();

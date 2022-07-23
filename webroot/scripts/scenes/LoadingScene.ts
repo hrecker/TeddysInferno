@@ -1,6 +1,7 @@
+import { loadConfig } from "../model/Config";
 import { loadUnitJson } from "../model/Units";
 
-// Load json and assets
+/** Load json and assets */
 export class LoadingScene extends Phaser.Scene {
     constructor() {
         super({
@@ -33,10 +34,12 @@ export class LoadingScene extends Phaser.Scene {
 
         // Load json
         this.load.json("units", "assets/units/units.json");
+        this.load.json("config", "assets/config/config.json");
     }
 
     create() {
         loadUnitJson(this.cache.json.get("units"));
+        loadConfig(this.cache.json.get("config"));
         this.scene.start("MainScene")
                   .start("MainUIScene")
                   .stop();

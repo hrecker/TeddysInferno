@@ -1,4 +1,5 @@
-import { Unit, takeDamage } from "../model/Units";
+import { Unit } from "../model/Units";
+import { takeDamage } from "./Status";
 
 /** Should be used as an overlap callback, to handle when a unit hits another unit */
 export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
@@ -34,7 +35,7 @@ export function handleEnemyBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWith
     }
 }
 
-// Destroy which of the two objects has isBullet set to true. Return the unit that was hit.
+/** Destroy which of the two objects has isBullet set to true. Return the unit that was hit. */
 function destroyBullet(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody,
                        obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody): Phaser.Types.Physics.Arcade.ImageWithDynamicBody {
     let bullet: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
@@ -51,6 +52,5 @@ function destroyBullet(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody,
     }
     // If bullet isn't defined or has no id, it has already hit something. In that case,
     // don't damage the unit, so that one bullet can't hit multiple units
-    //TODO this behavior may need to change for projectiles that pierce enemies
     return hitUnit;
 }

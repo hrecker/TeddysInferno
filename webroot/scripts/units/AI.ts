@@ -1,8 +1,7 @@
+import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 import { createExplosion } from "./Weapon";
-
-const unitInaccuracyRange = 100;
 
 /** Update a unit's AI for one frame (call each frame in the update method of a scene) */
 export function updateUnitAI(unit: Unit, scene: MainScene, delta: number) {
@@ -19,6 +18,7 @@ export function updateUnitAI(unit: Unit, scene: MainScene, delta: number) {
     }
 }
 
+/** Update spawner unit AI for one frame */
 function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene, delta: number) {
     if ("spawnCooldownRemainingMs" in spawner.aiData && spawner.aiData["spawnCooldownRemainingMs"] > 0) {
         spawner.aiData["spawnCooldownRemainingMs"] -= delta;
@@ -28,11 +28,13 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
     let randomRotation = Math.random() * 2 * Math.PI;
     let unit = scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
     unit.gameObj[0].setRotation(randomRotation);
-    unit.aiData["inaccuracy"] = new Phaser.Math.Vector2((Math.random() * unitInaccuracyRange) - (unitInaccuracyRange / 2), 
-            (Math.random() * unitInaccuracyRange) - (unitInaccuracyRange / 2));
+    let inaccuracyRange = config()["unitInaccuracyRange"];
+    unit.aiData["inaccuracy"] = new Phaser.Math.Vector2((Math.random() * inaccuracyRange) - (inaccuracyRange / 2), 
+            (Math.random() * inaccuracyRange) - (inaccuracyRange / 2));
     spawner.aiData["spawnCooldownRemainingMs"] = spawner.aiData["spawnDelay"];
 }
 
+/** Update bomb unit AI for one frame */
 function bombUpdate(bomb: Unit, scene: MainScene, delta: number) {
     if ("flashRemainingMs" in bomb.aiData && bomb.aiData["flashRemainingMs"] > 0) {
         bomb.aiData["flashRemainingMs"] -= delta;
@@ -54,9 +56,10 @@ function bombUpdate(bomb: Unit, scene: MainScene, delta: number) {
         return;
     }
     explodeBomb(bomb, scene);
-    scene.destroyUnit(bomb.id);
+    scene.destroyUnitById(bomb.id);
 }
 
+/** Explode bomb unit */
 // Note: this method does not destroy the bomb object
 function explodeBomb(bomb: Unit, scene: MainScene) {
     if (!("explosionSpawned" in bomb.aiData) || ! bomb.aiData["explosionSpawned"]) {
@@ -65,6 +68,7 @@ function explodeBomb(bomb: Unit, scene: MainScene) {
     }
 }
 
+/** Any logic necessary for specific units when being destroyed. */
 export function handleUnitDestroy(unit: Unit, scene: MainScene) {
     switch (unit.ai) {
         case "bomb":
