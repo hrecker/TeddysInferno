@@ -20,7 +20,7 @@ export class MainUIScene extends Phaser.Scene {
 
     /** Listen for updates to the game timer and update the text of the timer */
     timerListener(timer, scene) {
-        scene.setTimerText(Math.round(timer / 100.0) / 10);
+        scene.setTimerText((Math.round(timer / 100.0) / 10).toFixed(1));
     }
 
     create() {
