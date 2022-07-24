@@ -31,6 +31,10 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("bullet", "assets/sprites/bullet.png");
         this.load.image("gem", "assets/sprites/gem.png");
 
+        // UI
+        this.load.image("playButton", "assets/sprites/ui/playButton.png");
+        this.load.image("playButtonDown", "assets/sprites/ui/playButtonDown.png");
+
         // Load background
         this.load.image("background", "assets/sprites/background.png");
 
@@ -42,8 +46,7 @@ export class LoadingScene extends Phaser.Scene {
     create() {
         loadUnitJson(this.cache.json.get("units"));
         loadConfig(this.cache.json.get("config"));
-        this.scene.start("MainScene")
-                  .start("MainUIScene")
+        this.scene.start("MenuScene")
                   .stop();
     }
 }

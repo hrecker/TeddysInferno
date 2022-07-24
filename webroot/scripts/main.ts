@@ -3,6 +3,7 @@ import 'phaser';
 import { LoadingScene } from "./scenes/LoadingScene";
 import { MainScene } from "./scenes/MainScene";
 import { MainUIScene } from "./scenes/MainUIScene";
+import { MenuScene } from './scenes/MenuScene';
 
 var config: Phaser.Types.Core.GameConfig = {
     width: 960,
@@ -18,6 +19,7 @@ var config: Phaser.Types.Core.GameConfig = {
     },
     scene: [
         LoadingScene,
+        MenuScene,
         MainScene,
         MainUIScene
     ]

@@ -5,6 +5,29 @@
         "stroke": "black",
         "strokeThickness": 3
     },
+    "titleStyle": { 
+        "font": "bold 100px Verdana",
+        "shadow": {
+            "offsetX": 1,
+            "offsetY": 1,
+            "color": "#000",
+            "blur": 3,
+            "stroke": true,
+            "fill": true
+        }
+    },
+    "controlsStyle": { 
+        "font": "30px Verdana",
+        "align": "center",
+        "shadow": {
+            "offsetX": 1,
+            "offsetY": 1,
+            "color": "#000",
+            "blur": 3,
+            "stroke": true,
+            "fill": true
+        }
+    },
 
     "invinciblePlayer": false,
     "automaticRestart": {
