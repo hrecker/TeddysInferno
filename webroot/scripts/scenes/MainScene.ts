@@ -68,7 +68,8 @@ export class MainScene extends Phaser.Scene {
         killZoneTopLeft = background.getTopLeft();
         killZoneBottomRight = background.getBottomRight();
 
-        graphics = this.add.graphics();
+        // Create graphics and enable debug mode to show some more movement graphics
+        //graphics = this.add.graphics();
         this.createPlayerUnit();
         this.cameras.main.startFollow(player.gameObj[0]);
 
@@ -102,6 +103,11 @@ export class MainScene extends Phaser.Scene {
 
         //this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
+        
+        for (let i = 0; i < 4; i++) {
+            this.addUnit("looper", new Phaser.Math.Vector2(Math.random() * this.getKillZoneBottomRight().x,
+                    Math.random() * this.getKillZoneBottomRight().y));
+        }
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -159,9 +165,12 @@ export class MainScene extends Phaser.Scene {
     }
 
     moveUnits(targetPos: Phaser.Math.Vector2, delta: number) {
+        if (graphics) {
+            graphics.clear();
+        }
         Object.keys(enemyUnits).forEach(id => {
             // Pass in graphics for some debugging (the arcade physics debug property must be set to true)
-            moveUnit(enemyUnits[id], targetPos.clone(), null, this, delta);
+            moveUnit(enemyUnits[id], targetPos.clone(), graphics, this, delta);
         });
     }
 
@@ -191,11 +200,12 @@ export class MainScene extends Phaser.Scene {
             if (player.gameObj[0].x < killZoneTopLeft.x || player.gameObj[0].x > killZoneBottomRight.x || 
                     player.gameObj[0].y < killZoneTopLeft.y || player.gameObj[0].y > killZoneBottomRight.y) {
                 this.destroyPlayer();
+            } else {
+                // Player weapons
+                fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
+                // Update timer
+                incrementTimer(delta);
             }
-            // Player weapons
-            fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
-            // Update timer
-            incrementTimer(delta);
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos, delta);

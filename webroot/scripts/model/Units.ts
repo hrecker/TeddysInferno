@@ -16,6 +16,7 @@ export type Unit = {
     maxAcceleration: number;
     maxAngularSpeed: number;
     rotation: boolean;
+    disableDrag: boolean;
     // Health props
     health: number;
     maxHealth: number;
@@ -41,6 +42,7 @@ export function loadUnitJson(unitJson) {
             maxAcceleration: unitProps["maxAcceleration"],
             maxAngularSpeed: unitProps["maxAngularSpeed"],
             rotation: unitProps["rotation"],
+            disableDrag: unitProps["disableDrag"],
             health: unitProps["health"],
             maxHealth: unitProps["health"],
             bodyType: unitProps["bodyType"],
@@ -74,7 +76,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
 
     // Create the actual Phaser ImageWithDynamicBody
     let unitId = getNewId();
-    let unitImage = createUnitImage(unitJson, name, unitId, location, scene);
+    let unitImage = createUnitImage(unitJson, name, unitId, location, scene, ! unit.disableDrag);
     
     unit.id = unitId;
     unit.gameObj = [unitImage];
@@ -84,7 +86,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
         for (let i = 1; i <= 9; i++) {
             // TODO allow for different spawning for the tail? Not just straight horizontal worm?
             let segmentLocation = { x: (location.x + (i * -unitImage.width)), y: location.y};
-            let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene);
+            let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene, ! unit.disableDrag);
             unit.gameObj.push(segment);
         }
     }
@@ -93,7 +95,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
 }
 
 /** Create the Phaser ImageWithDynamicBody for the Unit */
-function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene) {
+function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene, shouldDrag: boolean) {
     let unitImage = scene.physics.add.image(location.x, location.y, name);
     unitImage.setData("id", unitId);
     unitImage.setName(name);
@@ -102,6 +104,10 @@ function createUnitImage(unitJson, name: string, unitId: number, location: Phase
     } else { // Default to square
         unitImage.setBodySize(unitJson["bodySize"], unitJson["bodySize"]);
     }
-    unitImage.setDrag(config()["unitDrag"]);
+    if (shouldDrag) {
+        unitImage.setDrag(config()["unitDrag"]);
+    } else {
+        unitImage.setDrag(0);
+    }
     return unitImage;
 }

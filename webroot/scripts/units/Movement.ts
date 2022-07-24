@@ -61,11 +61,17 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
 /** Move a non-player unit for one frame (call each frame in the update method of a scene) */
 export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene, delta: number) {
     switch (unit.movement) {
+        case "bomber":
+            moveBomberUnit(unit, scene);
+            break;
         case "homing":
             moveHomingUnit(unit, targetPos, debugGraphics, delta, true);
             break;
         case "lazyHoming":
             moveHomingUnit(unit, targetPos, debugGraphics, delta, true);
+            break;
+        case "loop":
+            moveLoopUnit(unit, debugGraphics, delta, scene);
             break;
         case "perfectHoming":
             moveHomingUnit(unit, targetPos, debugGraphics, delta, false);
@@ -73,29 +79,38 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
         case "worm":
             moveWormUnit(unit, targetPos, debugGraphics, delta);
             break;
-        case "bomber":
-            moveBomberUnit(unit, debugGraphics, scene);
     }
 
     clampUnitSpeed(unit);
 }
 
+/** Prevent unit from going over max speed */
+function clampUnitSpeed(unit: Unit) {
+    if (unit.gameObj[0].body.velocity.length() > unit.maxSpeed) {
+        let newVel = unit.gameObj[0].body.velocity.normalize().scale(unit.maxSpeed);
+        unit.gameObj[0].setVelocity(newVel.x, newVel.y);
+    }
+}
+
+/** Convert an angle to be within Phaser's expected [-PI, PI] range to prevent issues with jerky rotation.
+ *  Useful when using the Phaser.Math.Angle.RotateTo function.
+ */
+function clampTargetAngle(angle: number) {
+    if (angle > Math.PI) {
+        angle -= (2 * Math.PI);
+    }
+    return angle;
+}
+
 /** Move a homing unit for one frame */
 function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, delta: number, isLazy?: boolean) {
-    if (debugGraphics) {
-        debugGraphics.clear();
-    }
-
     // Get direction unit should move to hit target
     let finalTarget = target;
     if (unit.aiData["inaccuracy"]) {
         finalTarget = target.clone().add(unit.aiData["inaccuracy"]);
     }
     let homingDir = homingDirection(unit.gameObj[0].body, finalTarget, unit.maxAcceleration, isLazy);
-    let targetRotationAngle = homingDir.angle();
-    if (targetRotationAngle > Math.PI) {
-        targetRotationAngle -= (2 * Math.PI);
-    }
+    let targetRotationAngle = clampTargetAngle(homingDir.angle());
 
     if (unit.rotation) {
         unit.gameObj[0].setRotation(Phaser.Math.Angle.RotateTo(unit.gameObj[0].rotation, targetRotationAngle, unit.maxAngularSpeed * delta * 0.001));
@@ -120,7 +135,7 @@ function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: 
  * Based on a (possibly moving) body, a stationary target, and the max acceleration of the body, 
  * calculate the direction the body should accelerate to hit the target.
  */
-function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.Vector2, maxAcc: number, isLazy?: boolean): Phaser.Math.Vector2 {
+function homingDirection(body: Phaser.Physics.Arcade.Body, target: Phaser.Math.Vector2, maxAcc: number, isLazy?: boolean): Phaser.Math.Vector2 {
     let realTarget = target.clone();
     if (isLazy) {
         return realTarget.clone().subtract(body.center).normalize();
@@ -145,11 +160,42 @@ function homingDirection(body : Phaser.Physics.Arcade.Body, target: Phaser.Math.
     return impactPos.subtract(body.center).normalize();
 }
 
-/** Prevent unit from going over max speed */
-function clampUnitSpeed(unit: Unit) {
-    if (unit.gameObj[0].body.velocity.length() > unit.maxSpeed) {
-        let newVel = unit.gameObj[0].body.velocity.normalize().scale(unit.maxSpeed);
-        unit.gameObj[0].setVelocity(newVel.x, newVel.y);
+/** Pick a random target point in the scene on the map */
+function pickRandomTarget(scene: MainScene): Phaser.Math.Vector2 {
+    return new Phaser.Math.Vector2(Math.random() * scene.getKillZoneBottomRight().x,
+            Math.random() * scene.getKillZoneBottomRight().y);
+}
+
+/** Move a loop unit for one frame */
+function moveLoopUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, delta: number, scene: MainScene) {
+    // Pick first target
+    let radius = 0;
+    let center: Phaser.Math.Vector2;
+    if (! ("target" in unit.aiData) || unit.aiData["currentLoopDurationMs"] >= unit.aiData["loopDuration"]) {
+        let target = pickRandomTarget(scene);
+        unit.aiData["target"] = target;
+        radius = target.clone().subtract(unit.gameObj[0].body.center).length() / 2;
+        unit.aiData["radius"] = radius;
+        center = new Phaser.Math.Vector2((target.x + unit.gameObj[0].body.center.x) / 2,
+                (target.y + unit.gameObj[0].body.center.y) / 2);
+        unit.aiData["center"] = center;
+        unit.aiData["currentLoopDurationMs"] = 0
+    } else {
+        radius = unit.aiData["radius"];
+        center = unit.aiData["center"];
+        unit.aiData["currentLoopDurationMs"] += delta;
+    }
+    // Set desired velocity to be tangent along the circle being traveled
+    let targetRotationAngle = clampTargetAngle(unit.gameObj[0].body.center.clone().subtract(center).rotate(Math.PI / 2).angle());
+    unit.gameObj[0].setRotation(Phaser.Math.Angle.RotateTo(unit.gameObj[0].rotation, targetRotationAngle, unit.maxAngularSpeed * delta * 0.001));
+    let vel = Phaser.Math.Vector2.RIGHT.clone().rotate(unit.gameObj[0].rotation).scale(unit.maxSpeed);
+    unit.gameObj[0].setVelocity(vel.x, vel.y);
+    // Draw line being rotated towards
+    if (debugGraphics) {
+        let targetStretched = Phaser.Math.Vector2.RIGHT.clone().rotate(targetRotationAngle).scale(50);
+        let debugLine = new Phaser.Geom.Line(unit.gameObj[0].body.center.x, unit.gameObj[0].body.center.y, 
+                unit.gameObj[0].body.center.x + targetStretched.x, unit.gameObj[0].body.center.y + targetStretched.y);
+        debugGraphics.strokeLineShape(debugLine);
     }
 }
 
@@ -176,11 +222,7 @@ function isOutsideBounds(pos: Phaser.Math.Vector2, scene: MainScene) {
 }
 
 /** Move a bomber unit for one frame */
-function moveBomberUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene) {
-    if (debugGraphics) {
-        debugGraphics.clear();
-    }
-
+function moveBomberUnit(unit: Unit, scene: MainScene) {
     // If the bomber unit is outside of the play area or is not moving, pick a random direction and start
     let pos = unit.gameObj[0].body.center;
     if (! ("angle" in unit.aiData) || isOutsideBounds(pos, scene)) {

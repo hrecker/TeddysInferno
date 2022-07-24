@@ -89,6 +89,21 @@
             "spawnDelay": 5000
         }
     },
+    "looper": {
+        "name": "looper",
+        "movement": "loop",
+        "maxSpeed": 150,
+        "maxAngularSpeed": 1,
+        "health": 3,
+        "bodyType": "circle",
+        "bodySize": 9,
+        "bodyOffset": 7,
+        "disableDrag": "true",
+        "rotation": "true",
+        "aiData": {
+            "loopDuration": 5000
+        }
+    },
     "worm": {
         "name": "worm",
         "movement": "worm",
