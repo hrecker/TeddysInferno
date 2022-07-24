@@ -1,3 +1,4 @@
+import { getNewId } from "../state/IdState";
 import { config } from "./Config";
 
 let unitCache: { [name: string]: Unit };
@@ -54,13 +55,6 @@ export function loadUnitJson(unitJson) {
             aiData: unitProps["aiData"]
         };
     };
-}
-
-let currentId = 0;
-/** Get a new, unused id */
-export function getNewId() {
-    currentId++;
-    return currentId;
 }
 
 /** Create a Phaser ImageWithDynamicBody for the unit defined with the given name in units.json */

@@ -1,13 +1,15 @@
-import { moveUnit, movePlayerUnit } from "../units/Movement";
+import { moveUnit, movePlayerUnit, moveGem } from "../units/Movement";
 import { updateUnitAI, handleUnitDestroy } from "../units/AI";
 import { fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
-import { handleBulletHit, handleEnemyBulletHit, handleUnitHit } from "../units/Collision";
+import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } from "../units/Collision";
 import { config } from "../model/Config";
 import { incrementTimer, resetTimer } from "../state/TimerState";
+import { createGem } from "../model/Gem";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
+let gems: { [id: number]: Phaser.Types.Physics.Arcade.ImageWithDynamicBody } = {};
 let player: Unit;
 
 // Physics groups
@@ -15,6 +17,7 @@ let playerPhysicsGroup : Phaser.Physics.Arcade.Group;
 let unitsPhysicsGroup : Phaser.Physics.Arcade.Group;
 let bulletsPhysicsGroup : Phaser.Physics.Arcade.Group;
 let enemyBulletsPhysicsGroup : Phaser.Physics.Arcade.Group;
+let gemPhysicsGroup : Phaser.Physics.Arcade.Group;
 
 // Input
 let thrustKey : Phaser.Input.Keyboard.Key;
@@ -62,6 +65,7 @@ export class MainScene extends Phaser.Scene {
 
     create() {
         enemyUnits = {};
+        gems = {};
         resetTimer();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0);
@@ -87,27 +91,32 @@ export class MainScene extends Phaser.Scene {
         unitsPhysicsGroup = this.createPhysicsGroup();
         bulletsPhysicsGroup = this.createPhysicsGroup();
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
+        gemPhysicsGroup = this.createPhysicsGroup();
         
         // Create units immediately for development
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
         //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
 
         //this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
         
-        for (let i = 0; i < 4; i++) {
-            this.addUnit("looper", new Phaser.Math.Vector2(Math.random() * this.getKillZoneBottomRight().x,
-                    Math.random() * this.getKillZoneBottomRight().y));
-        }
+        //for (let i = 0; i < 4; i++) {
+        //    this.addUnit("looper", new Phaser.Math.Vector2(Math.random() * this.getKillZoneBottomRight().x,
+        //            Math.random() * this.getKillZoneBottomRight().y));
+        //}
+
+        this.addGem(new Phaser.Math.Vector2(200, 200));
+        this.addGem(new Phaser.Math.Vector2(300, 200));
+        this.addGem(new Phaser.Math.Vector2(400, 200));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -115,6 +124,8 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, unitsPhysicsGroup, handleUnitHit, null, this);
         // Handle enemy bullets or explosions hitting player
         this.physics.add.overlap(playerPhysicsGroup, enemyBulletsPhysicsGroup, handleEnemyBulletHit, null, this);
+        // Handle gems hitting player
+        this.physics.add.overlap(playerPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
     }
 
     addUnit(name: string, location: Phaser.Math.Vector2): Unit {
@@ -138,6 +149,19 @@ export class MainScene extends Phaser.Scene {
             return null;
         }
         return enemyUnits[id];
+    }
+
+    addGem(location: Phaser.Math.Vector2): Phaser.Types.Physics.Arcade.ImageWithDynamicBody {
+        let gem = createGem(location, this);
+        gems[gem.getData("id")] = gem;
+        gemPhysicsGroup.add(gem);
+        return gem;
+    }
+
+    destroyGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
+        let id = gem.getData("id");
+        gem.destroy();
+        delete gems[id];
     }
 
     destroyUnitById(id: number) {
@@ -174,6 +198,19 @@ export class MainScene extends Phaser.Scene {
         });
     }
 
+    /** Check if any player input is active that will stop gems from homing to player.
+     * This includes firing the weapon and waiting for cooldown on the weapon.
+     */
+    anyGemRepelInputActive() {
+        return player.cooldownRemainingMs > 0 || this.isStreamWeaponActive() || this.isShotgunWeaponActive();
+    }
+
+    moveGems(targetPos: Phaser.Math.Vector2) {
+        Object.keys(gems).forEach(id => {
+            moveGem(gems[id], targetPos.clone(), ! this.anyGemRepelInputActive());
+        });
+    }
+
     updateUnitsAI(delta) {
         Object.keys(enemyUnits).forEach(id => {
             updateUnitAI(enemyUnits[id], this, delta);
@@ -194,6 +231,8 @@ export class MainScene extends Phaser.Scene {
             // Enemy movement and AI
             this.moveUnits(player.gameObj[0].body.center, delta);
             this.updateUnitsAI(delta);
+            // Gem movement
+            this.moveGems(player.gameObj[0].body.center);
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
                 thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);

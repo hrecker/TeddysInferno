@@ -1,6 +1,6 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
-import { takeDamage } from "./Status";
+import { collectGem, takeDamage } from "./Status";
 
 /** Should be used as an overlap callback, to handle when a unit hits another unit */
 export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
@@ -57,4 +57,20 @@ function destroyBullet(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody,
     // If bullet isn't defined or has no id, it has already hit something. In that case,
     // don't damage the unit, so that one bullet can't hit multiple units
     return hitUnit;
+}
+
+/** Handle powerup gem hitting player */
+export function handleGemHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
+    let gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    let playerUnit: Unit;
+    if (obj1.name == "player") {
+        playerUnit = this.getUnit(obj1.getData("id"));
+        gem = obj2;
+    } else if (obj2.name == "player") {
+        gem = obj1;
+        playerUnit = this.getUnit(obj2.getData("id"));
+    }
+    if (playerUnit) {
+        collectGem(playerUnit, gem, this);
+    }
 }

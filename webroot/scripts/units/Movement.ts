@@ -84,11 +84,29 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
     clampUnitSpeed(unit);
 }
 
+/** Move a powerup gem for one frame - homing in on the player or not moving */
+export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, targetPos: Phaser.Math.Vector2, isHoming: boolean) {
+    if (isHoming) {
+        let accel = config()["gemAcceleration"];
+        let homingDir = homingDirection(gem.body, targetPos, accel);      
+        // Accelerate towards the target
+        gem.setAcceleration(homingDir.x * accel, homingDir.y * accel);
+    } else {
+        gem.setAcceleration(0);
+    }
+    clampSpeed(gem, config()["gemMaxSpeed"]);
+}
+
 /** Prevent unit from going over max speed */
 function clampUnitSpeed(unit: Unit) {
-    if (unit.gameObj[0].body.velocity.length() > unit.maxSpeed) {
-        let newVel = unit.gameObj[0].body.velocity.normalize().scale(unit.maxSpeed);
-        unit.gameObj[0].setVelocity(newVel.x, newVel.y);
+    clampSpeed(unit.gameObj[0], unit.maxSpeed);
+}
+
+/** Prevent a GameObject from going over a max speed */
+function clampSpeed(obj: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, maxSpeed: number) {
+    if (obj.body.velocity.length() > maxSpeed) {
+        let newVel = obj.body.velocity.normalize().scale(maxSpeed);
+        obj.setVelocity(newVel.x, newVel.y);
     }
 }
 

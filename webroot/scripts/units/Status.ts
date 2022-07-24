@@ -24,3 +24,14 @@ export function takeDamage(scene: MainScene, unit: Unit, damage: number) {
     }
     updateHealth(scene, unit, unit.health - damage);
 }
+
+/** Collect a powerup gem for the player */
+export function collectGem(player: Unit, gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, scene: MainScene) {
+    if (!("gemCount" in player.aiData)) {
+        player.aiData["gemCount"] = 0;
+    }
+    player.aiData["gemCount"]++;
+    console.log("Gem count: " + player.aiData["gemCount"]);
+    //TODO actual powerups
+    scene.destroyGem(gem);
+}

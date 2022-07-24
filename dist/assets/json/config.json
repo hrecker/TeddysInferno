@@ -15,6 +15,10 @@
     "unitInaccuracyRange": 100,
     "unitDrag": 250,
 
+    "gemAcceleration": 800,
+    "gemMaxSpeed": 400,
+    "gemDrag": 200,
+
     "bulletBodyRadius": 6,
     "explosionBodyRadius": 32,
 
