@@ -95,14 +95,14 @@ export class MainScene extends Phaser.Scene {
         
         // Create units immediately for development
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
         //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
 
@@ -113,10 +113,6 @@ export class MainScene extends Phaser.Scene {
         //    this.addUnit("looper", new Phaser.Math.Vector2(Math.random() * this.getKillZoneBottomRight().x,
         //            Math.random() * this.getKillZoneBottomRight().y));
         //}
-
-        this.addGem(new Phaser.Math.Vector2(200, 200));
-        this.addGem(new Phaser.Math.Vector2(300, 200));
-        this.addGem(new Phaser.Math.Vector2(400, 200));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -202,7 +198,7 @@ export class MainScene extends Phaser.Scene {
      * This includes firing the weapon and waiting for cooldown on the weapon.
      */
     anyGemRepelInputActive() {
-        return player.cooldownRemainingMs > 0 || this.isStreamWeaponActive() || this.isShotgunWeaponActive();
+        return (!player.gameObj[0]) || player.cooldownRemainingMs > 0 || this.isStreamWeaponActive() || this.isShotgunWeaponActive();
     }
 
     moveGems(targetPos: Phaser.Math.Vector2) {
@@ -248,6 +244,8 @@ export class MainScene extends Phaser.Scene {
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos, delta);
+            // Gem movement
+            this.moveGems(finalPlayerPos);
         }
     }
 }

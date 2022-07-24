@@ -18,6 +18,7 @@
     "gemAcceleration": 800,
     "gemMaxSpeed": 400,
     "gemDrag": 200,
+    "gemSpawnSpeed": 150,
 
     "bulletBodyRadius": 6,
     "explosionBodyRadius": 32,

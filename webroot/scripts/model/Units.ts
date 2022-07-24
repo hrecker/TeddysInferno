@@ -27,6 +27,7 @@ export type Unit = {
     // AI props
     ai: string;
     aiData;
+    droppedGems: number;
 }
 
 /** Store unit json data for creating units */
@@ -52,7 +53,8 @@ export function loadUnitJson(unitJson) {
             cooldownRemainingMs: 0,
             harmless: unitProps["harmless"],
             ai: unitProps["ai"],
-            aiData: unitProps["aiData"]
+            aiData: unitProps["aiData"],
+            droppedGems: unitProps["droppedGems"]
         };
     };
 }

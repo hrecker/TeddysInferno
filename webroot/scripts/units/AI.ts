@@ -75,4 +75,13 @@ export function handleUnitDestroy(unit: Unit, scene: MainScene) {
             explodeBomb(unit, scene);
             break;
     }
+    if (unit.name != "player") {
+        for (let i = 0; i < unit.droppedGems; i++) {
+            let gem = scene.addGem(unit.gameObj[0].body.center);
+            // Add some velocity in a random direction to the gem
+            let gemVel = Phaser.Math.Vector2.RIGHT.clone().rotate(Math.random() * 2 * Math.PI).
+                    scale(config()["gemSpawnSpeed"]);
+            gem.setVelocity(gemVel.x, gemVel.y);
+        }
+    }
 }

@@ -18,7 +18,8 @@
         "bodySize": 14,
         "bodyOffset": 2,
         "maxAngularSpeed": 1,
-        "rotation": "true"
+        "rotation": "true",
+        "droppedGems": 1
     },
     "chaser2": {
         "name": "chaser2",
@@ -30,7 +31,8 @@
         "bodySize": 14,
         "bodyOffset": 2,
         "maxAngularSpeed": 2.5,
-        "rotation": "true"
+        "rotation": "true",
+        "droppedGems": 1
     },
     "chaser3": {
         "name": "chaser3",
@@ -42,7 +44,8 @@
         "bodySize": 26,
         "bodyOffset": 5,
         "maxAngularSpeed": 5,
-        "rotation": "true"
+        "rotation": "true",
+        "droppedGems": 2
     },
     "spawner1": {
         "name": "spawner1",
@@ -57,7 +60,8 @@
         "aiData": {
             "spawnUnit": "chaser1",
             "spawnDelay": 2000
-        }
+        },
+        "droppedGems": 1
     },
     "spawner2": {
         "name": "spawner2",
@@ -72,7 +76,8 @@
         "aiData": {
             "spawnUnit": "chaser2",
             "spawnDelay": 2500
-        }
+        },
+        "droppedGems": 2
     },
     "spawner3": {
         "name": "spawner3",
@@ -87,7 +92,8 @@
         "aiData": {
             "spawnUnit": "chaser3",
             "spawnDelay": 5000
-        }
+        },
+        "droppedGems": 3
     },
     "looper": {
         "name": "looper",
@@ -102,7 +108,8 @@
         "rotation": "true",
         "aiData": {
             "loopDuration": 5000
-        }
+        },
+        "droppedGems": 1
     },
     "worm": {
         "name": "worm",
@@ -114,12 +121,14 @@
         "bodyType": "circle",
         "bodySize": 14,
         "bodyOffset": 2,
-        "rotation": "true"
+        "rotation": "true",
+        "droppedGems": 5
     },
     "obstacle": {
         "name": "obstacle",
         "health": 1,
-        "bodySize": 32
+        "bodySize": 32,
+        "droppedGems": 0
     },
     "bomber": {
         "name": "bomber",
@@ -133,7 +142,8 @@
         "bodyOffset": 17,
         "aiData": {
             "spawnDelay": 3000
-        }
+        },
+        "droppedGems": 2
     },
     "bomb": {
         "name": "bomb",
@@ -145,6 +155,7 @@
             "lifetimeRemainingMs": 4000,
             "flashDelay": 500,
             "textures": ["bomb", "bombflash"]
-        }
+        },
+        "droppedGems": 0
     }
 }
