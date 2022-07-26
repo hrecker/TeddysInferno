@@ -32,15 +32,17 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("gem", "assets/sprites/gem.png");
 
         // UI
+        this.load.image("boostIcon", "assets/sprites/ui/boostIcon.png");
         this.load.image("playButton", "assets/sprites/ui/playButton.png");
         this.load.image("playButtonDown", "assets/sprites/ui/playButtonDown.png");
+        this.load.image("quickTurnIcon", "assets/sprites/ui/quickTurnIcon.png");
 
         // Load background
         this.load.image("background", "assets/sprites/background.png");
 
         // Load json
-        this.load.json("units", "assets/json/units.json");
         this.load.json("config", "assets/json/config.json");
+        this.load.json("units", "assets/json/units.json");
     }
 
     create() {

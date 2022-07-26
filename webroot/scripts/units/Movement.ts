@@ -1,6 +1,7 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { useAbility } from "../state/AbilityState";
 
 /** Move the player unit for a frame based on inputs */
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
@@ -19,6 +20,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
     if (quickTurnActive && canQuickTurn) {
         player.gameObj[0].setRotation(player.gameObj[0].rotation + Math.PI);
         player.aiData["quickTurnCooldownRemainingMs"] = config()["playerQuickturnCooldownMs"];
+        useAbility("quickTurn", config()["playerQuickturnCooldownMs"]);
     } else {
         if (leftActive && !rightActive) {
             player.gameObj[0].setRotation(player.gameObj[0].rotation - config()["playerRotationSpeed"]);
@@ -44,6 +46,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation).scale(config()["playerBoostSpeed"]);
         player.aiData["boostDirection"] = dir;
         player.gameObj[0].setVelocity(dir.x, dir.y);
+        useAbility("boost", config()["playerBoostCooldownMs"]);
     }
 
     if (!isBoosting) {

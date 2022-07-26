@@ -45,6 +45,11 @@ export class MenuScene extends Phaser.Scene {
         this.add.text(centerX, playButton.y + 235, "- P or right click to fire blast of bullets", config()["controlsStyle"]).setOrigin(0.5);
         this.add.text(centerX, playButton.y + 275, "- Q to quickturn", config()["controlsStyle"]).setOrigin(0.5);
         this.add.text(centerX, playButton.y + 315, "- E to boost", config()["controlsStyle"]).setOrigin(0.5);
+
+        //TODO credits - button is from Kenney asset pack
+
+        //TODO added this for quicker testing - just skips the main menu scene and opens the game scene
+        this.handleButtonClick("playButton");
     }
 
     handleButtonClick(buttonName) {

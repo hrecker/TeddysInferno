@@ -47,7 +47,7 @@
     "explosionBodyRadius": 32,
 
     "playerRotationSpeed": 0.10,
-    "playerQuickturnCooldownMs": 2000,
+    "playerQuickturnCooldownMs": 1500,
     "playerBoostCooldownMs": 2000,
     "playerBoostDurationMs": 150,
     "playerBoostSpeed": 1000,
