@@ -34,18 +34,19 @@ export class MainUIScene extends Phaser.Scene {
     abilityListener(ability, cooldownMs, scene) {
         switch (ability) {
             case "boost":
-                scene.startCooldownTween(boostIconMask, cooldownMs);
+                scene.startCooldownTween(boostIcon, boostIconMask, cooldownMs);
                 break;
             case "quickTurn":
-                scene.startCooldownTween(quickTurnIconMask, cooldownMs);
+                scene.startCooldownTween(quickTurnIcon, quickTurnIconMask, cooldownMs);
                 break;
         }
     }
 
     /** Start tween for cooldown on ability icons */
-    startCooldownTween(mask, cooldownMs) {
+    startCooldownTween(icon, mask, cooldownMs) {
         mask.y = 72;
         mask.alpha = 0.2;
+        icon.alpha = 0.2;
         this.tweens.add({
             targets: mask,
             y: {
@@ -55,6 +56,7 @@ export class MainUIScene extends Phaser.Scene {
             duration: cooldownMs,
             onComplete: function() {
                 mask.alpha = 0.8;
+                icon.alpha = 0.8;
             }
         });
     }
@@ -67,8 +69,8 @@ export class MainUIScene extends Phaser.Scene {
 
         addAbilityListener(this.abilityListener, this);
 
-        boostIcon = this.add.image(this.game.renderer.width - 112, 40, "boostIcon");
-        quickTurnIcon = this.add.image(this.game.renderer.width - 40, 40, "quickTurnIcon");
+        boostIcon = this.add.image(this.game.renderer.width - 112, 40, "boostIcon").setAlpha(0.8);
+        quickTurnIcon = this.add.image(this.game.renderer.width - 40, 40, "quickTurnIcon").setAlpha(0.8);
 
         boostIconMask = this.add.graphics().setVisible(false).setAlpha(0.8);
         quickTurnIconMask = this.add.graphics().setVisible(false).setAlpha(0.8);

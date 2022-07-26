@@ -8,9 +8,9 @@ import { MenuScene } from './scenes/MenuScene';
 var config: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 640,
-    // TODO the default WebGL renderer was causing huge CPU usage on Chrome (even with a scene containing just the background image and no update logic)
-    // Using Canvas here for now. May consider looking at other Phaser versions too.
-    type: Phaser.CANVAS,
+    // NOTE - With hardware acceleration disabled in Chrome, WEBGL causes enormous CPU usage on my desktop.
+    // Will want to test on some other devices to see if there are performance issues.
+    type: Phaser.WEBGL,
     physics: {
         default: 'arcade',
         arcade: {
