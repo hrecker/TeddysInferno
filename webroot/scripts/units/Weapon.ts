@@ -1,5 +1,6 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
+import { MainScene } from "../scenes/MainScene";
 
 /** Fire player weapon for one frame */
 export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean) {
@@ -47,4 +48,46 @@ export function createExplosion(scene: Phaser.Scene, group: Phaser.Physics.Arcad
     // Destroy explosion after delay
     scene.time.delayedCall(config()["explosionLifetimeMs"], () => explosion.destroy());
     return explosion;
+}
+
+/** Fire weapon for enemy unit for one frame */
+export function fireEnemyWeapon(unit: Unit, player: Unit, scene: MainScene, delta: number) {
+    switch (unit.name) {
+        case "stealer1":
+            fireGemStealerWeapon(unit, player, scene, delta);
+            break;
+    }
+}
+
+/** Fire gem stealer weapon when appropriate for one frame*/
+export function fireGemStealerWeapon(stealerUnit: Unit, player: Unit, scene: MainScene, delta: number) {
+    if (! ("gemCount" in stealerUnit.aiData) || stealerUnit.aiData["gemCount"] <= 0) {
+        return;
+    }
+
+    if (! ("weaponCooldownRemainingMS" in stealerUnit.aiData)) {
+        stealerUnit.aiData["weaponCooldownRemainingMS"] = stealerUnit.aiData["weaponDelayMs"];
+        return;
+    }
+
+    if (stealerUnit.aiData["weaponCooldownRemainingMS"] > 0) {
+        stealerUnit.aiData["weaponCooldownRemainingMS"] -= delta;
+        return;
+    }
+
+    // Create flame projectile
+    let flame = scene.physics.add.image(stealerUnit.gameObj[0].body.center.x, stealerUnit.gameObj[0].body.center.y, "flame");
+    scene.getEnemyBulletsPhysicsGroup().add(flame);
+    flame.setData("isBullet", true);
+    flame.body.setOffset(config()["flameBodyOffset"]);
+    flame.body.setCircle(config()["flameBodyRadius"]);
+    // Fire flame towards player
+    let velocity = player.gameObj[0].body.center.clone().subtract(stealerUnit.gameObj[0].body.center).normalize().scale(config()["flameSpeed"]);
+    flame.setVelocity(velocity.x, velocity.y);
+    // Ensure flames are eventually destroyed
+    scene.time.delayedCall(config()["flameLifetimeMs"], () => flame.destroy());
+
+    stealerUnit.aiData["weaponCooldownRemainingMS"] = stealerUnit.aiData["weaponDelayMs"];
+    stealerUnit.aiData["gemCount"] -= 1;
+    scene.getEnemyBulletsPhysicsGroup();
 }

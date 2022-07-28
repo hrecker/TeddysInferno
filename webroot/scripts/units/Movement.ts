@@ -1,3 +1,4 @@
+import { Game } from "phaser";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
@@ -87,9 +88,29 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
     clampUnitSpeed(unit);
 }
 
-/** Move a powerup gem for one frame - homing in on the player or not moving */
-export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, targetPos: Phaser.Math.Vector2, isHoming: boolean) {
-    if (isHoming) {
+/** Move a powerup gem for one frame - homing in on the player, a stealer unit, or not moving */
+export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, stealerUnits: { [id: number]: Unit }, player: Unit, isGemRepelActive: boolean) {
+    let isHomingOnStealer = false;
+    let targetPos = player.gameObj[0].body.center;
+    let stealerIds = Object.keys(stealerUnits);
+    if (stealerIds.length > 0) {
+        isHomingOnStealer = true;
+        if (gem.getData("stealerTargetId") in stealerUnits) {
+            // Gem is already targeting an existing stealer. Use this as the target.
+            targetPos = stealerUnits[gem.getData("stealerTargetId")].gameObj[0].body.center;
+        } else {
+            // Need to pick a stealer unit to home in on - just pick a random one
+            isHomingOnStealer = true;
+            let chosenId = stealerIds[Math.floor(stealerIds.length * Math.random())];
+            gem.setData("stealerTargetId", chosenId);
+            targetPos = stealerUnits[chosenId].gameObj[0].body.center;
+        }
+    } else {
+        // Stop homing to any stealer when none exist
+        gem.setData("stealerTargetId", -1);
+    }
+
+    if (! isGemRepelActive || isHomingOnStealer) {
         let accel = config()["gemAcceleration"];
         let homingDir = homingDirection(gem.body, targetPos, accel);      
         // Accelerate towards the target

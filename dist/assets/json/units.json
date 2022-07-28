@@ -157,5 +157,16 @@
             "textures": ["bomb", "bombflash"]
         },
         "droppedGems": 0
+    },
+    "stealer1": {
+        "name": "stealer1",
+        "health": 8,
+        "bodyType": "circle",
+        "bodySize": 26,
+        "bodyOffset": 5,
+        "droppedGems": 3,
+        "aiData": {
+            "weaponDelayMs": 2000
+        }
     }
 }

@@ -23,12 +23,14 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("spawner1", "assets/sprites/units/spawner1.png");
         this.load.image("spawner2", "assets/sprites/units/spawner2.png");
         this.load.image("spawner3", "assets/sprites/units/spawner3.png");
+        this.load.image("stealer1", "assets/sprites/units/stealer1.png");
         this.load.image("worm", "assets/sprites/units/worm.png");
         this.load.image("wormsegment", "assets/sprites/units/wormsegment.png");
 
         this.load.image("player", "assets/sprites/units/player.png");
 
         this.load.image("bullet", "assets/sprites/bullet.png");
+        this.load.image("flame", "assets/sprites/flame.png");
         this.load.image("gem", "assets/sprites/gem.png");
 
         // UI

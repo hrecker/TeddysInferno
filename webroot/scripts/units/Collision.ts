@@ -62,15 +62,17 @@ function destroyBullet(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody,
 /** Handle powerup gem hitting player */
 export function handleGemHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
     let gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-    let playerUnit: Unit;
-    if (obj1.name == "player") {
-        playerUnit = this.getUnit(obj1.getData("id"));
-        gem = obj2;
-    } else if (obj2.name == "player") {
+    let unit: Unit;
+    if (obj1.name == "gem") {
         gem = obj1;
-        playerUnit = this.getUnit(obj2.getData("id"));
+        unit = this.getUnit(obj2.getData("id"));
+    } else if (obj2.name == "gem") {
+        unit = this.getUnit(obj1.getData("id"));
+        gem = obj2;
     }
-    if (playerUnit) {
-        collectGem(playerUnit, gem, this);
+
+    if (unit.name == "player" || unit.name == "stealer1") {
+        collectGem(unit, gem, this);
     }
+
 }

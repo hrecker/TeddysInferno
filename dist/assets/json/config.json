@@ -29,7 +29,7 @@
         }
     },
 
-    "invinciblePlayer": false,
+    "invinciblePlayer": true,
     "automaticRestart": {
         "enabled": true,
         "restartTime": 2000
@@ -45,6 +45,8 @@
 
     "bulletBodyRadius": 6,
     "explosionBodyRadius": 32,
+    "flameBodyRadius": 9,
+    "flameBodyOffset": 7,
 
     "playerRotationSpeed": 0.10,
     "playerQuickturnCooldownMs": 1500,
@@ -56,6 +58,8 @@
     "bulletSpeed": 1000,
     "bulletLifetimeMs": 3000,
     "explosionLifetimeMs": 2000,
+    "flameSpeed": 500,
+    "flameLifetimeMs": 5000,
 
     "shotgunBulletCount": 5,
     "streamAngleSpread": 0.1,
