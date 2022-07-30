@@ -5,6 +5,11 @@
         "stroke": "black",
         "strokeThickness": 3
     },
+    "weaponUpgradeStatusFontStyle": { 
+        "font": "24px verdana",
+        "stroke": "black",
+        "strokeThickness": 2
+    },
     "titleStyle": { 
         "font": "bold 100px Verdana",
         "shadow": {

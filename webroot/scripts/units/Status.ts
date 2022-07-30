@@ -1,6 +1,7 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { updateGemCount, updateWeaponLevel } from "../state/UpgradeState";
 
 /** Update the health/max health of a given unit, and destroy it if health reaches zero. */
 function updateHealth(scene: MainScene, unit: Unit, newHealth: number, newMaxHealth?: number) {
@@ -37,10 +38,12 @@ export function collectGem(unit: Unit, gem: Phaser.Types.Physics.Arcade.ImageWit
     if (unit.name == "player") {
         let weaponLevel = unit.aiData["weaponLevel"];
         let upgradeThresholds = config()["weaponUpgradeThresholds"];
-        if (weaponLevel < upgradeThresholds.length && unit.aiData["gemCount"] >= config()["upgradeThresholds"][weaponLevel]) {
+        if (weaponLevel < upgradeThresholds.length && unit.aiData["gemCount"] >= config()["weaponUpgradeThresholds"][weaponLevel]) {
             unit.aiData["weaponLevel"]++;
             console.log("level up :" + unit.aiData["weaponLevel"]);
+            updateWeaponLevel(unit.aiData["weaponLevel"]);
         }
+        updateGemCount(unit.aiData["gemCount"], unit.aiData["weaponLevel"]);
     }
 
     scene.destroyGem(gem);
