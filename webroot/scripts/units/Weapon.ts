@@ -1,6 +1,7 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { getStreamCooldownMs, getShotgunCooldownMs } from "./Status";
 
 /** Fire player weapon for one frame */
 export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean) {
@@ -11,12 +12,12 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
 
     if (streamWeaponKeyDown) {
         createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
-        player.cooldownRemainingMs = config()["streamCooldownMs"];
+        player.cooldownRemainingMs = getStreamCooldownMs(player);
     } else if (shotgunWeaponKeyDown) {
         for (let i = 0; i < config()["shotgunBulletCount"]; i++) {
             createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
         }
-        player.cooldownRemainingMs = config()["shotgunCooldownMs"];
+        player.cooldownRemainingMs = getShotgunCooldownMs(player);
     }
 }
 

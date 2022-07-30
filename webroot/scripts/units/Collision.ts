@@ -1,6 +1,6 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
-import { collectGem, takeDamage } from "./Status";
+import { collectGem, getBulletDamage, takeDamage } from "./Status";
 
 /** Should be used as an overlap callback, to handle when a unit hits another unit */
 export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
@@ -25,7 +25,7 @@ export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynam
     // Bullets can only hit one enemy. If a bullet hits two enemies the second might be null here.
     if (hitUnit) {
         let unit: Unit = this.getUnit(hitUnit.getData("id"));
-        takeDamage(this, unit, config()["bulletDamage"]);
+        takeDamage(this, unit, getBulletDamage(this.getPlayer()));
     }
 }
 

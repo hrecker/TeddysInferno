@@ -98,17 +98,17 @@ export class MainScene extends Phaser.Scene {
         // Create units immediately for development
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
         this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
         this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
         //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
-        this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
-        this.addUnit("stealer1", new Phaser.Math.Vector2(900, 600));
+        //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
+        //this.addUnit("stealer1", new Phaser.Math.Vector2(900, 600));
 
         //this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
@@ -155,6 +155,10 @@ export class MainScene extends Phaser.Scene {
             return null;
         }
         return enemyUnits[id];
+    }
+
+    getPlayer() {
+        return player;
     }
 
     addGem(location: Phaser.Math.Vector2): Phaser.Types.Physics.Arcade.ImageWithDynamicBody {

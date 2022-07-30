@@ -1,3 +1,4 @@
+import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 
@@ -32,6 +33,30 @@ export function collectGem(unit: Unit, gem: Phaser.Types.Physics.Arcade.ImageWit
     }
     unit.aiData["gemCount"]++;
     console.log("Gem count " + unit.name + ": " + unit.aiData["gemCount"]);
-    //TODO actual powerups for player
+    
+    if (unit.name == "player") {
+        let weaponLevel = unit.aiData["weaponLevel"];
+        let upgradeThresholds = config()["weaponUpgradeThresholds"];
+        if (weaponLevel < upgradeThresholds.length && unit.aiData["gemCount"] >= config()["upgradeThresholds"][weaponLevel]) {
+            unit.aiData["weaponLevel"]++;
+            console.log("level up :" + unit.aiData["weaponLevel"]);
+        }
+    }
+
     scene.destroyGem(gem);
+}
+
+/** Get bullet damage for the player based on weapon level */
+export function getBulletDamage(player: Unit) {
+    return config()["weaponLevelValues"][player.aiData["weaponLevel"]]["bulletDamage"];
+}
+
+/** Get stream cooldown for the player */
+export function getStreamCooldownMs(player: Unit) {
+    return config()["weaponLevelValues"][player.aiData["weaponLevel"]]["streamCooldownMs"];
+}
+
+/** Get shotgun cooldown for the player */
+export function getShotgunCooldownMs(player: Unit) {
+    return config()["weaponLevelValues"][player.aiData["weaponLevel"]]["shotgunCooldownMs"];
 }

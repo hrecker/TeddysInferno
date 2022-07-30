@@ -87,6 +87,11 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
         }
     }
 
+    // For the player unit, set the weapon upgrade level
+    if (name == "player") {
+        unit.aiData["weaponLevel"] = 0;
+    }
+
     return unit;
 }
 

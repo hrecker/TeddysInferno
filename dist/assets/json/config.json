@@ -54,7 +54,6 @@
     "playerBoostDurationMs": 150,
     "playerBoostSpeed": 1000,
 
-    "bulletDamage": 1,
     "bulletSpeed": 1000,
     "bulletLifetimeMs": 3000,
     "explosionLifetimeMs": 2000,
@@ -64,6 +63,32 @@
     "shotgunBulletCount": 5,
     "streamAngleSpread": 0.1,
     "shotgunAngleSpread": 0.3,
-    "streamCooldownMs": 100,
-    "shotgunCooldownMs": 500
+
+    "weaponUpgradeThresholds": [
+        50,
+        150,
+        350
+    ],
+    "weaponLevelValues": [
+        {
+            "bulletDamage": 1,
+            "streamCooldownMs": 100,
+            "shotgunCooldownMs": 500
+        },
+        {
+            "bulletDamage": 2,
+            "streamCooldownMs": 90,
+            "shotgunCooldownMs": 450
+        },
+        {
+            "bulletDamage": 3,
+            "streamCooldownMs": 75,
+            "shotgunCooldownMs": 375
+        },
+        {
+            "bulletDamage": 5,
+            "streamCooldownMs": 50,
+            "shotgunCooldownMs": 250
+        }
+    ]
 }
