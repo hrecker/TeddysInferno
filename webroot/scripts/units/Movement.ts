@@ -91,7 +91,10 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
 /** Move a powerup gem for one frame - homing in on the player, a stealer unit, or not moving */
 export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, stealerUnits: { [id: number]: Unit }, player: Unit, isGemRepelActive: boolean) {
     let isHomingOnStealer = false;
-    let targetPos = player.gameObj[0].body.center;
+    let targetPos;
+    if (! isGemRepelActive) {
+        targetPos = player.gameObj[0].body.center;
+    }
     let stealerIds = Object.keys(stealerUnits);
     if (stealerIds.length > 0) {
         isHomingOnStealer = true;
