@@ -42,6 +42,8 @@
 
     "unitInaccuracyRange": 100,
     "unitDrag": 250,
+    "unitSpawnDurationMs": 2000,
+    "unitSpawnTweenLoopMs": 500,
 
     "gemAcceleration": 800,
     "gemMaxSpeed": 400,

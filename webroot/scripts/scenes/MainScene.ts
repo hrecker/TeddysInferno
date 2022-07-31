@@ -6,6 +6,7 @@ import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } fr
 import { config } from "../model/Config";
 import { incrementTimer, resetTimer } from "../state/TimerState";
 import { createGem } from "../model/Gem";
+import { countdownSpawns, startSpawn } from "../units/Spawn";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -97,15 +98,18 @@ export class MainScene extends Phaser.Scene {
         
         // Create units immediately for development
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
+        this.startUnitSpawn("spawner1", new Phaser.Math.Vector2(175, 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
+        this.startUnitSpawn("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
         //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
+        this.startUnitSpawn("worm", new Phaser.Math.Vector2(-500, 300));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
         //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
         //this.addUnit("stealer1", new Phaser.Math.Vector2(900, 600));
@@ -128,6 +132,30 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
         // Handle gems hitting units
         this.physics.add.overlap(unitsPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
+    }
+
+    /** Start the spawn animation for a unit */
+    startUnitSpawn(name: string, location: Phaser.Math.Vector2) {
+        let portal = this.add.image(location.x, location.y, "spawnportal");
+        this.tweens.add({
+            targets: portal,
+            alpha: {
+                from: 0,
+                to: 0.9
+            },
+            duration: config()["unitSpawnTweenLoopMs"],
+            yoyo: true,
+            loop: 100,
+        })
+        startSpawn(name, location, portal);
+    }
+
+    /** Wait for spawn animations to complete. If any complete, spawn the unit. */
+    updateSpawns(delta: number) {
+        let completed = countdownSpawns(delta);
+        completed.forEach(spawn => {
+            this.addUnit(spawn.name, spawn.location);
+        })
     }
 
     addUnit(name: string, location: Phaser.Math.Vector2): Unit {
@@ -252,7 +280,7 @@ export class MainScene extends Phaser.Scene {
             this.updateUnitsAI(delta);
             this.fireUnitWeapons(delta);
             // Gem movement
-            this.moveGems(player.gameObj[0].body.center);
+            this.moveGems();
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
                 thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);
@@ -269,7 +297,8 @@ export class MainScene extends Phaser.Scene {
             // Enemy movement
             this.moveUnits(finalPlayerPos, delta);
             // Gem movement
-            this.moveGems(finalPlayerPos);
+            this.moveGems();
         }
+        this.updateSpawns(delta);
     }
 }
