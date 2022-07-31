@@ -9,6 +9,11 @@ function setTimer(val) {
         callback.callback(timer, callback.scene));
 }
 
+/** Get the current timer value, in milliseconds */
+export function getTimer() {
+    return timer;
+}
+
 /** Set the timer to 0 */
 export function resetTimer() {
     setTimer(0);

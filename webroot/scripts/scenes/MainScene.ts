@@ -4,9 +4,10 @@ import { fireEnemyWeapon, fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } from "../units/Collision";
 import { config } from "../model/Config";
-import { incrementTimer, resetTimer } from "../state/TimerState";
+import { getTimer, incrementTimer, resetTimer } from "../state/TimerState";
 import { createGem } from "../model/Gem";
 import { countdownSpawns, startSpawn } from "../units/Spawn";
+import { getSpawns, resetSpawnset } from "../model/Spawnset";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -32,6 +33,7 @@ let boostKey : Phaser.Input.Keyboard.Key;
 
 // Map bounds
 let killZoneTopLeft, killZoneBottomRight;
+const spawnMargin = 32;
 
 let finalPlayerPos : Phaser.Math.Vector2;
 //TODO remove in prod build
@@ -70,6 +72,7 @@ export class MainScene extends Phaser.Scene {
         stealerUnits = {};
         gems = {};
         resetTimer();
+        resetSpawnset();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0);
         killZoneTopLeft = background.getTopLeft();
@@ -96,32 +99,6 @@ export class MainScene extends Phaser.Scene {
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
         gemPhysicsGroup = this.createPhysicsGroup();
         
-        // Create units immediately for development
-        //this.addUnit("worm", new Phaser.Math.Vector2(100, 200));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, 175));
-        this.startUnitSpawn("spawner1", new Phaser.Math.Vector2(175, 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(175, killZoneBottomRight.y - 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(100, killZoneBottomRight.y - 100));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(killZoneBottomRight.x - 175, killZoneBottomRight.y - 175));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
-        this.startUnitSpawn("spawner2", new Phaser.Math.Vector2(killZoneBottomRight.x - 100, killZoneBottomRight.y - 100));
-        //this.addUnit("worm", new Phaser.Math.Vector2(700, 400));
-        this.startUnitSpawn("worm", new Phaser.Math.Vector2(-500, 300));
-        //this.addUnit("spawner3", new Phaser.Math.Vector2(200, 500));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(900, 600));
-
-        //this.addUnit("bomber", new Phaser.Math.Vector2(400, 200));
-        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 200));
-        
-        //for (let i = 0; i < 4; i++) {
-        //    this.addUnit("looper", new Phaser.Math.Vector2(Math.random() * this.getKillZoneBottomRight().x,
-        //            Math.random() * this.getKillZoneBottomRight().y));
-        //}
-        
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
         // Handle units hitting player
@@ -135,8 +112,13 @@ export class MainScene extends Phaser.Scene {
     }
 
     /** Start the spawn animation for a unit */
-    startUnitSpawn(name: string, location: Phaser.Math.Vector2) {
-        let portal = this.add.image(location.x, location.y, "spawnportal");
+    startUnitSpawn(name: string, location?: Phaser.Math.Vector2) {
+        if (! location) {
+            let randomX = (Math.random() * (killZoneBottomRight.x - killZoneTopLeft.x - (2 * spawnMargin))) + spawnMargin + killZoneTopLeft.x;
+            let randomY = (Math.random() * (killZoneBottomRight.y - killZoneTopLeft.y - (2 * spawnMargin))) + spawnMargin + killZoneTopLeft.y;
+            location = new Phaser.Math.Vector2(randomX, randomY);
+        }
+        let portal = this.add.image(location.x, location.y, "spawnportal").setAlpha(0);
         this.tweens.add({
             targets: portal,
             alpha: {
@@ -292,6 +274,10 @@ export class MainScene extends Phaser.Scene {
                 fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
                 // Update timer
                 incrementTimer(delta);
+                // Spawning enemies
+                getSpawns(getTimer()).forEach(toSpawn => {
+                    this.startUnitSpawn(toSpawn);
+                })
             }
         } else {
             // Enemy movement

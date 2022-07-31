@@ -1,0 +1,35 @@
+{
+    "spawnTimes": {
+        "3": [
+            "spawner1"
+        ],
+        "9": [
+            "spawner1"
+        ],
+        "15": [
+            "spawner1"
+        ],
+        "25": [
+            "spawner2"
+        ],
+        "30": [
+            "spawner1"
+        ],
+        "38": [
+            "spawner1",
+            "spawner2"
+        ],
+        "50": [
+            "spawner3"
+        ],
+        "60": [
+            "spawner1",
+            "spawner2"
+        ],
+        "75": [
+            "spawner1",
+            "spawner2",
+            "spawner3"
+        ]
+    }
+}

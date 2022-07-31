@@ -34,7 +34,7 @@
         }
     },
 
-    "invinciblePlayer": true,
+    "invinciblePlayer": false,
     "automaticRestart": {
         "enabled": true,
         "restartTime": 2000

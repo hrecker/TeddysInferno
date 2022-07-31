@@ -1,4 +1,5 @@
 import { loadConfig } from "../model/Config";
+import { loadSpawnset } from "../model/Spawnset";
 import { loadUnitJson } from "../model/Units";
 
 /** Load json and assets */
@@ -46,11 +47,13 @@ export class LoadingScene extends Phaser.Scene {
         // Load json
         this.load.json("config", "assets/json/config.json");
         this.load.json("units", "assets/json/units.json");
+        this.load.json("spawnset", "assets/json/spawnset.json");
     }
 
     create() {
         loadUnitJson(this.cache.json.get("units"));
         loadConfig(this.cache.json.get("config"));
+        loadSpawnset(this.cache.json.get("spawnset"));
         this.scene.start("MenuScene")
                   .stop();
     }
