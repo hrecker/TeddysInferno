@@ -6,12 +6,8 @@ import { updateBombCount, updateGemCount, updateWeaponLevel } from "../state/Upg
 let upgradeGemCountCache: { [upgradesComplete: number]: number } = {};
 
 /** Update the health/max health of a given unit, and destroy it if health reaches zero. */
-function updateHealth(scene: MainScene, unit: Unit, newHealth: number, newMaxHealth?: number) {
+function updateHealth(scene: MainScene, unit: Unit, newHealth: number) {
     unit.health = newHealth;
-    if (newMaxHealth) {
-        unit.maxHealth = newMaxHealth;
-    }
-
     if (unit.health <= 0) {
         if (unit.name == "player") {
             scene.destroyPlayer();
@@ -19,14 +15,15 @@ function updateHealth(scene: MainScene, unit: Unit, newHealth: number, newMaxHea
             scene.destroyUnitById(unit.id);
         }
     }
+    return unit.health;
 }
 
-/** Cause the unit to take a certain amount of damage. */
-export function takeDamage(scene: MainScene, unit: Unit, damage: number) {
+/** Cause the unit to take a certain amount of damage. Return unit health remaining. */
+export function takeDamage(scene: MainScene, unit: Unit, damage: number): number {
     if (damage <= 0) {
-        return;
+        return unit.health;
     }
-    updateHealth(scene, unit, unit.health - damage);
+    return updateHealth(scene, unit, unit.health - damage);
 }
 
 /** Calculate the next threshold for earning a bomb for the player */
@@ -68,7 +65,6 @@ function collectGemPlayer(player: Unit) {
         if (player.aiData["weaponLevel"] < config()["weaponUpgradeThresholds"].length) {
             // Upgrade weapon
             player.aiData["weaponLevel"]++;
-            console.log("level up :" + player.aiData["weaponLevel"]);
             updateWeaponLevel(player.aiData["weaponLevel"]);
         } else {
             // Add bomb

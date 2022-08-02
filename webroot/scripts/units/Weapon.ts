@@ -1,7 +1,8 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
-import { getStreamCooldownMs, getShotgunCooldownMs } from "./Status";
+import { updateBombCount } from "../state/UpgradeState";
+import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./Status";
 
 /** Fire player weapon for one frame */
 export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean) {
@@ -19,6 +20,31 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
         }
         player.cooldownRemainingMs = getShotgunCooldownMs(player);
     }
+}
+
+/** Activate player bomb for one frame. Return true if bomb was activated this frame. */
+export function activateBomb(scene: MainScene, delta: number, player: Unit, bombKeyDown: boolean): boolean {
+    if ("bombCooldownRemainingMs" in player.aiData && player.aiData["bombCooldownRemainingMs"] > 0) {
+        player.aiData["bombCooldownRemainingMs"] -= delta;
+        return false;
+    }
+    if (bombKeyDown && player.aiData["bombCount"] > 0) {
+        // Activate bomb, repelling and damaging all units in the scene
+        scene.getEnemyUnits().forEach(unit => {
+            let health = takeDamage(scene, unit, config()["bombDamage"]);
+            if (health > 0 && unit.maxSpeed > 0) {
+                // Repel unit
+                let repelVelocity = unit.gameObj[0].body.center.clone().subtract(player.gameObj[0].body.center).normalize().scale(config()["bombRepelSpeed"]);
+                unit.gameObj[0].setVelocity(repelVelocity.x, repelVelocity.y);
+                unit.gameObj[0].setAcceleration(0);
+            }
+        });
+        player.aiData["bombCooldownRemainingMs"] = config()["bombCooldownMs"];
+        player.aiData["bombCount"]--;
+        updateBombCount(player.aiData["bombCount"]);
+        return true;
+    }
+    return false;
 }
 
 /** Get a random bullet angle for the shotgun */

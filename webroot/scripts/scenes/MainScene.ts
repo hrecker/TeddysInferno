@@ -1,6 +1,6 @@
 import { moveUnit, movePlayerUnit, moveGem } from "../units/Movement";
 import { updateUnitAI, handleUnitDestroy } from "../units/AI";
-import { fireEnemyWeapon, fireWeapon } from "../units/Weapon";
+import { activateBomb, fireEnemyWeapon, fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } from "../units/Collision";
 import { config } from "../model/Config";
@@ -30,11 +30,13 @@ let streamWeaponKey : Phaser.Input.Keyboard.Key;
 let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 let quickTurnKey : Phaser.Input.Keyboard.Key;
 let boostKey : Phaser.Input.Keyboard.Key;
+let bombKey: Phaser.Input.Keyboard.Key;
 
 // Map bounds
 let killZoneTopLeft, killZoneBottomRight;
 const spawnMargin = 32;
 
+let bombRepelRemainingMs = 0;
 let finalPlayerPos : Phaser.Math.Vector2;
 //TODO remove in prod build
 let graphics;
@@ -90,6 +92,7 @@ export class MainScene extends Phaser.Scene {
         shotgunWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         quickTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         boostKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+        bombKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.input.mouse.disableContextMenu();
 
         playerPhysicsGroup = this.createPhysicsGroup();
@@ -98,6 +101,14 @@ export class MainScene extends Phaser.Scene {
         bulletsPhysicsGroup = this.createPhysicsGroup();
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
         gemPhysicsGroup = this.createPhysicsGroup();
+
+        // For debugging
+        //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
+        //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -167,6 +178,14 @@ export class MainScene extends Phaser.Scene {
         return enemyUnits[id];
     }
 
+    getEnemyUnits(): Unit[] {
+        let units = [];
+        Object.keys(enemyUnits).forEach(id => {
+            units.push(enemyUnits[id]);
+        });
+        return units;
+    }
+
     getPlayer() {
         return player;
     }
@@ -211,13 +230,13 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    moveUnits(targetPos: Phaser.Math.Vector2, delta: number) {
+    moveUnits(targetPos: Phaser.Math.Vector2, delta: number, isBombRepelActive: boolean) {
         if (graphics) {
             graphics.clear();
         }
         Object.keys(enemyUnits).forEach(id => {
             // Pass in graphics for some debugging (the arcade physics debug property must be set to true)
-            moveUnit(enemyUnits[id], targetPos.clone(), graphics, this, delta);
+            moveUnit(enemyUnits[id], targetPos.clone(), graphics, this, delta, isBombRepelActive);
         });
     }
 
@@ -256,9 +275,13 @@ export class MainScene extends Phaser.Scene {
 
     /** Main game update loop */
     update(time, delta) {
+        if (bombRepelRemainingMs > 0) {
+            bombRepelRemainingMs -= delta;
+        }
+
         if (player.gameObj[0]) {
             // Enemy movement, AI, and weapons
-            this.moveUnits(player.gameObj[0].body.center, delta);
+            this.moveUnits(player.gameObj[0].body.center, delta, bombRepelRemainingMs > 0);
             this.updateUnitsAI(delta);
             this.fireUnitWeapons(delta);
             // Gem movement
@@ -272,6 +295,9 @@ export class MainScene extends Phaser.Scene {
             } else {
                 // Player weapons
                 fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
+                if (activateBomb(this, delta, player, bombKey.isDown)) {
+                    bombRepelRemainingMs = config()["bombRepelDurationMs"];
+                }
                 // Update timer
                 incrementTimer(delta);
                 // Spawning enemies
@@ -281,7 +307,7 @@ export class MainScene extends Phaser.Scene {
             }
         } else {
             // Enemy movement
-            this.moveUnits(finalPlayerPos, delta);
+            this.moveUnits(finalPlayerPos, delta, bombRepelRemainingMs > 0);
             // Gem movement
             this.moveGems();
         }

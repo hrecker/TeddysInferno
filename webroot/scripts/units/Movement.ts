@@ -63,7 +63,16 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
 }
 
 /** Move a non-player unit for one frame (call each frame in the update method of a scene) */
-export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene, delta: number) {
+export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene, delta: number, isBombRepelActive: boolean) {
+    // Units can't move when being repelled by bomb
+    if (isBombRepelActive) {
+        // Worms still should follow the head when being repelled though
+        if (unit.movement == "worm") {
+            moveWormUnit(unit, targetPos, debugGraphics, delta);
+        }
+        return;
+    }
+    
     switch (unit.movement) {
         case "bomber":
             moveBomberUnit(unit, scene);
@@ -84,7 +93,6 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
             moveWormUnit(unit, targetPos, debugGraphics, delta);
             break;
     }
-
     clampUnitSpeed(unit);
 }
 

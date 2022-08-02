@@ -99,5 +99,9 @@
         }
     ],
     "baseGemsForBomb": 20,
-    "gemsForBombGrowthRate": 1.1
+    "gemsForBombGrowthRate": 1.1,
+    "bombCooldownMs": 500,
+    "bombRepelDurationMs": 250,
+    "bombRepelSpeed": 600,
+    "bombDamage": 1
 }
