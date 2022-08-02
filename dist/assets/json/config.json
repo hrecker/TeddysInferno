@@ -97,5 +97,7 @@
             "streamCooldownMs": 50,
             "shotgunCooldownMs": 250
         }
-    ]
+    ],
+    "baseGemsForBomb": 20,
+    "gemsForBombGrowthRate": 1.1
 }

@@ -15,8 +15,6 @@ export function loadSpawnset(spawnsetJson) {
         spawnUnits.push(spawnsetJson["spawnTimes"][spawnTime]);
     }
     currentSpawnIndex = 0;
-    console.log(spawnTimes);
-    console.log(spawnUnits);
 }
 
 /** Get spawns that should begin now based on the game time */
@@ -26,7 +24,5 @@ export function getSpawns(gameTime: number): string[] {
         toSpawn.push(...spawnUnits[currentSpawnIndex]);
         currentSpawnIndex++;
     }
-    if (toSpawn.length > 0)
-        console.log("spawning: " + toSpawn);
     return toSpawn;
 }

@@ -1,7 +1,7 @@
 import { config } from "../model/Config";
 import { addAbilityListener } from "../state/AbilityState";
 import { addTimerListener } from "../state/TimerState";
-import { addGemCountListener, addWeaponLevelListener } from "../state/UpgradeState";
+import { addBombCountListener, addGemCountListener, addWeaponLevelListener } from "../state/UpgradeState";
 
 let timerText: Phaser.GameObjects.Text;
 
@@ -17,6 +17,11 @@ let levelProgress: Phaser.GameObjects.Graphics;
 let weaponLevelText: Phaser.GameObjects.Text;
 let homingShotsText: Phaser.GameObjects.Text;
 let maxLevelProgessWidth = 146;
+let bombCountText: Phaser.GameObjects.Text;
+
+const weaponUpgradeProgressColor = 0x38b031;
+const bombProgressColor = 0x00bcd9;
+let progressColor = weaponUpgradeProgressColor;
 
 /** UI displayed over MainScene */
 export class MainUIScene extends Phaser.Scene {
@@ -51,33 +56,26 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     /** Listen for the player gaining gems */
-    gemCountListener(gemCount, currentLevel, scene) {
-        let gemsForPrevious = 0;
-        if (currentLevel > 0) {
-            gemsForPrevious = config()["weaponUpgradeThresholds"][currentLevel - 1];
-        }
-        if (currentLevel == config()["weaponUpgradeThresholds"].length) {
-            //Already at max level, now gathering homing gems
-            //TODO update this to actually count homing shots once that is implemented
-            homingShotsText.setText("Homing: " + (gemCount - gemsForPrevious));
-        } else {
-            levelProgress.clear();
-            levelProgress.fillStyle(0x38b031);
-            let gemsForLevelUp = config()["weaponUpgradeThresholds"][currentLevel];
-            let rectWidth = maxLevelProgessWidth * ((gemCount - gemsForPrevious) / (gemsForLevelUp - gemsForPrevious));
-            levelProgress.fillRect(132, 14, rectWidth, 20);
-        }
+    gemCountListener(gemCount, previousThreshold, nextThreshold, scene) {
+        levelProgress.clear();
+        levelProgress.fillStyle(progressColor);
+        let rectWidth = maxLevelProgessWidth * ((gemCount - previousThreshold) / (nextThreshold - previousThreshold));
+        levelProgress.fillRect(132, 14, rectWidth, 20);
     }
 
     /** Listen for the player increasing weapon level */
     weaponLevelListener(weaponLevel, scene) {
-        if (weaponLevel == config()["weaponUpgradeThresholds"].length) {
-            weaponLevelText.setText("Max Level");
-            levelProgressOutline.destroy();
-            levelProgress.destroy();
-        }
         // Weapon level is 0-indexed, but we should display the base level as level 1
         weaponLevelText.setText("Level " + (weaponLevel + 1));
+        if (weaponLevel == config()["weaponUpgradeThresholds"].length) {
+            // Max level
+            progressColor = bombProgressColor;
+        }
+    }
+
+    /** Listen for the player changing bomb count */
+    bombCountListener(bombCount, scene) {
+        bombCountText.setText("Bombs: " + bombCount);
     }
 
     /** Start tween for cooldown on ability icons */
@@ -105,6 +103,7 @@ export class MainUIScene extends Phaser.Scene {
         timerText.alpha = 0.75;
 
         weaponLevelText = this.add.text(24, 24, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
+        bombCountText = this.add.text(24, 60, "", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         levelProgressOutline = this.add.graphics();
         levelProgressOutline.lineStyle(4, 0xffffff, 0.75);
         levelProgressOutline.strokeRect(130, 12, 150, 24);
@@ -115,6 +114,7 @@ export class MainUIScene extends Phaser.Scene {
         addAbilityListener(this.abilityListener, this);
         addGemCountListener(this.gemCountListener, this);
         addWeaponLevelListener(this.weaponLevelListener, this);
+        addBombCountListener(this.bombCountListener, this);
 
         boostIcon = this.add.image(this.game.renderer.width - 112, 40, "boostIcon").setAlpha(0.8);
         quickTurnIcon = this.add.image(this.game.renderer.width - 40, 40, "quickTurnIcon").setAlpha(0.8);
