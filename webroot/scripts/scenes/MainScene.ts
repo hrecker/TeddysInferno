@@ -139,7 +139,7 @@ export class MainScene extends Phaser.Scene {
             duration: config()["unitSpawnTweenLoopMs"],
             yoyo: true,
             loop: 100,
-        })
+        });
         startSpawn(name, location, portal);
     }
 
