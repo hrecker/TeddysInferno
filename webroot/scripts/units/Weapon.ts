@@ -4,22 +4,25 @@ import { MainScene } from "../scenes/MainScene";
 import { updateBombCount } from "../state/UpgradeState";
 import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./Status";
 
-/** Fire player weapon for one frame */
-export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean) {
+/** Fire player weapon for one frame. Return the number of bullets fired this frame. */
+export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean): number {
     if (player.cooldownRemainingMs > 0) {
         player.cooldownRemainingMs -= delta;
-        return;
+        return 0;
     }
 
     if (streamWeaponKeyDown) {
         createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
         player.cooldownRemainingMs = getStreamCooldownMs(player);
+        return 1;
     } else if (shotgunWeaponKeyDown) {
         for (let i = 0; i < config()["shotgunBulletCount"]; i++) {
             createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
         }
         player.cooldownRemainingMs = getShotgunCooldownMs(player);
+        return config()["shotgunBulletCount"];
     }
+    return 0;
 }
 
 /** Activate player bomb for one frame. Return true if bomb was activated this frame. */

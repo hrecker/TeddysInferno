@@ -1,6 +1,6 @@
 import { config } from "../model/Config";
 import { addAbilityListener } from "../state/AbilityState";
-import { getHighScores } from "../state/HighScoreState";
+import { getGameResults } from "../state/GameResultState";
 import { addPlayerAliveListener } from "../state/PlayerAliveState";
 import { addTimerListener } from "../state/TimerState";
 import { addBombCountListener, addGemCountListener, addWeaponLevelListener } from "../state/UpgradeState";
@@ -25,11 +25,17 @@ const bombProgressColor = 0x00bcd9;
 let progressColor = weaponUpgradeProgressColor;
 
 // Leaderboard UI
-let leaderboardHeader: Phaser.GameObjects.Text;
+type LeaderboardRow = {
+    seconds: Phaser.GameObjects.Text;
+    gems: Phaser.GameObjects.Text;
+    kills: Phaser.GameObjects.Text;
+    shots: Phaser.GameObjects.Text;
+};
+
+let leaderboardTitle: Phaser.GameObjects.Text;
 let leaderboardNumbers: Phaser.GameObjects.Text[];
-let leaderboardLines: Phaser.GameObjects.Text[];
-let maxLeaderboardLineWidth = 0;
-const leaderboardTextMargin = 100;
+let leaderboardRows: LeaderboardRow[];
+const leaderboardColumnMargin = 50;
 
 /** UI displayed over MainScene */
 export class MainUIScene extends Phaser.Scene {
@@ -116,35 +122,62 @@ export class MainUIScene extends Phaser.Scene {
 
     /** Update leaderboard with player highscores */
     updateLeaderboard() {
-        let highScores = getHighScores();
-        maxLeaderboardLineWidth = 0;
-        // Update the lines in the leaderboard with the current high scores
-        for (let i = 0; i < leaderboardLines.length && i < highScores.length; i++) {
-            leaderboardLines[i].setText(highScores[i].toFixed(3) + " seconds");
-            maxLeaderboardLineWidth = Math.max(maxLeaderboardLineWidth, leaderboardLines[i].width);
+        let gameResults = getGameResults();
+        // Update the rows in the leaderboard with the current high scores
+        let maxSecondsWidth = leaderboardRows[0].seconds.width;
+        let maxGemsWidth = leaderboardRows[0].gems.width;
+        let maxKillsWidth = leaderboardRows[0].kills.width;
+        let maxShotsWidth = leaderboardRows[0].shots.width;
+        for (let i = 0; (i + 1) < leaderboardRows.length && i < gameResults.length; i++) {
+            leaderboardRows[i + 1].seconds.setText(gameResults[i].score.toFixed(3));
+            leaderboardRows[i + 1].gems.setText(gameResults[i].gemsCollected.toString());
+            leaderboardRows[i + 1].kills.setText(gameResults[i].enemiesKilled.toString());
+            leaderboardRows[i + 1].shots.setText(gameResults[i].shotsFired.toString());
+            maxSecondsWidth = Math.max(maxSecondsWidth, leaderboardRows[i + 1].seconds.width);
+            maxGemsWidth = Math.max(maxGemsWidth, leaderboardRows[i + 1].gems.width);
+            maxKillsWidth = Math.max(maxKillsWidth, leaderboardRows[i + 1].kills.width);
+            maxShotsWidth = Math.max(maxShotsWidth, leaderboardRows[i + 1].shots.width);
         }
-        let fullWidth = maxLeaderboardLineWidth + leaderboardNumbers[0].width + leaderboardTextMargin;
-        for (let i = 0; i < leaderboardLines.length; i++) {
-            leaderboardLines[i].setX((this.game.renderer.width / 2) + (fullWidth / 2));
-            leaderboardNumbers[i].setX((this.game.renderer.width / 2) - (fullWidth / 2));
+        // Reposition the rows in the leaderboard
+        let fullWidth = (leaderboardColumnMargin * 4) + maxSecondsWidth + maxGemsWidth + maxKillsWidth + maxShotsWidth + leaderboardNumbers[0].width;
+        let maxX = (this.game.renderer.width / 2) + (fullWidth / 2);
+        for (let i = 0; i < leaderboardRows.length; i++) {
+            if (i < leaderboardNumbers.length) {
+                leaderboardNumbers[i].setX((this.game.renderer.width / 2) - (fullWidth / 2));
+            }
+            leaderboardRows[i].seconds.setX(maxX - maxShotsWidth - maxKillsWidth - maxGemsWidth - (3 * leaderboardColumnMargin));
+            leaderboardRows[i].gems.setX(maxX - maxShotsWidth - maxKillsWidth - (2 * leaderboardColumnMargin));
+            leaderboardRows[i].kills.setX(maxX - maxShotsWidth - leaderboardColumnMargin);
+            leaderboardRows[i].shots.setX(maxX);
         }
     }
 
-    setLeaderboardVisible(visible: boolean) {
-        if (! leaderboardHeader || ! leaderboardLines || ! leaderboardNumbers) {
+    setLeaderboardVisible(isVisible: boolean) {
+        if (! leaderboardTitle || ! leaderboardRows || ! leaderboardNumbers) {
             return;
         }
-        leaderboardHeader.setVisible(visible);
-        for (let i = 0; i < leaderboardLines.length; i++) {
+        leaderboardTitle.setVisible(isVisible);
+        for (let i = 0; i < leaderboardRows.length; i++) {
             // Don't show 0 second scores
-            if (leaderboardLines[i].text == "0.000 seconds") {
-                leaderboardLines[i].setVisible(false);
-                leaderboardNumbers[i].setVisible(false);
+            if (leaderboardRows[i].seconds.text == "0.000") {
+                this.setRowVisible(leaderboardRows[i], false);
+                if (i < leaderboardNumbers.length) {
+                    leaderboardNumbers[i].setVisible(false);
+                }
             } else {
-                leaderboardLines[i].setVisible(visible);
-                leaderboardNumbers[i].setVisible(visible);
+                this.setRowVisible(leaderboardRows[i], isVisible);
+                if (i < leaderboardNumbers.length) {
+                    leaderboardNumbers[i].setVisible(isVisible);
+                }
             }
         }
+    }
+
+    setRowVisible(row: LeaderboardRow, isVisible: boolean) {
+        row.seconds.setVisible(isVisible);
+        row.gems.setVisible(isVisible);
+        row.kills.setVisible(isVisible);
+        row.shots.setVisible(isVisible);
     }
 
     create() {
@@ -159,14 +192,25 @@ export class MainUIScene extends Phaser.Scene {
         levelProgressOutline.strokeRect(130, 12, 150, 24);
         levelProgress = this.add.graphics();
 
-        leaderboardHeader = this.add.text(this.game.renderer.width / 2, 100, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
+        leaderboardTitle = this.add.text(this.game.renderer.width / 2, 100, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
         leaderboardNumbers = [];
-        leaderboardLines = [];
+        leaderboardRows = [];
+        let labelRow = {
+            seconds: this.add.text(0, 225, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
+            gems: this.add.text(0, 225, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            kills: this.add.text(0, 225, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            shots: this.add.text(0, 225, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+        };
+        leaderboardRows.push(labelRow);
         for (let i = 0; i < config()["leaderboardCount"]; i++) {
-            let y = 200 + (i * 75);
-            leaderboardNumbers.push(this.add.text(this.game.renderer.width / 2, y, (i + 1).toString(), config()["leaderboardLineStyle"]).setOrigin(0, 0.5));
-            leaderboardLines.push(this.add.text(this.game.renderer.width / 2, y, "0.000 seconds", config()["leaderboardLineStyle"]).setOrigin(1, 0.5));
-            maxLeaderboardLineWidth = Math.max(maxLeaderboardLineWidth, leaderboardLines[i].width);
+            let y = 275 + (i * 75);
+            leaderboardNumbers.push(this.add.text(this.game.renderer.width / 2, y, (i + 1).toString(), config()["leaderboardRowStyle"]).setOrigin(0, 1));
+            leaderboardRows.push({
+                seconds: this.add.text(0, y, "0.000", config()["leaderboardRowStyle"]).setOrigin(1, 1),
+                gems: this.add.text(0, y, "0", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+                kills: this.add.text(0, y, "0", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+                shots: this.add.text(0, y, "0", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            });
         }
         this.setLeaderboardVisible(false);
 

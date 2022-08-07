@@ -82,10 +82,12 @@ export function collectGem(unit: Unit, gem: Phaser.Types.Physics.Arcade.ImageWit
         unit.aiData["gemCount"] = 0;
     }
     unit.aiData["gemCount"]++;
+    let collectedByPlayer = false;
     if (unit.name == "player") {
         collectGemPlayer(unit);
+        collectedByPlayer = true;
     }
-    scene.destroyGem(gem);
+    scene.destroyGem(gem, collectedByPlayer);
 }
 
 /** Get bullet damage for the player based on weapon level */

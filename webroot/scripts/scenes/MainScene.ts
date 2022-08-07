@@ -8,8 +8,9 @@ import { getTimer, incrementTimer, resetTimer } from "../state/TimerState";
 import { createGem } from "../model/Gem";
 import { countdownSpawns, startSpawn } from "../units/Spawn";
 import { getSpawns, resetSpawnset } from "../model/Spawnset";
-import { saveHighScore } from "../state/HighScoreState";
+import { saveGameResult, saveHighScore } from "../state/GameResultState";
 import { setPlayerIsAlive } from "../state/PlayerAliveState";
+import { GameResult } from "../model/GameResult";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -43,6 +44,8 @@ let finalPlayerPos : Phaser.Math.Vector2;
 //TODO remove in prod build
 let graphics;
 
+let gameResult: GameResult;
+
 /** Main game scene */
 export class MainScene extends Phaser.Scene {
     constructor() {
@@ -75,6 +78,12 @@ export class MainScene extends Phaser.Scene {
         enemyUnits = {};
         stealerUnits = {};
         gems = {};
+        gameResult = {
+            score: 0,
+            gemsCollected: 0,
+            enemiesKilled: 0,
+            shotsFired: 0
+        };
         resetTimer();
         resetSpawnset();
         setPlayerIsAlive(true);
@@ -200,10 +209,13 @@ export class MainScene extends Phaser.Scene {
         return gem;
     }
 
-    destroyGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
+    destroyGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, collectedByPlayer: boolean) {
         let id = gem.getData("id");
         gem.destroy();
         delete gems[id];
+        if (collectedByPlayer) {
+            gameResult.gemsCollected++;
+        }
     }
 
     destroyUnitById(id: number) {
@@ -219,6 +231,9 @@ export class MainScene extends Phaser.Scene {
         unit.gameObj.forEach(obj => {
             obj.destroy();
         });
+        if (unit.name != "bomb" && unit.name != "player") {
+            gameResult.enemiesKilled++;
+        }
     }
 
     destroyPlayer() {
@@ -226,7 +241,8 @@ export class MainScene extends Phaser.Scene {
             finalPlayerPos = player.gameObj[0].body.center.clone();
             this.destroyUnit(player);
             player.gameObj[0] = null;
-            saveHighScore(getTimer());
+            gameResult.score = Math.floor(getTimer()) / 1000.0;
+            saveGameResult(gameResult);
             setPlayerIsAlive(false);
         }
         if (config()["automaticRestart"]["enabled"]) {
@@ -299,7 +315,7 @@ export class MainScene extends Phaser.Scene {
                 this.destroyPlayer();
             } else {
                 // Player weapons
-                fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
+                gameResult.shotsFired += fireWeapon(this, bulletsPhysicsGroup, delta, player, this.isStreamWeaponActive(), this.isShotgunWeaponActive());
                 if (activateBomb(this, delta, player, bombKey.isDown)) {
                     bombRepelRemainingMs = config()["bombRepelDurationMs"];
                 }

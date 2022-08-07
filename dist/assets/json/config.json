@@ -44,8 +44,19 @@
             "fill": true
         }
     },
-    "leaderboardLineStyle": { 
-        "font": "65px Verdana",
+    "leaderboardRowStyle": { 
+        "font": "45px Verdana",
+        "shadow": {
+            "offsetX": 1,
+            "offsetY": 1,
+            "color": "#000",
+            "blur": 3,
+            "stroke": true,
+            "fill": true
+        }
+    },
+    "leaderboardSmallRowStyle": { 
+        "font": "35px Verdana",
         "shadow": {
             "offsetX": 1,
             "offsetY": 1,
@@ -57,6 +68,7 @@
     },
 
     "leaderboardCount": 5,
+    "maxGamesStored": 100,
 
     "invinciblePlayer": false,
     "automaticRestart": {
