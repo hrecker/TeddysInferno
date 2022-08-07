@@ -8,6 +8,8 @@ import { getTimer, incrementTimer, resetTimer } from "../state/TimerState";
 import { createGem } from "../model/Gem";
 import { countdownSpawns, startSpawn } from "../units/Spawn";
 import { getSpawns, resetSpawnset } from "../model/Spawnset";
+import { saveHighScore } from "../state/HighScoreState";
+import { setPlayerIsAlive } from "../state/PlayerAliveState";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -75,6 +77,7 @@ export class MainScene extends Phaser.Scene {
         gems = {};
         resetTimer();
         resetSpawnset();
+        setPlayerIsAlive(true);
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0);
         killZoneTopLeft = background.getTopLeft();
@@ -223,6 +226,8 @@ export class MainScene extends Phaser.Scene {
             finalPlayerPos = player.gameObj[0].body.center.clone();
             this.destroyUnit(player);
             player.gameObj[0] = null;
+            saveHighScore(getTimer());
+            setPlayerIsAlive(false);
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],
