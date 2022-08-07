@@ -94,6 +94,7 @@ export class MainUIScene extends Phaser.Scene {
 
     playerIsAliveListener(isAlive, scene) {
         if (isAlive) {
+            levelProgress.clear();
             scene.setLeaderboardVisible(false);
         } else {
             scene.updateLeaderboard();
