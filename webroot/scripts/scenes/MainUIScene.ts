@@ -1,6 +1,6 @@
 import { config } from "../model/Config";
 import { addAbilityListener } from "../state/AbilityState";
-import { getGameResults } from "../state/GameResultState";
+import { getGameResults, getLatestGameResultIndex } from "../state/GameResultState";
 import { addPlayerAliveListener } from "../state/PlayerAliveState";
 import { addTimerListener } from "../state/TimerState";
 import { addBombCountListener, addGemCountListener, addWeaponLevelListener } from "../state/UpgradeState";
@@ -36,6 +36,8 @@ let leaderboardTitle: Phaser.GameObjects.Text;
 let leaderboardNumbers: Phaser.GameObjects.Text[];
 let leaderboardRows: LeaderboardRow[];
 const leaderboardColumnMargin = 50;
+const defaultLeaderboardRowColor = "white";
+const highlightLeaderboardRowColor = "#8dff5c";
 
 /** UI displayed over MainScene */
 export class MainUIScene extends Phaser.Scene {
@@ -124,6 +126,7 @@ export class MainUIScene extends Phaser.Scene {
     /** Update leaderboard with player highscores */
     updateLeaderboard() {
         let gameResults = getGameResults();
+        let highlightIndex = getLatestGameResultIndex();
         // Update the rows in the leaderboard with the current high scores
         let maxSecondsWidth = leaderboardRows[0].seconds.width;
         let maxGemsWidth = leaderboardRows[0].gems.width;
@@ -138,6 +141,19 @@ export class MainUIScene extends Phaser.Scene {
             maxGemsWidth = Math.max(maxGemsWidth, leaderboardRows[i + 1].gems.width);
             maxKillsWidth = Math.max(maxKillsWidth, leaderboardRows[i + 1].kills.width);
             maxShotsWidth = Math.max(maxShotsWidth, leaderboardRows[i + 1].shots.width);
+            if (i == highlightIndex) {
+                leaderboardNumbers[i].setColor(highlightLeaderboardRowColor);
+                leaderboardRows[i + 1].seconds.setColor(highlightLeaderboardRowColor);
+                leaderboardRows[i + 1].gems.setColor(highlightLeaderboardRowColor);
+                leaderboardRows[i + 1].kills.setColor(highlightLeaderboardRowColor);
+                leaderboardRows[i + 1].shots.setColor(highlightLeaderboardRowColor);
+            } else {
+                leaderboardNumbers[i].setColor(defaultLeaderboardRowColor);
+                leaderboardRows[i + 1].seconds.setColor(defaultLeaderboardRowColor);
+                leaderboardRows[i + 1].gems.setColor(defaultLeaderboardRowColor);
+                leaderboardRows[i + 1].kills.setColor(defaultLeaderboardRowColor);
+                leaderboardRows[i + 1].shots.setColor(defaultLeaderboardRowColor);
+            }
         }
         // Reposition the rows in the leaderboard
         let fullWidth = (leaderboardColumnMargin * 4) + maxSecondsWidth + maxGemsWidth + maxKillsWidth + maxShotsWidth + leaderboardNumbers[0].width;
