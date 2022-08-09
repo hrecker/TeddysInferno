@@ -74,6 +74,8 @@ export function createExplosion(scene: Phaser.Scene, group: Phaser.Physics.Arcad
     //TODO object pool for explosions rather than destroying them and creating new ones?
     let explosion = scene.physics.add.image(position.x, position.y, "explosion");
     group.add(explosion);
+    explosion.setData("isBullet", true);
+    explosion.setData("noDestroyOnHit", true);
     explosion.body.setCircle(config()["explosionBodyRadius"]);
     // Destroy explosion after delay
     scene.time.delayedCall(config()["explosionLifetimeMs"], () => explosion.destroy());

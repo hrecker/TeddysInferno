@@ -51,7 +51,7 @@ function destroyBullet(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody,
         bullet = obj2;
         hitUnit = obj1;
     }
-    if (bullet) {
+    if (bullet && ! bullet.getData("noDestroyOnHit")) {
         bullet.destroy();
     }
     // If bullet isn't defined or has no id, it has already hit something. In that case,

@@ -128,12 +128,12 @@ export class MainScene extends Phaser.Scene {
         gemPhysicsGroup = this.createPhysicsGroup();
 
         // For debugging
-        this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
-        this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
-        this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
-        this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
+        //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
+        //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
