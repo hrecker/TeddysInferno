@@ -335,9 +335,9 @@ export class MainScene extends Phaser.Scene {
                 // Update timer
                 this.incrementTimer(delta);
                 // Spawning enemies
-                /*getSpawns(timer).forEach(toSpawn => {
+                getSpawns(timer).forEach(toSpawn => {
                     this.startUnitSpawn(toSpawn);
-                })*/
+                });
             }
         } else {
             // Enemy movement
