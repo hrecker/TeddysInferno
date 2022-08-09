@@ -25,7 +25,7 @@ export function createGem(location: Phaser.Types.Math.Vector2Like, scene: MainSc
     });
     // Destroy the gem after a set time
     scene.time.delayedCall(config()["gemLifetimeMs"], () => {
-        scene.destroyGem(gemImage);
+        scene.destroyGem(gemImage, false);
     });
 
     return gemImage;

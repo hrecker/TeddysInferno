@@ -1,9 +1,7 @@
+import { Ability, addAbilityListener, addBombCountListener, addGemCountListener,
+         addPlayerDeathListener, addPlayerSpawnListener, addTimerListener, addWeaponLevelListener } from "../events/EventMessenger";
 import { config } from "../model/Config";
-import { addAbilityListener } from "../state/AbilityState";
 import { getGameResults, getLatestGameResultIndex } from "../state/GameResultState";
-import { addPlayerAliveListener } from "../state/PlayerAliveState";
-import { addTimerListener } from "../state/TimerState";
-import { addBombCountListener, addGemCountListener, addWeaponLevelListener } from "../state/UpgradeState";
 
 let timerText: Phaser.GameObjects.Text;
 
@@ -55,24 +53,24 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     /** Listen for updates to the game timer and update the text of the timer */
-    timerListener(timer, scene) {
+    timerListener(timer: number, scene: MainUIScene) {
         scene.setTimerText((Math.round(timer / 100.0) / 10).toFixed(1));
     }
 
     /** Listen for the player using their abilities */
-    abilityListener(ability, cooldownMs, scene) {
+    abilityListener(ability: Ability, cooldownMs: number, scene: MainUIScene) {
         switch (ability) {
-            case "boost":
+            case Ability.Boost:
                 scene.startCooldownTween(boostIcon, boostIconMask, cooldownMs);
                 break;
-            case "quickTurn":
+            case Ability.QuickTurn:
                 scene.startCooldownTween(quickTurnIcon, quickTurnIconMask, cooldownMs);
                 break;
         }
     }
 
     /** Listen for the player gaining gems */
-    gemCountListener(gemCount, previousThreshold, nextThreshold, scene) {
+    gemCountListener(gemCount: number, previousThreshold: number, nextThreshold: number, scene: MainUIScene) {
         levelProgress.clear();
         levelProgress.fillStyle(progressColor);
         let rectWidth = maxLevelProgessWidth * ((gemCount - previousThreshold) / (nextThreshold - previousThreshold));
@@ -80,7 +78,7 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     /** Listen for the player increasing weapon level */
-    weaponLevelListener(weaponLevel, scene) {
+    weaponLevelListener(weaponLevel: number, scene: MainUIScene) {
         // Weapon level is 0-indexed, but we should display the base level as level 1
         weaponLevelText.setText("Level " + (weaponLevel + 1));
         if (weaponLevel == config()["weaponUpgradeThresholds"].length) {
@@ -90,18 +88,18 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     /** Listen for the player changing bomb count */
-    bombCountListener(bombCount, scene) {
+    bombCountListener(bombCount: number, scene: MainUIScene) {
         bombCountText.setText("Bombs: " + bombCount);
     }
 
-    playerIsAliveListener(isAlive, scene) {
-        if (isAlive) {
-            levelProgress.clear();
-            scene.setLeaderboardVisible(false);
-        } else {
-            scene.updateLeaderboard();
-            scene.setLeaderboardVisible(true);
-        }
+    playerSpawnListener(scene: MainUIScene) {
+        levelProgress.clear();
+        scene.setLeaderboardVisible(false);
+    }
+
+    playerDeathListener(scene: MainUIScene) {
+        scene.updateLeaderboard();
+        scene.setLeaderboardVisible(true);
     }
 
     /** Start tween for cooldown on ability icons */
@@ -236,7 +234,8 @@ export class MainUIScene extends Phaser.Scene {
         addGemCountListener(this.gemCountListener, this);
         addWeaponLevelListener(this.weaponLevelListener, this);
         addBombCountListener(this.bombCountListener, this);
-        addPlayerAliveListener(this.playerIsAliveListener, this);
+        addPlayerSpawnListener(this.playerSpawnListener, this);
+        addPlayerDeathListener(this.playerDeathListener, this);
 
         boostIcon = this.add.image(this.game.renderer.width - 112, 40, "boostIcon").setAlpha(0.8);
         quickTurnIcon = this.add.image(this.game.renderer.width - 40, 40, "quickTurnIcon").setAlpha(0.8);

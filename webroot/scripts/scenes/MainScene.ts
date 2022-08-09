@@ -4,13 +4,12 @@ import { activateBomb, fireEnemyWeapon, fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } from "../units/Collision";
 import { config } from "../model/Config";
-import { getTimer, incrementTimer, resetTimer } from "../state/TimerState";
 import { createGem } from "../model/Gem";
 import { countdownSpawns, startSpawn } from "../units/Spawn";
 import { getSpawns, resetSpawnset } from "../model/Spawnset";
-import { saveGameResult, saveHighScore } from "../state/GameResultState";
-import { setPlayerIsAlive } from "../state/PlayerAliveState";
+import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
+import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -45,6 +44,7 @@ let finalPlayerPos : Phaser.Math.Vector2;
 let graphics;
 
 let gameResult: GameResult;
+let timer = 0;
 
 /** Main game scene */
 export class MainScene extends Phaser.Scene {
@@ -74,6 +74,19 @@ export class MainScene extends Phaser.Scene {
         return killZoneBottomRight;
     }
 
+    resetTimer() {
+        this.setTimer(0);
+    }
+
+    incrementTimer(delta) {
+        this.setTimer(timer + delta);
+    }
+
+    setTimer(value: number) {
+        timer = value;
+        timerEvent(timer);
+    }
+
     create() {
         enemyUnits = {};
         stealerUnits = {};
@@ -84,9 +97,9 @@ export class MainScene extends Phaser.Scene {
             enemiesKilled: 0,
             shotsFired: 0
         };
-        resetTimer();
+        this.resetTimer();
         resetSpawnset();
-        setPlayerIsAlive(true);
+        playerSpawnEvent();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0);
         killZoneTopLeft = background.getTopLeft();
@@ -241,9 +254,9 @@ export class MainScene extends Phaser.Scene {
             finalPlayerPos = player.gameObj[0].body.center.clone();
             this.destroyUnit(player);
             player.gameObj[0] = null;
-            gameResult.score = Math.floor(getTimer()) / 1000.0;
+            gameResult.score = Math.floor(timer) / 1000.0;
             saveGameResult(gameResult);
-            setPlayerIsAlive(false);
+            playerDeathEvent();
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],
@@ -320,9 +333,9 @@ export class MainScene extends Phaser.Scene {
                     bombRepelRemainingMs = config()["bombRepelDurationMs"];
                 }
                 // Update timer
-                incrementTimer(delta);
+                this.incrementTimer(delta);
                 // Spawning enemies
-                getSpawns(getTimer()).forEach(toSpawn => {
+                getSpawns(timer).forEach(toSpawn => {
                     this.startUnitSpawn(toSpawn);
                 })
             }

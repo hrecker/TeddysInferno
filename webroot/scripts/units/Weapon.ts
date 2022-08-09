@@ -1,7 +1,7 @@
+import { bombCountEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
-import { updateBombCount } from "../state/UpgradeState";
 import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./Status";
 
 /** Fire player weapon for one frame. Return the number of bullets fired this frame. */
@@ -44,7 +44,7 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
         });
         player.aiData["bombCooldownRemainingMs"] = config()["bombCooldownMs"];
         player.aiData["bombCount"]--;
-        updateBombCount(player.aiData["bombCount"]);
+        bombCountEvent(player.aiData["bombCount"]);
         return true;
     }
     return false;

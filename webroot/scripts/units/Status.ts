@@ -1,7 +1,7 @@
+import { bombCountEvent, gemCountEvent, weaponLevelEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
-import { updateBombCount, updateGemCount, updateWeaponLevel } from "../state/UpgradeState";
 
 let upgradeGemCountCache: { [upgradesComplete: number]: number } = {};
 
@@ -65,15 +65,15 @@ function collectGemPlayer(player: Unit) {
         if (player.aiData["weaponLevel"] < config()["weaponUpgradeThresholds"].length) {
             // Upgrade weapon
             player.aiData["weaponLevel"]++;
-            updateWeaponLevel(player.aiData["weaponLevel"]);
+            weaponLevelEvent(player.aiData["weaponLevel"]);
         } else {
             // Add bomb
             player.aiData["bombCount"]++;
             player.aiData["bombsEarned"]++;
-            updateBombCount(player.aiData["bombCount"]);
+            bombCountEvent(player.aiData["bombCount"]);
         }
     }
-    updateGemCount(player.aiData["gemCount"], getPreviousUpgradeThreshold(player), getNextUpgradeThreshold(player));
+    gemCountEvent(player.aiData["gemCount"], getPreviousUpgradeThreshold(player), getNextUpgradeThreshold(player));
 }
 
 /** Collect a powerup gem for a unit */
