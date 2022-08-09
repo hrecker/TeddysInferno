@@ -8,7 +8,7 @@ import { getTimer, incrementTimer, resetTimer } from "../state/TimerState";
 import { createGem } from "../model/Gem";
 import { countdownSpawns, startSpawn } from "../units/Spawn";
 import { getSpawns, resetSpawnset } from "../model/Spawnset";
-import { saveGameResult, saveHighScore } from "../state/GameResultState";
+import { saveGameResult } from "../state/GameResultState";
 import { setPlayerIsAlive } from "../state/PlayerAliveState";
 import { GameResult } from "../model/GameResult";
 
