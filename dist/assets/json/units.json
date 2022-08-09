@@ -19,7 +19,7 @@
         "bodyOffset": 2,
         "maxAngularSpeed": 1,
         "rotation": "true",
-        "droppedGems": 1
+        "gemsDropped": 1
     },
     "chaser2": {
         "name": "chaser2",
@@ -32,7 +32,7 @@
         "bodyOffset": 2,
         "maxAngularSpeed": 2.5,
         "rotation": "true",
-        "droppedGems": 1
+        "gemsDropped": 1
     },
     "chaser3": {
         "name": "chaser3",
@@ -45,7 +45,7 @@
         "bodyOffset": 5,
         "maxAngularSpeed": 5,
         "rotation": "true",
-        "droppedGems": 2
+        "gemsDropped": 2
     },
     "spawner1": {
         "name": "spawner1",
@@ -57,11 +57,9 @@
         "bodySize": 20,
         "bodyOffset": 12,
         "ai": "spawner",
-        "aiData": {
-            "spawnUnit": "chaser1",
-            "spawnDelay": 2000
-        },
-        "droppedGems": 1
+        "spawnUnit": "chaser1",
+        "spawnDelayMs": 2000,
+        "gemsDropped": 1
     },
     "spawner2": {
         "name": "spawner2",
@@ -73,11 +71,9 @@
         "bodySize": 20,
         "bodyOffset": 12,
         "ai": "spawner",
-        "aiData": {
-            "spawnUnit": "chaser2",
-            "spawnDelay": 2500
-        },
-        "droppedGems": 2
+        "spawnUnit": "chaser2",
+        "spawnDelayMs": 2500,
+        "gemsDropped": 2
     },
     "spawner3": {
         "name": "spawner3",
@@ -89,11 +85,9 @@
         "bodySize": 40,
         "bodyOffset": 24,
         "ai": "spawner",
-        "aiData": {
-            "spawnUnit": "chaser3",
-            "spawnDelay": 5000
-        },
-        "droppedGems": 3
+        "spawnUnit": "chaser3",
+        "spawnDelayMs": 5000,
+        "gemsDropped": 3
     },
     "looper": {
         "name": "looper",
@@ -106,10 +100,8 @@
         "bodyOffset": 7,
         "disableDrag": "true",
         "rotation": "true",
-        "aiData": {
-            "loopDuration": 5000
-        },
-        "droppedGems": 1
+        "loopDurationMs": 5000,
+        "gemsDropped": 1
     },
     "worm": {
         "name": "worm",
@@ -122,13 +114,13 @@
         "bodySize": 14,
         "bodyOffset": 2,
         "rotation": "true",
-        "droppedGems": 5
+        "gemsDropped": 5
     },
     "obstacle": {
         "name": "obstacle",
         "health": 1,
         "bodySize": 32,
-        "droppedGems": 0
+        "gemsDropped": 0
     },
     "bomber": {
         "name": "bomber",
@@ -140,10 +132,8 @@
         "bodyType": "circle",
         "ai": "bomber",
         "bodyOffset": 17,
-        "aiData": {
-            "spawnDelay": 3000
-        },
-        "droppedGems": 2
+        "spawnDelayMs": 3000,
+        "gemsDropped": 2
     },
     "bomb": {
         "name": "bomb",
@@ -151,12 +141,10 @@
         "bodySize": 16,
         "harmless": true,
         "ai": "bomb",
-        "aiData": {
-            "lifetimeRemainingMs": 4000,
-            "flashDelay": 500,
-            "textures": ["bomb", "bombflash"]
-        },
-        "droppedGems": 0
+        "lifetimeMs": 4000,
+        "flashDelayMs": 500,
+        "textures": ["bomb", "bombflash"],
+        "gemsDropped": 0
     },
     "stealer1": {
         "name": "stealer1",
@@ -164,9 +152,7 @@
         "bodyType": "circle",
         "bodySize": 26,
         "bodyOffset": 5,
-        "droppedGems": 3,
-        "aiData": {
-            "weaponDelayMs": 2000
-        }
+        "gemsDropped": 3,
+        "weaponDelayMs": 2000
     }
 }

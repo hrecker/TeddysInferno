@@ -128,12 +128,12 @@ export class MainScene extends Phaser.Scene {
         gemPhysicsGroup = this.createPhysicsGroup();
 
         // For debugging
-        //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
-        //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
-        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
-        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
+        this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
+        this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
+        this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
+        this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -173,7 +173,7 @@ export class MainScene extends Phaser.Scene {
         let completed = countdownSpawns(delta);
         completed.forEach(spawn => {
             this.addUnit(spawn.name, spawn.location);
-        })
+        });
     }
 
     addUnit(name: string, location: Phaser.Math.Vector2): Unit {
@@ -278,7 +278,7 @@ export class MainScene extends Phaser.Scene {
      * This includes firing the weapon and waiting for cooldown on the weapon.
      */
     anyGemRepelInputActive() {
-        return (!player.gameObj[0]) || player.cooldownRemainingMs > 0 || this.isStreamWeaponActive() || this.isShotgunWeaponActive();
+        return (!player.gameObj[0]) || player.state.weaponCooldownRemainingMs > 0 || this.isStreamWeaponActive() || this.isShotgunWeaponActive();
     }
 
     moveGems() {
@@ -335,9 +335,9 @@ export class MainScene extends Phaser.Scene {
                 // Update timer
                 this.incrementTimer(delta);
                 // Spawning enemies
-                getSpawns(timer).forEach(toSpawn => {
+                /*getSpawns(timer).forEach(toSpawn => {
                     this.startUnitSpawn(toSpawn);
-                })
+                })*/
             }
         } else {
             // Enemy movement

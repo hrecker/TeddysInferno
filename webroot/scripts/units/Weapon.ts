@@ -2,24 +2,24 @@ import { bombCountEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
-import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./Status";
+import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./UnitStatus";
 
 /** Fire player weapon for one frame. Return the number of bullets fired this frame. */
 export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean): number {
-    if (player.cooldownRemainingMs > 0) {
-        player.cooldownRemainingMs -= delta;
+    if (player.state.weaponCooldownRemainingMs > 0) {
+        player.state.weaponCooldownRemainingMs -= delta;
         return 0;
     }
 
     if (streamWeaponKeyDown) {
         createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
-        player.cooldownRemainingMs = getStreamCooldownMs(player);
+        player.state.weaponCooldownRemainingMs = getStreamCooldownMs(player);
         return 1;
     } else if (shotgunWeaponKeyDown) {
         for (let i = 0; i < config()["shotgunBulletCount"]; i++) {
             createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
         }
-        player.cooldownRemainingMs = getShotgunCooldownMs(player);
+        player.state.weaponCooldownRemainingMs = getShotgunCooldownMs(player);
         return config()["shotgunBulletCount"];
     }
     return 0;
@@ -27,11 +27,11 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
 
 /** Activate player bomb for one frame. Return true if bomb was activated this frame. */
 export function activateBomb(scene: MainScene, delta: number, player: Unit, bombKeyDown: boolean): boolean {
-    if ("bombCooldownRemainingMs" in player.aiData && player.aiData["bombCooldownRemainingMs"] > 0) {
-        player.aiData["bombCooldownRemainingMs"] -= delta;
+    if (player.state.bombCooldownRemainingMs > 0) {
+        player.state.bombCooldownRemainingMs -= delta;
         return false;
     }
-    if (bombKeyDown && player.aiData["bombCount"] > 0) {
+    if (bombKeyDown && player.state.bombCount > 0) {
         // Activate bomb, repelling and damaging all units in the scene
         scene.getEnemyUnits().forEach(unit => {
             let health = takeDamage(scene, unit, config()["bombDamage"]);
@@ -42,9 +42,9 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
                 unit.gameObj[0].setAcceleration(0);
             }
         });
-        player.aiData["bombCooldownRemainingMs"] = config()["bombCooldownMs"];
-        player.aiData["bombCount"]--;
-        bombCountEvent(player.aiData["bombCount"]);
+        player.state.bombCooldownRemainingMs = config()["bombCooldownMs"];
+        player.state.bombCount--;
+        bombCountEvent(player.state.bombCount);
         return true;
     }
     return false;
@@ -91,17 +91,12 @@ export function fireEnemyWeapon(unit: Unit, player: Unit, scene: MainScene, delt
 
 /** Fire gem stealer weapon when appropriate for one frame*/
 export function fireGemStealerWeapon(stealerUnit: Unit, player: Unit, scene: MainScene, delta: number) {
-    if (! ("gemCount" in stealerUnit.aiData) || stealerUnit.aiData["gemCount"] <= 0) {
+    if (stealerUnit.state.gemCount <= 0) {
         return;
     }
 
-    if (! ("weaponCooldownRemainingMS" in stealerUnit.aiData)) {
-        stealerUnit.aiData["weaponCooldownRemainingMS"] = stealerUnit.aiData["weaponDelayMs"];
-        return;
-    }
-
-    if (stealerUnit.aiData["weaponCooldownRemainingMS"] > 0) {
-        stealerUnit.aiData["weaponCooldownRemainingMS"] -= delta;
+    if (stealerUnit.state.weaponCooldownRemainingMs > 0) {
+        stealerUnit.state.weaponCooldownRemainingMs -= delta;
         return;
     }
 
@@ -117,7 +112,7 @@ export function fireGemStealerWeapon(stealerUnit: Unit, player: Unit, scene: Mai
     // Ensure flames are eventually destroyed
     scene.time.delayedCall(config()["flameLifetimeMs"], () => flame.destroy());
 
-    stealerUnit.aiData["weaponCooldownRemainingMS"] = stealerUnit.aiData["weaponDelayMs"];
-    stealerUnit.aiData["gemCount"] -= 1;
+    stealerUnit.state.weaponCooldownRemainingMs = stealerUnit.weaponDelayMs;
+    stealerUnit.state.gemCount--;
     scene.getEnemyBulletsPhysicsGroup();
 }

@@ -1,6 +1,6 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
-import { collectGem, getBulletDamage, takeDamage } from "./Status";
+import { collectGem, getBulletDamage, takeDamage } from "./UnitStatus";
 
 /** Should be used as an overlap callback, to handle when a unit hits another unit */
 export function handleUnitHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, obj2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {

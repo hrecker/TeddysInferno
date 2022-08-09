@@ -7,7 +7,7 @@ import { createExplosion } from "./Weapon";
 export function updateUnitAI(unit: Unit, scene: MainScene, delta: number) {
     switch (unit.ai) {
         case "spawner":
-            spawnerUpdate(unit, unit.aiData["spawnUnit"], scene, delta);
+            spawnerUpdate(unit, unit.spawnUnit, scene, delta);
             break;
         case "bomber":
             spawnerUpdate(unit, "bomb", scene, delta);
@@ -20,8 +20,8 @@ export function updateUnitAI(unit: Unit, scene: MainScene, delta: number) {
 
 /** Update spawner unit AI for one frame */
 function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene, delta: number) {
-    if ("spawnCooldownRemainingMs" in spawner.aiData && spawner.aiData["spawnCooldownRemainingMs"] > 0) {
-        spawner.aiData["spawnCooldownRemainingMs"] -= delta;
+    if (spawner.state.spawnCooldownRemainingMs > 0) {
+        spawner.state.spawnCooldownRemainingMs -= delta;
         return;
     }
 
@@ -29,30 +29,30 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
     let unit = scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
     unit.gameObj[0].setRotation(randomRotation);
     let inaccuracyRange = config()["unitInaccuracyRange"];
-    unit.aiData["inaccuracy"] = new Phaser.Math.Vector2((Math.random() * inaccuracyRange) - (inaccuracyRange / 2), 
+    unit.inaccuracy = new Phaser.Math.Vector2((Math.random() * inaccuracyRange) - (inaccuracyRange / 2), 
             (Math.random() * inaccuracyRange) - (inaccuracyRange / 2));
-    spawner.aiData["spawnCooldownRemainingMs"] = spawner.aiData["spawnDelay"];
+    spawner.state.spawnCooldownRemainingMs = spawner.spawnDelayMs;
 }
 
 /** Update bomb unit AI for one frame */
 function bombUpdate(bomb: Unit, scene: MainScene, delta: number) {
-    if ("flashRemainingMs" in bomb.aiData && bomb.aiData["flashRemainingMs"] > 0) {
-        bomb.aiData["flashRemainingMs"] -= delta;
+    if (bomb.state.flashRemainingMs > 0) {
+        bomb.state.flashRemainingMs -= delta;
     } else {
         let currentTextureId = 0;
-        for (let i = 1; i < bomb.aiData["textures"].length; i++) {
-            if (bomb.aiData["textures"][i] == bomb.gameObj[0].texture.key) {
+        for (let i = 1; i < bomb.textures.length; i++) {
+            if (bomb.textures[i] == bomb.gameObj[0].texture.key) {
                 currentTextureId = i;
                 break;
             }
         }
-        let newTextureId = (currentTextureId + 1) % bomb.aiData["textures"].length;
-        bomb.gameObj[0].setTexture(bomb.aiData["textures"][newTextureId]);
-        bomb.aiData["flashRemainingMs"] = bomb.aiData["flashDelay"];
+        let newTextureId = (currentTextureId + 1) % bomb.textures.length;
+        bomb.gameObj[0].setTexture(bomb.textures[newTextureId]);
+        bomb.state.flashRemainingMs = bomb.flashDelayMs;
     }
 
-    if ("lifetimeRemainingMs" in bomb.aiData && bomb.aiData["lifetimeRemainingMs"] > 0) {
-        bomb.aiData["lifetimeRemainingMs"] -= delta;
+    if (bomb.state.lifetimeRemainingMs > 0) {
+        bomb.state.lifetimeRemainingMs -= delta;
         return;
     }
     explodeBomb(bomb, scene);
@@ -62,8 +62,8 @@ function bombUpdate(bomb: Unit, scene: MainScene, delta: number) {
 /** Explode bomb unit */
 // Note: this method does not destroy the bomb object
 function explodeBomb(bomb: Unit, scene: MainScene) {
-    if (!("explosionSpawned" in bomb.aiData) || ! bomb.aiData["explosionSpawned"]) {
-        bomb.aiData["explosionSpawned"] = true;
+    if (! bomb.state.explosionSpawned) {
+        bomb.state.explosionSpawned = true;
         createExplosion(scene, scene.getEnemyBulletsPhysicsGroup(), bomb.gameObj[0].body.center);
     }
 }
@@ -76,7 +76,7 @@ export function handleUnitDestroy(unit: Unit, scene: MainScene) {
             break;
     }
     if (unit.name != "player") {
-        for (let i = 0; i < unit.droppedGems; i++) {
+        for (let i = 0; i < unit.gemsDropped; i++) {
             let gem = scene.addGem(unit.gameObj[0].body.center);
             // Add some velocity in a random direction to the gem
             let gemVel = Phaser.Math.Vector2.RIGHT.clone().rotate(Math.random() * 2 * Math.PI).

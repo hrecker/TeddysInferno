@@ -7,19 +7,19 @@ import { MainScene } from "../scenes/MainScene";
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
                                thrustActive: boolean, leftActive: boolean, rightActive: boolean, delta: number) {
     let canQuickTurn = true;
-    if ("quickTurnCooldownRemainingMs" in player.aiData && player.aiData["quickTurnCooldownRemainingMs"] > 0) {
-        player.aiData["quickTurnCooldownRemainingMs"] -= delta;
+    if (player.state.quickTurnCooldownRemainingMs > 0) {
+        player.state.quickTurnCooldownRemainingMs -= delta;
         canQuickTurn = false;
     }
     let canBoost = true;
-    if ("boostCooldownRemainingMs" in player.aiData && player.aiData["boostCooldownRemainingMs"] > 0) {
-        player.aiData["boostCooldownRemainingMs"] -= delta;
+    if (player.state.boostCooldownRemainingMs > 0) {
+        player.state.boostCooldownRemainingMs -= delta;
         canBoost = false;
     }
 
     if (quickTurnActive && canQuickTurn) {
         player.gameObj[0].setRotation(player.gameObj[0].rotation + Math.PI);
-        player.aiData["quickTurnCooldownRemainingMs"] = config()["playerQuickturnCooldownMs"];
+        player.state.quickTurnCooldownRemainingMs= config()["playerQuickturnCooldownMs"];
         abilityEvent(Ability.QuickTurn, config()["playerQuickturnCooldownMs"]);
     } else {
         if (leftActive && !rightActive) {
@@ -31,20 +31,20 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
     }
 
     let isBoosting = false;
-    if ("activeBoostRemainingMs" in player.aiData && player.aiData["activeBoostRemainingMs"] > 0) {
-        player.aiData["activeBoostRemainingMs"] -= delta;
+    if (player.state.activeBoostRemainingMs > 0) {
+        player.state.activeBoostRemainingMs -= delta;
         isBoosting = true;
         player.gameObj[0].setAcceleration(0, 0);
-        player.gameObj[0].setVelocity(player.aiData["boostDirection"].x, player.aiData["boostDirection"].y);
+        player.gameObj[0].setVelocity(player.state.boostDirection.x, player.state.boostDirection.y);
     }
 
     if (boostActive && canBoost) {
-        player.aiData["activeBoostRemainingMs"] = config()["playerBoostDurationMs"];
-        player.aiData["boostCooldownRemainingMs"] = config()["playerBoostCooldownMs"];
+        player.state.activeBoostRemainingMs = config()["playerBoostDurationMs"];
+        player.state.boostCooldownRemainingMs = config()["playerBoostCooldownMs"];
         isBoosting = true;
         player.gameObj[0].setAcceleration(0, 0);
         let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation).scale(config()["playerBoostSpeed"]);
-        player.aiData["boostDirection"] = dir;
+        player.state.boostDirection = dir;
         player.gameObj[0].setVelocity(dir.x, dir.y);
         abilityEvent(Ability.Boost, config()["playerBoostCooldownMs"]);
     }
@@ -158,8 +158,8 @@ function clampTargetAngle(angle: number) {
 function moveHomingUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, delta: number, isLazy?: boolean) {
     // Get direction unit should move to hit target
     let finalTarget = target;
-    if (unit.aiData["inaccuracy"]) {
-        finalTarget = target.clone().add(unit.aiData["inaccuracy"]);
+    if (unit.inaccuracy) {
+        finalTarget = target.clone().add(unit.inaccuracy);
     }
     let homingDir = homingDirection(unit.gameObj[0].body, finalTarget, unit.maxAcceleration, isLazy);
     let targetRotationAngle = clampTargetAngle(homingDir.angle());
@@ -223,19 +223,19 @@ function moveLoopUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, de
     // Pick first target
     let radius = 0;
     let center: Phaser.Math.Vector2;
-    if (! ("target" in unit.aiData) || unit.aiData["currentLoopDurationMs"] >= unit.aiData["loopDuration"]) {
+    if (unit.state.currentLoopDurationMs == -1 || unit.state.currentLoopDurationMs >= unit.loopDurationMs) {
         let target = pickRandomTarget(scene);
-        unit.aiData["target"] = target;
+        unit.state.loopTarget = target;
         radius = target.clone().subtract(unit.gameObj[0].body.center).length() / 2;
-        unit.aiData["radius"] = radius;
+        unit.state.loopRadius = radius;
         center = new Phaser.Math.Vector2((target.x + unit.gameObj[0].body.center.x) / 2,
                 (target.y + unit.gameObj[0].body.center.y) / 2);
-        unit.aiData["center"] = center;
-        unit.aiData["currentLoopDurationMs"] = 0
+        unit.state.loopCenter = center;
+        unit.state.currentLoopDurationMs = 0
     } else {
-        radius = unit.aiData["radius"];
-        center = unit.aiData["center"];
-        unit.aiData["currentLoopDurationMs"] += delta;
+        radius = unit.state.loopRadius;
+        center = unit.state.loopCenter;
+        unit.state.currentLoopDurationMs += delta;
     }
     // Set desired velocity to be tangent along the circle being traveled
     let targetRotationAngle = clampTargetAngle(unit.gameObj[0].body.center.clone().subtract(center).rotate(Math.PI / 2).angle());
@@ -277,9 +277,9 @@ function isOutsideBounds(pos: Phaser.Math.Vector2, scene: MainScene) {
 function moveBomberUnit(unit: Unit, scene: MainScene) {
     // If the bomber unit is outside of the play area or is not moving, pick a random direction and start
     let pos = unit.gameObj[0].body.center;
-    if (! ("angle" in unit.aiData) || isOutsideBounds(pos, scene)) {
+    if (! unit.state.moveAngle || isOutsideBounds(pos, scene)) {
         let newAngle;
-        if (! ("angle" in unit.aiData)) {
+        if (! unit.state.moveAngle) {
             // Random starting direction
             newAngle = (Math.random() * 2 * Math.PI) - Math.PI;
         } else {
@@ -298,9 +298,9 @@ function moveBomberUnit(unit: Unit, scene: MainScene) {
         }
         
         unit.gameObj[0].setRotation(newAngle + (Math.PI / 2));
-        unit.aiData["angle"] = newAngle;
+        unit.state.moveAngle = newAngle;
     }
 
-    let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.aiData["angle"]).scale(unit.maxSpeed);
+    let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.state.moveAngle).scale(unit.maxSpeed);
     unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
 }
