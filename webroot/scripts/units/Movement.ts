@@ -2,7 +2,6 @@ import { Ability, abilityEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
-import { vector2Str } from "../util/Util";
 
 export enum MovementState {
     Neutral = "Neutral",
