@@ -49,8 +49,8 @@
     },
     "spawner1": {
         "name": "spawner1",
-        "movement": "none",
-        "maxSpeed": 0,
+        "movement": "spawner",
+        "maxSpeed": 75,
         "maxAcceleration": 0,
         "health": 10,
         "bodyType": "circle",
@@ -63,8 +63,8 @@
     },
     "spawner2": {
         "name": "spawner2",
-        "movement": "none",
-        "maxSpeed": 0,
+        "movement": "spawner",
+        "maxSpeed": 75,
         "maxAcceleration": 0,
         "health": 15,
         "bodyType": "circle",
@@ -77,8 +77,8 @@
     },
     "spawner3": {
         "name": "spawner3",
-        "movement": "none",
-        "maxSpeed": 0,
+        "movement": "spawner",
+        "maxSpeed": 75,
         "maxAcceleration": 0,
         "health": 25,
         "bodyType": "circle",

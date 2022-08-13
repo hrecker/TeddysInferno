@@ -94,6 +94,8 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
         case "perfectHoming":
             moveHomingUnit(unit, targetPos, debugGraphics, delta, false);
             break;
+        case "spawner":
+            moveSpawnerUnit(unit, scene);
         case "worm":
             moveWormUnit(unit, targetPos, debugGraphics, delta);
             break;
@@ -357,4 +359,22 @@ function moveBomberUnit(unit: Unit, scene: MainScene) {
 
     let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.state.moveAngle).scale(unit.maxSpeed);
     unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
+}
+
+/** Move a spawner unit for one frame */
+function moveSpawnerUnit(unit: Unit, scene: MainScene) {
+    let pos = unit.gameObj[0].body.center;
+    let outDistance = outOfBoundsDistance(pos, scene);
+
+    if (outDistance.length() > 0) {
+        // Move towards the center of the stage
+        let center = new Phaser.Math.Vector2(scene.game.renderer.width / 2, scene.game.renderer.height / 2);
+        let velocity = center.subtract(pos).scale(unit.maxSpeed);
+        unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
+        unit.state.movementState = MovementState.Recovering;
+    } else if (outDistance.length() <= 0 && unit.state.movementState == MovementState.Recovering) {
+        // Recovery complete
+        unit.state.movementState = MovementState.Neutral;
+        unit.gameObj[0].body.setVelocity(0, 0);
+    }
 }

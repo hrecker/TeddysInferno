@@ -26,8 +26,8 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
         return;
     }
 
-    // Don't spawn while recovering back inbounds
-    if (spawner.state.movementState == MovementState.Recovering) {
+    // Don't spawn bombs while recovering back inbounds
+    if (spawner.state.movementState == MovementState.Recovering && spawner.name == "bomber") {
         return;
     }
 
