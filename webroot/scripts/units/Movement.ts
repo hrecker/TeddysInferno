@@ -2,6 +2,12 @@ import { Ability, abilityEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { vector2Str } from "../util/Util";
+
+export enum MovementState {
+    Neutral = "Neutral",
+    Recovering = "Recovering"
+}
 
 /** Move the player unit for a frame based on inputs */
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
@@ -267,39 +273,87 @@ function moveWormUnit(unit: Unit, target: Phaser.Math.Vector2, debugGraphics: Ph
     }
 }
 
-/** Check if a unit is outside the bounds of the stage */
-function isOutsideBounds(pos: Phaser.Math.Vector2, scene: MainScene) {
-    return pos.x < scene.getKillZoneTopLeft().x || pos.x > scene.getKillZoneBottomRight().x ||
-           pos.y < scene.getKillZoneTopLeft().y || pos.y > scene.getKillZoneBottomRight().y;
+/** Get the x and y distance a unit has gone out of bounds.
+ *  If still inbounds, returns the zero vector.
+ */
+function outOfBoundsDistance(pos: Phaser.Math.Vector2, scene: MainScene) {
+    let xOut = 0;
+    let yOut = 0;
+
+    if (pos.x < scene.getKillZoneTopLeft().x) {
+        xOut = pos.x - scene.getKillZoneTopLeft().x;
+    } else if (pos.x > scene.getKillZoneBottomRight().x) {
+        xOut = pos.x - scene.getKillZoneBottomRight().x;
+    }
+
+    if (pos.y < scene.getKillZoneTopLeft().y) {
+        yOut = pos.y - scene.getKillZoneTopLeft().y;
+    } else if (pos.y > scene.getKillZoneBottomRight().y) {
+        yOut = pos.y - scene.getKillZoneBottomRight().y;
+    }
+    return new Phaser.Math.Vector2(xOut, yOut);
 }
 
+// How far out of bounds a bomber can go before entering recovery mode
+const bomberRecoveryThreshold = 15;
 /** Move a bomber unit for one frame */
 function moveBomberUnit(unit: Unit, scene: MainScene) {
     // If the bomber unit is outside of the play area or is not moving, pick a random direction and start
     let pos = unit.gameObj[0].body.center;
-    if (! unit.state.moveAngle || isOutsideBounds(pos, scene)) {
-        let newAngle;
-        if (! unit.state.moveAngle) {
-            // Random starting direction
-            newAngle = (Math.random() * 2 * Math.PI) - Math.PI;
-        } else {
-            let currentVelocity = unit.gameObj[0].body.velocity.clone();
-            // If outside of x bounds and moving away from center, reverse the x component of velocity
-            if ((pos.x < scene.getKillZoneTopLeft().x && currentVelocity.x < 0) || 
-                    (pos.x > scene.getKillZoneBottomRight().x && currentVelocity.x > 0)) {
-                currentVelocity.x *= -1;
+    let outDistance = outOfBoundsDistance(pos, scene);
+    let moveAngle = unit.state.moveAngle;
+
+    if (unit.state.movementState == MovementState.Recovering) {
+        if (outDistance.length() <= 0) {
+            // Random new direction once recovered, based on current velocity
+            // Ensures we don't pick a direction straight back out of bounds
+            let minX = -1;
+            let maxX = 1;
+            let minY = -1;
+            let maxY = 1;
+            if (unit.gameObj[0].body.velocity.x > 0) {
+                minX = 0;
+            } else if (unit.gameObj[0].body.velocity.x < 0) {
+                maxX = 0;
             }
-            // If outside of y bounds and moving away from center, reverse the y component of velocity
-            if ((pos.y < scene.getKillZoneTopLeft().y && currentVelocity.y < 0) ||
-                    (pos.y > scene.getKillZoneBottomRight().y && currentVelocity.y > 0)) {
-                currentVelocity.y *= -1;
+            if (unit.gameObj[0].body.velocity.y > 0) {
+                minY = 0;
+            } else if (unit.gameObj[0].body.velocity.y < 0) {
+                maxY = 0;
             }
-            newAngle = currentVelocity.angle();
+
+            let randomDir = new Phaser.Math.Vector2(Math.random() * (maxX - minX) + minX, Math.random() * (maxY - minY) + minY);
+            moveAngle = randomDir.angle();
+            unit.state.movementState = MovementState.Neutral;
         }
-        
-        unit.gameObj[0].setRotation(newAngle + (Math.PI / 2));
-        unit.state.moveAngle = newAngle;
+    } else {
+        // After being repelled, take the most direct path back to the main stage
+        if (outDistance.length() >= bomberRecoveryThreshold) {
+            moveAngle = outDistance.clone().negate().angle();
+            unit.state.movementState = MovementState.Recovering;
+        } else if (! unit.state.moveAngle || outDistance.length() > 0) {
+            if (! unit.state.moveAngle) {
+                // Random starting direction
+                moveAngle = (Math.random() * 2 * Math.PI) - Math.PI;
+            } else {
+                let currentVelocity = unit.gameObj[0].body.velocity.clone();
+                // If outside of x bounds and moving away from center, reverse the x component of velocity
+                if ((pos.x < scene.getKillZoneTopLeft().x && currentVelocity.x < 0) || 
+                        (pos.x > scene.getKillZoneBottomRight().x && currentVelocity.x > 0)) {
+                    currentVelocity.x *= -1;
+                }
+                // If outside of y bounds and moving away from center, reverse the y component of velocity
+                if ((pos.y < scene.getKillZoneTopLeft().y && currentVelocity.y < 0) ||
+                        (pos.y > scene.getKillZoneBottomRight().y && currentVelocity.y > 0)) {
+                    currentVelocity.y *= -1;
+                }
+                moveAngle = currentVelocity.angle();
+            }
+            
+        }
     }
+    unit.gameObj[0].setRotation(moveAngle + (Math.PI / 2));
+    unit.state.moveAngle = moveAngle;
 
     let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.state.moveAngle).scale(unit.maxSpeed);
     unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);

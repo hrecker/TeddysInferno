@@ -1,6 +1,7 @@
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { MovementState } from "./Movement";
 import { createExplosion } from "./Weapon";
 
 /** Update a unit's AI for one frame (call each frame in the update method of a scene) */
@@ -22,6 +23,11 @@ export function updateUnitAI(unit: Unit, scene: MainScene, delta: number) {
 function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene, delta: number) {
     if (spawner.state.spawnCooldownRemainingMs > 0) {
         spawner.state.spawnCooldownRemainingMs -= delta;
+        return;
+    }
+
+    // Don't spawn while recovering back inbounds
+    if (spawner.state.movementState == MovementState.Recovering) {
         return;
     }
 

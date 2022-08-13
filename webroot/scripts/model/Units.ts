@@ -1,4 +1,5 @@
 import { getNewId } from "../state/IdState";
+import { MovementState } from "../units/Movement";
 import { config } from "./Config";
 
 let unitCache: { [name: string]: Unit };
@@ -24,6 +25,7 @@ export type UnitState = {
     loopRadius?: number;
     loopCenter?: Phaser.Math.Vector2;
     moveAngle?: number;
+    movementState?: MovementState;
     // Shared
     health?: number;
     weaponCooldownRemainingMs?: number;
@@ -125,7 +127,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
 
     // Initialize unit state
     unit.state.weaponLevel = 0;
-    unit.state.bombCount = 0;
+    unit.state.bombCount = 100;
     unit.state.bombsEarned = 0;
     unit.state.bombCooldownRemainingMs = 0;
     unit.state.gemCount = 0;
