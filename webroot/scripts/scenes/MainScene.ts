@@ -10,6 +10,7 @@ import { getSpawns, resetSpawnset } from "../model/Spawnset";
 import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
+import { getRandomArrayElements } from "../util/Util";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -37,6 +38,7 @@ let bombKey: Phaser.Input.Keyboard.Key;
 // Map bounds
 let killZoneTopLeft, killZoneBottomRight;
 const spawnMargin = 32;
+let spawnRegions: Phaser.Math.Vector2[][] = [];
 
 let bombRepelRemainingMs = 0;
 let finalPlayerPos : Phaser.Math.Vector2;
@@ -105,6 +107,19 @@ export class MainScene extends Phaser.Scene {
         killZoneTopLeft = background.getTopLeft();
         killZoneBottomRight = background.getBottomRight();
 
+        // Create nine spawn regions. Used when units spawn at the same time to prevent spawning
+        // on top of each other.
+        spawnRegions = [];
+        for (let i = 0; i < 3; i++) {
+            let minX = i * background.width / 3;
+            let maxX = (i + 1) * background.width / 3;
+            for (let j = 0; j < 3; j++) {
+                let minY = j * background.height / 3;
+                let maxY = (j + 1) * background.height / 3;
+                spawnRegions.push([new Phaser.Math.Vector2(minX, minY), new Phaser.Math.Vector2(maxX, maxY)]);
+            }
+        }
+
         // Create graphics and enable debug mode to show some more movement graphics
         //graphics = this.add.graphics();
         this.createPlayerUnit();
@@ -147,6 +162,26 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
         // Handle gems hitting units
         this.physics.add.overlap(unitsPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
+    }
+    
+    /** Start the spawn animation for a set of units, preventing them from spawning on top of each other when possible */
+    startUnitSpawns(names: string[]) {
+        if (names.length == 0) {
+            return;
+        }
+
+        if (names.length == 1) {
+            this.startUnitSpawn(names[0]);
+            return;
+        }
+
+        let chosenSpawnRegions = getRandomArrayElements(spawnRegions, Math.min(spawnRegions.length, names.length));
+        for (let i = 0; i < names.length; i++) {
+            let spawnRegion = chosenSpawnRegions[i % spawnRegions.length];
+            let randomX = (Math.random() * (spawnRegion[1].x - spawnRegion[0].x - (2 * spawnMargin))) + spawnMargin + spawnRegion[0].x;
+            let randomY = (Math.random() * (spawnRegion[1].y - spawnRegion[0].y - (2 * spawnMargin))) + spawnMargin + spawnRegion[0].y;
+            this.startUnitSpawn(names[i], new Phaser.Math.Vector2(randomX, randomY));
+        }
     }
 
     /** Start the spawn animation for a unit */
@@ -337,9 +372,7 @@ export class MainScene extends Phaser.Scene {
                 // Update timer
                 this.incrementTimer(delta);
                 // Spawning enemies
-                getSpawns(timer).forEach(toSpawn => {
-                    this.startUnitSpawn(toSpawn);
-                });
+                this.startUnitSpawns(getSpawns(timer));
             }
         } else {
             // Enemy movement
