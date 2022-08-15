@@ -70,7 +70,7 @@
     "leaderboardCount": 5,
     "maxGamesStored": 100,
 
-    "invinciblePlayer": true,
+    "invinciblePlayer": false,
     "automaticRestart": {
         "enabled": true,
         "restartTime": 2000

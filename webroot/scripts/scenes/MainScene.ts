@@ -148,9 +148,11 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(900, 400));
-        this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
-        this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
+        //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
+        //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
