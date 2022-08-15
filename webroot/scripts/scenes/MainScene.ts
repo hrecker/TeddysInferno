@@ -148,8 +148,8 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(900, 400));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
+        this.addUnit("spawner1", new Phaser.Math.Vector2(300, 400));
+        this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         
         // Handle bullet hit on units

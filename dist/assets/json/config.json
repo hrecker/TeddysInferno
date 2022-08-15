@@ -1,5 +1,5 @@
 {
-    "backgroundColor": "#821603",
+    "backgroundColor": "#28282e",
     "timerFontStyle": { 
         "font": "36px verdana",
         "stroke": "black",
@@ -70,7 +70,7 @@
     "leaderboardCount": 5,
     "maxGamesStored": 100,
 
-    "invinciblePlayer": false,
+    "invinciblePlayer": true,
     "automaticRestart": {
         "enabled": true,
         "restartTime": 2000
