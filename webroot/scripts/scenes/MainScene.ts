@@ -330,8 +330,12 @@ export class MainScene extends Phaser.Scene {
         });
     }
 
-    updateUnitsAI(delta) {
-        Object.keys(enemyUnits).forEach(id => {
+    updateUnitsAI(delta, filter?) {
+        let units = Object.keys(enemyUnits);
+        if (filter) {
+            units = units.filter(filter);
+        }
+        units.forEach(id => {
             updateUnitAI(enemyUnits[id], this, delta);
         });
     }
@@ -395,6 +399,10 @@ export class MainScene extends Phaser.Scene {
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos, delta, bombRepelRemainingMs > 0);
+            // Keep updating bombs after player dies
+            this.updateUnitsAI(delta, unitId => {
+                return enemyUnits[unitId].ai == "bomb";
+            });
             // Gem movement
             this.moveGems();
         }
