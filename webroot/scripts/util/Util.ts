@@ -15,3 +15,9 @@ export function getRandomArrayElements(arr, count: number) {
     }
     return shuffled.slice(min);
 }
+
+/** Check is a position is outside the given bounds representing a rectangle */
+export function isOutsideBounds(pos: Phaser.Math.Vector2, topLeft: Phaser.Types.Math.Vector2Like, bottomRight: Phaser.Types.Math.Vector2Like) {
+    return pos.x < topLeft.x || pos.x > bottomRight.x ||
+           pos.y < topLeft.y || pos.y > bottomRight.y;
+}

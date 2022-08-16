@@ -2,6 +2,7 @@ import { Ability, abilityEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { isOutsideBounds } from "../util/Util";
 
 export enum MovementState {
     Neutral = "Neutral",
@@ -68,6 +69,12 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
 
 /** Move a non-player unit for one frame (call each frame in the update method of a scene) */
 export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphics: Phaser.GameObjects.Graphics, scene: MainScene, delta: number, isBombRepelActive: boolean) {
+    // Destroy units if they get really far away
+    if (isOutsideBounds(unit.gameObj[0].body.center, scene.getEnemyKillZoneTopLeft(), scene.getEnemyKillZoneBottomRight())) {
+        scene.destroyUnitById(unit.id);
+        return;
+    }
+    
     // Units can't move when being repelled by bomb
     if (isBombRepelActive) {
         // Worms still should follow the head when being repelled though

@@ -10,7 +10,7 @@ import { getSpawns, resetSpawnset } from "../model/Spawnset";
 import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
-import { getRandomArrayElements } from "../util/Util";
+import { getRandomArrayElements, isOutsideBounds } from "../util/Util";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -37,6 +37,7 @@ let bombKey: Phaser.Input.Keyboard.Key;
 
 // Map bounds
 let killZoneTopLeft, killZoneBottomRight;
+let enemyKillZoneTopLeft, enemyKillZoneBottomRight;
 const spawnMargin = 32;
 let spawnRegions: Phaser.Math.Vector2[][] = [];
 
@@ -80,6 +81,14 @@ export class MainScene extends Phaser.Scene {
         return killZoneBottomRight;
     }
 
+    getEnemyKillZoneTopLeft() {
+        return enemyKillZoneTopLeft;
+    }
+
+    getEnemyKillZoneBottomRight() {
+        return enemyKillZoneBottomRight;
+    }
+
     resetTimer() {
         this.setTimer(0);
     }
@@ -110,6 +119,8 @@ export class MainScene extends Phaser.Scene {
         let background = this.add.image(0, 0, "background").setOrigin(0, 0);
         killZoneTopLeft = background.getTopLeft();
         killZoneBottomRight = background.getBottomRight();
+        enemyKillZoneTopLeft = new Phaser.Math.Vector2(killZoneTopLeft.x - this.game.renderer.width / 2, killZoneTopLeft.y - this.game.renderer.height / 2);
+        enemyKillZoneBottomRight = new Phaser.Math.Vector2(killZoneBottomRight.x + this.game.renderer.width / 2, killZoneBottomRight.y + this.game.renderer.height / 2);
 
         // Create nine spawn regions. Used when units spawn at the same time to prevent spawning
         // on top of each other.
@@ -382,8 +393,7 @@ export class MainScene extends Phaser.Scene {
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
                 thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);
-            if (player.gameObj[0].x < killZoneTopLeft.x || player.gameObj[0].x > killZoneBottomRight.x || 
-                    player.gameObj[0].y < killZoneTopLeft.y || player.gameObj[0].y > killZoneBottomRight.y) {
+            if (isOutsideBounds(player.gameObj[0].body.center, killZoneTopLeft, killZoneBottomRight)) {
                 this.destroyPlayer();
             } else {
                 // Player weapons
