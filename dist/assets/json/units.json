@@ -152,9 +152,7 @@
     "stealer1": {
         "name": "stealer1",
         "health": 8,
-        "bodyType": "circle",
-        "bodySize": 26,
-        "bodyOffset": 5,
+        "bodySize": 64,
         "gemsDropped": 3,
         "weaponDelayMs": 2000
     }
