@@ -48,6 +48,10 @@ let graphics;
 let gameResult: GameResult;
 let timer = 0;
 
+// FPS timing for debugging
+//let fpsCount = 0;
+//let fpsTimer = -1;
+
 /** Main game scene */
 export class MainScene extends Phaser.Scene {
     constructor() {
@@ -348,6 +352,18 @@ export class MainScene extends Phaser.Scene {
 
     /** Main game update loop */
     update(time, delta) {
+        // FPS timing for debugging
+        //if (fpsTimer == -1) {
+        //    fpsTimer = 0;
+        //}
+        //fpsCount++;
+        //fpsTimer += delta;
+        //if (fpsTimer >= 1000) {
+        //    fpsTimer = fpsTimer - 1000;
+        //    console.log("FPS: " + fpsCount);
+        //    fpsCount = 0;
+        //}
+
         if (bombRepelRemainingMs > 0) {
             bombRepelRemainingMs -= delta;
         }
