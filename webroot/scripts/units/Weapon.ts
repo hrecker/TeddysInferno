@@ -12,12 +12,14 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
     }
 
     if (streamWeaponKeyDown) {
-        createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
+        let spawnPos = getBulletSpawnPos(player);
+        createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
         player.state.weaponCooldownRemainingMs = getStreamCooldownMs(player);
         return 1;
     } else if (shotgunWeaponKeyDown) {
+        let spawnPos = getBulletSpawnPos(player);
         for (let i = 0; i < config()["shotgunBulletCount"]; i++) {
-            createBullet(scene, physicsGroup, player.gameObj[0].body.center, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
+            createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
         }
         player.state.weaponCooldownRemainingMs = getShotgunCooldownMs(player);
         return config()["shotgunBulletCount"];
@@ -48,6 +50,11 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
         return true;
     }
     return false;
+}
+
+/** Get the spawn position for a bullet fired by a unit */
+function getBulletSpawnPos(unit: Unit) {
+    return unit.gameObj[0].body.center.clone().add(Phaser.Math.Vector2.RIGHT.clone().rotate(unit.gameObj[0].rotation).scale(unit.gameObj[0].width / 2));
 }
 
 /** Get a random bullet angle for the shotgun */
