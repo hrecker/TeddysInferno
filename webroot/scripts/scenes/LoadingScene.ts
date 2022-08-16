@@ -44,6 +44,9 @@ export class LoadingScene extends Phaser.Scene {
         // Load background
         this.load.image("background", "assets/sprites/background.png");
 
+        // Shaders
+        this.load.glsl('bundle', 'assets/shaders/bundle.glsl.js');
+
         // Load json
         this.load.json("config", "assets/json/config.json");
         this.load.json("units", "assets/json/units.json");

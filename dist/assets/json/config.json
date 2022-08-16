@@ -76,6 +76,9 @@
         "restartTime": 2000
     },
 
+    "gameAreaWidth": 800,
+    "gameAreaHeight": 800,
+
     "unitInaccuracyRange": 100,
     "unitDrag": 250,
     "unitSpawnDurationMs": 2000,
