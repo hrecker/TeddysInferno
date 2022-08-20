@@ -127,7 +127,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
 
     // Initialize unit state
     unit.state.weaponLevel = 0;
-    unit.state.bombCount = 110;
+    unit.state.bombCount = 0;
     unit.state.bombsEarned = 0;
     unit.state.bombCooldownRemainingMs = 0;
     unit.state.gemCount = 0;

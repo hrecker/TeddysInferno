@@ -23,13 +23,13 @@ export class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
-
         mainMenuGroup = this.add.group();
         lifetimeStatsGroup = this.add.group();
 
         let centerX = this.game.renderer.width / 2;
         let centerY = this.game.renderer.height / 2;
+        this.add.shader("Tunnel",  centerX, centerY, 
+                this.game.renderer.width * 2, this.game.renderer.height * 3, ["shaderTexture"]);
         mainMenuGroup.add(this.add.text(centerX, this.game.renderer.height / 8, "Teddy's Inferno", config()["titleStyle"]).setOrigin(0.5));
 
         // Buttons

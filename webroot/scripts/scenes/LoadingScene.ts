@@ -51,9 +51,13 @@ export class LoadingScene extends Phaser.Scene {
 
         // Load background
         this.load.image("background", "assets/sprites/background.png");
+        this.load.image("shaderTexture", "assets/sprites/shaderTexture.png");
 
         // Shaders
         this.load.glsl('bundle', 'assets/shaders/bundle.glsl.js');
+        
+        // Load audio
+        this.load.audio('backgroundMusic', 'assets/music/Endless-Cyber-Runner.mp3');
 
         // Load json
         this.load.json("config", "assets/json/config.json");
@@ -65,7 +69,8 @@ export class LoadingScene extends Phaser.Scene {
         loadUnitJson(this.cache.json.get("units"));
         loadConfig(this.cache.json.get("config"));
         loadSpawnset(this.cache.json.get("spawnset"));
-        this.scene.start("MenuScene")
+        this.scene.start("BackgroundScene")
+                  .start("MenuScene")
                   .stop();
     }
 }
