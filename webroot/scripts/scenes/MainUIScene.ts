@@ -1,7 +1,7 @@
 import { Ability, addAbilityListener, addBombCountListener, addGemCountListener,
-         addPlayerDeathListener, addPlayerSpawnListener, addTimerListener, addWeaponLevelListener } from "../events/EventMessenger";
+         addPlayerDeathListener, addPlayerSpawnListener, addTimerListener, addWeaponLevelListener, clearListeners } from "../events/EventMessenger";
 import { config } from "../model/Config";
-import { getGameResults, getLatestGameResultIndex } from "../state/GameResultState";
+import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from "../state/GameResultState";
 
 let timerText: Phaser.GameObjects.Text;
 
@@ -36,6 +36,11 @@ let leaderboardRows: LeaderboardRow[];
 const leaderboardColumnMargin = 50;
 const defaultLeaderboardRowColor = "white";
 const highlightLeaderboardRowColor = "#8dff5c";
+
+// Currently selected button
+let selectedButton: string;
+let menuButton: Phaser.GameObjects.Image;
+let retryButton: Phaser.GameObjects.Image;
 
 /** UI displayed over MainScene */
 export class MainUIScene extends Phaser.Scene {
@@ -126,15 +131,39 @@ export class MainUIScene extends Phaser.Scene {
         let gameResults = getGameResults();
         let highlightIndex = getLatestGameResultIndex();
         // Update the rows in the leaderboard with the current high scores
+        let maxRankWidth = leaderboardNumbers[0].width;
         let maxSecondsWidth = leaderboardRows[0].seconds.width;
         let maxGemsWidth = leaderboardRows[0].gems.width;
         let maxKillsWidth = leaderboardRows[0].kills.width;
         let maxShotsWidth = leaderboardRows[0].shots.width;
         for (let i = 0; (i + 1) < leaderboardRows.length && i < gameResults.length; i++) {
-            leaderboardRows[i + 1].seconds.setText(gameResults[i].score.toFixed(3));
-            leaderboardRows[i + 1].gems.setText(gameResults[i].gemsCollected.toString());
-            leaderboardRows[i + 1].kills.setText(gameResults[i].enemiesKilled.toString());
-            leaderboardRows[i + 1].shots.setText(gameResults[i].shotsFired.toString());
+            let gameResult = gameResults[i];
+            // Last row is reserved for result from most recent game
+            if (i == leaderboardRows.length - 2) {
+                // If the score from the most recent game is outside of the top few, show it as an additional row at the bottom
+                if (highlightIndex == -1 || highlightIndex >= leaderboardRows.length - 2) {
+                    gameResult = getLatestGameResult();
+                    if (highlightIndex == -1) {
+                        leaderboardNumbers[i].setText(config()["maxGamesStored"] + "+");
+                    } else {
+                        leaderboardNumbers[i].setText((highlightIndex + 1).toString());
+                    }
+                    highlightIndex = i;
+                } else {
+                    // Otherwise just set it as a 0 second result
+                    gameResult = {
+                        score: 0,
+                        gemsCollected: 0,
+                        enemiesKilled: 0,
+                        shotsFired: 0
+                    };
+                }
+            }
+            leaderboardRows[i + 1].seconds.setText(gameResult.score.toFixed(3));
+            leaderboardRows[i + 1].gems.setText(gameResult.gemsCollected.toString());
+            leaderboardRows[i + 1].kills.setText(gameResult.enemiesKilled.toString());
+            leaderboardRows[i + 1].shots.setText(gameResult.shotsFired.toString());
+            maxRankWidth = Math.max(maxRankWidth, leaderboardNumbers[i].width);
             maxSecondsWidth = Math.max(maxSecondsWidth, leaderboardRows[i + 1].seconds.width);
             maxGemsWidth = Math.max(maxGemsWidth, leaderboardRows[i + 1].gems.width);
             maxKillsWidth = Math.max(maxKillsWidth, leaderboardRows[i + 1].kills.width);
@@ -153,8 +182,9 @@ export class MainUIScene extends Phaser.Scene {
                 leaderboardRows[i + 1].shots.setColor(defaultLeaderboardRowColor);
             }
         }
+
         // Reposition the rows in the leaderboard
-        let fullWidth = (leaderboardColumnMargin * 4) + maxSecondsWidth + maxGemsWidth + maxKillsWidth + maxShotsWidth + leaderboardNumbers[0].width;
+        let fullWidth = (leaderboardColumnMargin * 4) + maxRankWidth + maxSecondsWidth + maxGemsWidth + maxKillsWidth + maxShotsWidth + leaderboardNumbers[0].width;
         let maxX = (this.game.renderer.width / 2) + (fullWidth / 2);
         for (let i = 0; i < leaderboardRows.length; i++) {
             if (i < leaderboardNumbers.length) {
@@ -172,20 +202,23 @@ export class MainUIScene extends Phaser.Scene {
             return;
         }
         leaderboardTitle.setVisible(isVisible);
-        for (let i = 0; i < leaderboardRows.length; i++) {
+        this.setRowVisible(leaderboardRows[0], isVisible);
+        let lastVisibleY = -1;
+        for (let i = 1; i < leaderboardRows.length; i++) {
             // Don't show 0 second scores
             if (leaderboardRows[i].seconds.text == "0.000") {
                 this.setRowVisible(leaderboardRows[i], false);
-                if (i < leaderboardNumbers.length) {
-                    leaderboardNumbers[i].setVisible(false);
-                }
+                leaderboardNumbers[i - 1].setVisible(false);
             } else {
                 this.setRowVisible(leaderboardRows[i], isVisible);
-                if (i < leaderboardNumbers.length) {
-                    leaderboardNumbers[i].setVisible(isVisible);
+                leaderboardNumbers[i - 1].setVisible(isVisible);
+                if (isVisible) {
+                    lastVisibleY = leaderboardNumbers[i - 1].y;
                 }
             }
         }
+        menuButton.setVisible(isVisible);
+        retryButton.setVisible(isVisible);
     }
 
     setRowVisible(row: LeaderboardRow, isVisible: boolean) {
@@ -193,6 +226,41 @@ export class MainUIScene extends Phaser.Scene {
         row.gems.setVisible(isVisible);
         row.kills.setVisible(isVisible);
         row.shots.setVisible(isVisible);
+    }
+
+    configureButton(button: Phaser.GameObjects.Image, buttonName: string, defaultTexture: string, downTexture: string) {
+        button.setInteractive();
+        button.on('pointerout', () => {
+            button.setTexture(defaultTexture); 
+            selectedButton = null;
+        });
+        button.on('pointerdown', () => {
+            button.setTexture(downTexture);
+            selectedButton = buttonName;
+        });
+        button.on('pointerup', () => {
+            if (selectedButton === buttonName) {
+                this.handleButtonClick(buttonName);
+            }
+            button.setTexture(defaultTexture);
+            selectedButton = null;
+        });
+    }
+
+    handleButtonClick(buttonName) {
+        switch (buttonName) {
+            case "menu":
+                // Back to the main menu
+                clearListeners();
+                this.scene.stop();
+                this.scene.stop("MainScene");
+                this.scene.start("MenuScene");
+                break;
+            case "retry":
+                // Restart game scene
+                this.scene.get("MainScene").scene.restart();
+                break;
+        }
     }
 
     create() {
@@ -207,18 +275,20 @@ export class MainUIScene extends Phaser.Scene {
         levelProgressOutline.strokeRect(130, 12, 150, 24);
         levelProgress = this.add.graphics();
 
-        leaderboardTitle = this.add.text(this.game.renderer.width / 2, 100, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
+        leaderboardTitle = this.add.text(this.game.renderer.width / 2, 90, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
         leaderboardNumbers = [];
         leaderboardRows = [];
         let labelRow = {
-            seconds: this.add.text(0, 225, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
-            gems: this.add.text(0, 225, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
-            kills: this.add.text(0, 225, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
-            shots: this.add.text(0, 225, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            seconds: this.add.text(0, 180, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
+            gems: this.add.text(0, 180, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            kills: this.add.text(0, 180, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            shots: this.add.text(0, 180, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
         };
         leaderboardRows.push(labelRow);
-        for (let i = 0; i < config()["leaderboardCount"]; i++) {
-            let y = 275 + (i * 75);
+        let y;
+        // Add one row under leaderboard count to show result of most recent game
+        for (let i = 0; i < config()["leaderboardCount"] + 1; i++) {
+            y = 225 + (i * 55);
             leaderboardNumbers.push(this.add.text(this.game.renderer.width / 2, y, (i + 1).toString(), config()["leaderboardRowStyle"]).setOrigin(0, 1));
             leaderboardRows.push({
                 seconds: this.add.text(0, y, "0.000", config()["leaderboardRowStyle"]).setOrigin(1, 1),
@@ -227,6 +297,10 @@ export class MainUIScene extends Phaser.Scene {
                 shots: this.add.text(0, y, "0", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
             });
         }
+        menuButton = this.add.image(this.game.renderer.width / 2 - 120, y + 50, "menuButton");
+        retryButton = this.add.image(this.game.renderer.width / 2 + 120, y + 50, "retryButton");
+        this.configureButton(menuButton, "menu", "menuButton", "menuButtonDown");
+        this.configureButton(retryButton, "retry", "retryButton", "retryButtonDown");
         this.setLeaderboardVisible(false);
 
         addTimerListener(this.timerListener, this);

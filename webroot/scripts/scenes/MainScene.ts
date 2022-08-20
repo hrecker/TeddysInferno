@@ -11,6 +11,7 @@ import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
 import { getRandomArrayElements, isOutsideBounds } from "../util/Util";
+import { takeDamage } from "../units/UnitStatus";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};

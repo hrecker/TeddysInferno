@@ -34,7 +34,7 @@
         }
     },
     "leaderboardTitleStyle": { 
-        "font": "100px Verdana",
+        "font": "80px Verdana",
         "shadow": {
             "offsetX": 1,
             "offsetY": 1,
@@ -45,7 +45,7 @@
         }
     },
     "leaderboardRowStyle": { 
-        "font": "45px Verdana",
+        "font": "40px Verdana",
         "shadow": {
             "offsetX": 1,
             "offsetY": 1,
@@ -72,7 +72,7 @@
 
     "invinciblePlayer": false,
     "automaticRestart": {
-        "enabled": true,
+        "enabled": false,
         "restartTime": 2000
     },
 

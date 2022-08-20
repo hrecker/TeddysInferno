@@ -78,7 +78,7 @@ export class MenuScene extends Phaser.Scene {
         //TODO credits - button is from Kenney asset pack
 
         //TODO added this for quicker testing - just skips the main menu scene and opens the game scene
-        //this.handleButtonClick("playButton");
+        //this.handleButtonClick("play");
     }
 
     configureButton(button: Phaser.GameObjects.Image, buttonName: string, defaultTexture: string, downTexture: string) {

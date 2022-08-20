@@ -31,6 +31,17 @@ let gemCountCallbacks: GemCountCallback[] = [];
 let weaponLevelCallbacks: NumberCallback[] = [];
 let bombCountCallbacks: NumberCallback[] = [];
 
+/** Clear out any active listeners */
+export function clearListeners() {
+    timerCallbacks = [];
+    abilityCallbacks = [];
+    playerSpawnCallbacks = [];
+    playerDeathCallbacks = [];
+    gemCountCallbacks = [];
+    weaponLevelCallbacks = [];
+    bombCountCallbacks = [];
+}
+
 /** Add a callback listening for timer changes */
 export function addTimerListener(callback: (timer: number, scene: Phaser.Scene) => void, scene: Phaser.Scene) {
     timerCallbacks.push({ 
