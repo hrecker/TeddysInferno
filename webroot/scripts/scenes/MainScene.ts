@@ -116,7 +116,7 @@ export class MainScene extends Phaser.Scene {
         resetSpawnset();
         playerSpawnEvent();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
-        this.add.shader("Tunnel", config()["gameAreaWidth"] / 2, config()["gameAreaHeight"] / 2, this.game.renderer.width * 2, this.game.renderer.height * 2, ["background"]);
+        this.add.shader("Tunnel", config()["gameAreaWidth"] / 2, config()["gameAreaHeight"] / 2, this.game.renderer.width * 2, this.game.renderer.height * 3, ["background"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0).setAlpha(0.7);
         background.setScale(config()["gameAreaWidth"] / background.width, config()["gameAreaHeight"] / background.height);
         killZoneTopLeft = background.getTopLeft();

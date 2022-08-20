@@ -2,6 +2,7 @@ import { config } from "../model/Config";
 import { GameResult } from "../model/GameResult";
 
 const resultsKey = "gameResults";
+const lifetimeStatsKey = "lifetimeStats";
 let latestGameResultIndex = -1;
 
 /** Save a player's score on the list of high scores */
@@ -18,8 +19,13 @@ export function saveGameResult(gameResult: GameResult): GameResult[] {
             break;
         }
     }
-    //TODO saving all-time stats (time survived, deaths, all time gems collected, shots fired, enemies killed)
+    let lifetimeStats = getLifetimeStats();
+    lifetimeStats.score += gameResult.score;
+    lifetimeStats.gemsCollected += gameResult.gemsCollected;
+    lifetimeStats.enemiesKilled += gameResult.enemiesKilled;
+    lifetimeStats.shotsFired += gameResult.shotsFired;
     localStorage.setItem(resultsKey, JSON.stringify(currentResults));
+    localStorage.setItem(lifetimeStatsKey, JSON.stringify(lifetimeStats));
     return currentResults;
 }
 
@@ -28,6 +34,20 @@ export function getGameResults(): GameResult[] {
     let results = localStorage.getItem(resultsKey)
     if (! results) {
         return [];
+    }
+    return JSON.parse(results);
+}
+
+/** Get lifetime stats for the player */
+export function getLifetimeStats(): GameResult {
+    let results = localStorage.getItem(lifetimeStatsKey)
+    if (! results) {
+        return {
+            score: 0,
+            gemsCollected: 0,
+            enemiesKilled: 0,
+            shotsFired: 0
+        };
     }
     return JSON.parse(results);
 }
