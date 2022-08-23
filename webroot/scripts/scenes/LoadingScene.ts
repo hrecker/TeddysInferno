@@ -59,6 +59,13 @@ export class LoadingScene extends Phaser.Scene {
         // Load audio
         this.load.audio('backgroundMusic', 'assets/music/Endless-Cyber-Runner.mp3');
 
+        // SFX
+        this.load.audio('death', 'assets/sfx/death.wav');
+        this.load.audio('enemydeath', 'assets/sfx/enemydeath.wav');
+        this.load.audio('gemCollect', 'assets/sfx/gemcollect.wav');
+        this.load.audio('shot', 'assets/sfx/shoot.wav');
+        this.load.audio('shotgun', 'assets/sfx/shotgun.wav');
+
         // Load json
         this.load.json("config", "assets/json/config.json");
         this.load.json("units", "assets/json/units.json");

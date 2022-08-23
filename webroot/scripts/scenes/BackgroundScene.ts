@@ -12,7 +12,7 @@ export class BackgroundScene extends Phaser.Scene {
         bgMusic = this.sound.add('backgroundMusic');
         bgMusic.play({
             loop: true,
-            volume: 1
+            volume: 0.8
         });
     }
 

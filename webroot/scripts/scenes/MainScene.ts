@@ -12,6 +12,7 @@ import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
 import { getRandomArrayElements, isOutsideBounds } from "../util/Util";
 import { takeDamage } from "../units/UnitStatus";
+import { getSound, loadSounds, SoundEffect } from "../model/Sound";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -183,6 +184,9 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
         // Handle gems hitting units
         this.physics.add.overlap(unitsPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
+
+        // SFX
+        loadSounds(this);
     }
     
     /** Start the spawn animation for a set of units, preventing them from spawning on top of each other when possible */
@@ -304,6 +308,9 @@ export class MainScene extends Phaser.Scene {
         });
         if (unit.name != "bomb" && unit.name != "player") {
             gameResult.enemiesKilled++;
+            getSound(SoundEffect.EnemyDeath).play({
+                volume: 0.4
+            });
         }
     }
 
@@ -315,6 +322,9 @@ export class MainScene extends Phaser.Scene {
             gameResult.score = Math.floor(timer) / 1000.0;
             saveGameResult(gameResult);
             playerDeathEvent();
+            getSound(SoundEffect.Death).play({
+                volume: 0.8
+            });
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],

@@ -1,11 +1,12 @@
 import { bombCountEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
+import { getSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./UnitStatus";
 
 /** Fire player weapon for one frame. Return the number of bullets fired this frame. */
-export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean): number {
+export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean): number {
     if (player.state.weaponCooldownRemainingMs > 0) {
         player.state.weaponCooldownRemainingMs -= delta;
         return 0;
@@ -15,6 +16,9 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
         let spawnPos = getBulletSpawnPos(player);
         createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
         player.state.weaponCooldownRemainingMs = getStreamCooldownMs(player);
+        getSound(SoundEffect.Shot).play({
+            volume: 0.5
+        });
         return 1;
     } else if (shotgunWeaponKeyDown) {
         let spawnPos = getBulletSpawnPos(player);
@@ -22,6 +26,9 @@ export function fireWeapon(scene: Phaser.Scene, physicsGroup: Phaser.Physics.Arc
             createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
         }
         player.state.weaponCooldownRemainingMs = getShotgunCooldownMs(player);
+        getSound(SoundEffect.Shotgun).play({
+            volume: 0.5
+        });
         return config()["shotgunBulletCount"];
     }
     return 0;

@@ -1,5 +1,6 @@
 import { bombCountEvent, gemCountEvent, weaponLevelEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
+import { getSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 
@@ -84,6 +85,10 @@ export function collectGem(unit: Unit, gem: Phaser.Types.Physics.Arcade.ImageWit
         collectGemPlayer(unit);
         collectedByPlayer = true;
     }
+    //TODO different sound when enemy collects?
+    getSound(SoundEffect.GemCollect).play({
+        volume: 0.5
+    });
     scene.destroyGem(gem, collectedByPlayer);
 }
 
