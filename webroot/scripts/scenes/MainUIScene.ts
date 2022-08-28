@@ -1,6 +1,7 @@
 import { Ability, addAbilityListener, addBombCountListener, addGemCountListener,
          addPlayerDeathListener, addPlayerSpawnListener, addTimerListener, addWeaponLevelListener, clearListeners } from "../events/EventMessenger";
 import { config } from "../model/Config";
+import { playSound, SoundEffect } from "../model/Sound";
 import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from "../state/GameResultState";
 
 let timerText: Phaser.GameObjects.Text;
@@ -237,6 +238,7 @@ export class MainUIScene extends Phaser.Scene {
         button.on('pointerdown', () => {
             button.setTexture(downTexture);
             selectedButton = buttonName;
+            playSound(this, SoundEffect.ButtonClick);
         });
         button.on('pointerup', () => {
             if (selectedButton === buttonName) {

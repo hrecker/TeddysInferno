@@ -148,13 +148,13 @@
 
     "defaultMusicVolume": 0.8,
     "defaultSfxVolume": {
-        "Ability": 0.6,
+        "Ability": 1,
         "BasicShot": 1,
         "ButtonClick": 1,
         "Death": 0.8,
         "EnemyBomb": 1,
         "EnemyBombDrop": 0.7,
-        "EnemyDeath": 1,
+        "EnemyDeath": 0.45,
         "EnemySpawned": 1,
         "GemCollect": 1,
         "LevelUp": 0.9,
