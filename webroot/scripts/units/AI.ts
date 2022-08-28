@@ -1,4 +1,5 @@
 import { config } from "../model/Config";
+import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 import { MovementState } from "./Movement";
@@ -38,6 +39,12 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
     unit.inaccuracy = new Phaser.Math.Vector2((Math.random() * inaccuracyRange) - (inaccuracyRange / 2), 
             (Math.random() * inaccuracyRange) - (inaccuracyRange / 2));
     spawner.state.spawnCooldownRemainingMs = spawner.spawnDelayMs;
+
+    if (spawner.name == "bomber") {
+        playSound(scene, SoundEffect.EnemyBombDrop);
+    } else {
+        playSound(scene, SoundEffect.EnemySpawned);
+    }
 }
 
 /** Update bomb unit AI for one frame */
@@ -71,6 +78,7 @@ function explodeBomb(bomb: Unit, scene: MainScene) {
     if (! bomb.state.explosionSpawned) {
         bomb.state.explosionSpawned = true;
         createExplosion(scene, scene.getEnemyBulletsPhysicsGroup(), bomb.gameObj[0].body.center);
+        playSound(scene, SoundEffect.EnemyDeath);
     }
 }
 

@@ -1,4 +1,5 @@
 import { config } from "../model/Config";
+import { playSound, SoundEffect } from "../model/Sound";
 import { getLifetimeStats } from "../state/GameResultState";
 
 // Currently selected button
@@ -90,6 +91,7 @@ export class MenuScene extends Phaser.Scene {
         button.on('pointerdown', () => {
             button.setTexture(downTexture);
             selectedButton = buttonName;
+            playSound(this, SoundEffect.ButtonClick);
         });
         button.on('pointerup', () => {
             if (selectedButton === buttonName) {

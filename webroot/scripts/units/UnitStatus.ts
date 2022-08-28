@@ -1,6 +1,6 @@
 import { bombCountEvent, gemCountEvent, weaponLevelEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
-import { getSound, SoundEffect } from "../model/Sound";
+import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 
@@ -61,17 +61,19 @@ function getNextUpgradeThreshold(player: Unit) {
 }
 
 /** Progress upgrades for player when collecting a gem */
-function collectGemPlayer(player: Unit) {
+function collectGemPlayer(player: Unit, scene: MainScene) {
     if (player.state.gemCount >= getNextUpgradeThreshold(player)) {
         if (player.state.weaponLevel < config()["weaponUpgradeThresholds"].length) {
             // Upgrade weapon
             player.state.weaponLevel++;
             weaponLevelEvent(player.state.weaponLevel);
+            playSound(scene, SoundEffect.LevelUp);
         } else {
             // Add bomb
             player.state.bombCount++;
             player.state.bombsEarned++;
             bombCountEvent(player.state.bombCount);
+            playSound(scene, SoundEffect.LevelUp);
         }
     }
     gemCountEvent(player.state.gemCount, getPreviousUpgradeThreshold(player), getNextUpgradeThreshold(player));
@@ -82,13 +84,11 @@ export function collectGem(unit: Unit, gem: Phaser.Types.Physics.Arcade.ImageWit
     unit.state.gemCount++;
     let collectedByPlayer = false;
     if (unit.name == "player") {
-        collectGemPlayer(unit);
+        collectGemPlayer(unit, scene);
         collectedByPlayer = true;
     }
     //TODO different sound when enemy collects?
-    getSound(SoundEffect.GemCollect).play({
-        volume: 0.5
-    });
+    playSound(scene, SoundEffect.GemCollect);
     scene.destroyGem(gem, collectedByPlayer);
 }
 

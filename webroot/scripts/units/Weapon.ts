@@ -1,6 +1,6 @@
 import { bombCountEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
-import { getSound, SoundEffect } from "../model/Sound";
+import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./UnitStatus";
@@ -16,9 +16,7 @@ export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade
         let spawnPos = getBulletSpawnPos(player);
         createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
         player.state.weaponCooldownRemainingMs = getStreamCooldownMs(player);
-        getSound(SoundEffect.Shot).play({
-            volume: 0.5
-        });
+        playSound(scene, SoundEffect.BasicShot);
         return 1;
     } else if (shotgunWeaponKeyDown) {
         let spawnPos = getBulletSpawnPos(player);
@@ -26,9 +24,7 @@ export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade
             createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["shotgunAngleSpread"]));
         }
         player.state.weaponCooldownRemainingMs = getShotgunCooldownMs(player);
-        getSound(SoundEffect.Shotgun).play({
-            volume: 0.5
-        });
+        playSound(scene, SoundEffect.ShotgunShot);
         return config()["shotgunBulletCount"];
     }
     return 0;
@@ -56,6 +52,7 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
         bombCountEvent(player.state.bombCount);
         scene.cameras.main.shake(config()["bombRepelDurationMs"], 0.004);
         scene.cameras.main.flash(config()["bombRepelDurationMs"], 100, 100, 100);
+        playSound(scene, SoundEffect.PlayerBomb);
         return true;
     }
     return false;
@@ -133,4 +130,6 @@ export function fireGemStealerWeapon(stealerUnit: Unit, player: Unit, scene: Mai
     stealerUnit.state.weaponCooldownRemainingMs = stealerUnit.weaponDelayMs;
     stealerUnit.state.gemCount--;
     scene.getEnemyBulletsPhysicsGroup();
+
+    playSound(scene, SoundEffect.StealerShot);
 }

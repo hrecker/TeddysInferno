@@ -60,11 +60,21 @@ export class LoadingScene extends Phaser.Scene {
         this.load.audio('backgroundMusic', 'assets/music/Endless-Cyber-Runner.mp3');
 
         // SFX
-        this.load.audio('death', 'assets/sfx/death.wav');
-        this.load.audio('enemydeath', 'assets/sfx/enemydeath.wav');
-        this.load.audio('gemCollect', 'assets/sfx/gemcollect.wav');
-        this.load.audio('shot', 'assets/sfx/shoot.wav');
-        this.load.audio('shotgun', 'assets/sfx/shotgun.wav');
+        this.load.audio("Ability", "assets/sfx/Ability.mp3");
+        this.load.audio("BasicShot", "assets/sfx/BasicShot.mp3");
+        this.load.audio("ButtonClick", "assets/sfx/button_click.ogg");
+        this.load.audio("Death", "assets/sfx/Death.mp3");
+        this.load.audio("EnemyBomb", "assets/sfx/EnemyBomb.mp3");
+        this.load.audio("EnemyBombDrop", "assets/sfx/EnemyBombDrop.mp3");
+        this.load.audio("EnemyDeath", "assets/sfx/EnemyDeath.mp3");
+        this.load.audio("EnemySpawned", "assets/sfx/EnemySpawned.mp3");
+        this.load.audio("GemCollect", "assets/sfx/GemCollect.mp3");
+        this.load.audio("LevelUp", "assets/sfx/LevelUp.mp3");
+        this.load.audio("PlayerBomb", "assets/sfx/PlayerBomb.mp3");
+        this.load.audio("ShotgunShot", "assets/sfx/ShotgunShot.mp3");
+        this.load.audio("Spawning", "assets/sfx/Spawning.mp3");
+        this.load.audio("StealerActive", "assets/sfx/StealerActive.mp3");
+        this.load.audio("StealerShot", "assets/sfx/StealerShot.mp3");
 
         // Load json
         this.load.json("config", "assets/json/config.json");

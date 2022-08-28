@@ -1,5 +1,6 @@
 import { Ability, abilityEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
+import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
 import { isOutsideBounds } from "../util/Util";
@@ -11,7 +12,7 @@ export enum MovementState {
 
 /** Move the player unit for a frame based on inputs */
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
-                               thrustActive: boolean, leftActive: boolean, rightActive: boolean, delta: number) {
+                               thrustActive: boolean, leftActive: boolean, rightActive: boolean, scene: MainScene, delta: number) {
     let canQuickTurn = true;
     if (player.state.quickTurnCooldownRemainingMs > 0) {
         player.state.quickTurnCooldownRemainingMs -= delta;
@@ -27,6 +28,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         player.gameObj[0].setRotation(player.gameObj[0].rotation + Math.PI);
         player.state.quickTurnCooldownRemainingMs= config()["playerQuickturnCooldownMs"];
         abilityEvent(Ability.QuickTurn, config()["playerQuickturnCooldownMs"]);
+        playSound(scene, SoundEffect.Ability);
     } else {
         if (leftActive && !rightActive) {
             player.gameObj[0].setRotation(player.gameObj[0].rotation - config()["playerRotationSpeed"]);
@@ -53,6 +55,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         player.state.boostDirection = dir;
         player.gameObj[0].setVelocity(dir.x, dir.y);
         abilityEvent(Ability.Boost, config()["playerBoostCooldownMs"]);
+        playSound(scene, SoundEffect.Ability);
     }
 
     if (!isBoosting) {

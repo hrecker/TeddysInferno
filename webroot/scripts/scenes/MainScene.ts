@@ -11,8 +11,7 @@ import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
 import { getRandomArrayElements, isOutsideBounds } from "../util/Util";
-import { takeDamage } from "../units/UnitStatus";
-import { getSound, loadSounds, SoundEffect } from "../model/Sound";
+import { getSound, loadSounds, playSound, SoundEffect } from "../model/Sound";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -162,6 +161,13 @@ export class MainScene extends Phaser.Scene {
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
         gemPhysicsGroup = this.createPhysicsGroup();
 
+        // SFX
+        let stealerSound = getSound(SoundEffect.StealerActive);
+        if (stealerSound) {
+            stealerSound.stop();
+        }
+        loadSounds(this);
+
         // For debugging
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
         //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
@@ -172,7 +178,8 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
+        this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
+        this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
@@ -184,9 +191,6 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
         // Handle gems hitting units
         this.physics.add.overlap(unitsPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
-
-        // SFX
-        loadSounds(this);
     }
     
     /** Start the spawn animation for a set of units, preventing them from spawning on top of each other when possible */
@@ -228,6 +232,7 @@ export class MainScene extends Phaser.Scene {
             loop: 100,
         });
         startSpawn(name, location, portal);
+        playSound(this, SoundEffect.Spawning);
     }
 
     /** Wait for spawn animations to complete. If any complete, spawn the unit. */
@@ -235,6 +240,7 @@ export class MainScene extends Phaser.Scene {
         let completed = countdownSpawns(delta);
         completed.forEach(spawn => {
             this.addUnit(spawn.name, spawn.location);
+            playSound(this, SoundEffect.EnemySpawned);
         });
     }
 
@@ -247,6 +253,7 @@ export class MainScene extends Phaser.Scene {
         //TODO if future stealers added, modify this
         if (unit.name == "stealer1") {
             stealerUnits[unit.id] = unit;
+            playSound(this, SoundEffect.StealerActive, true);
         }
         return unit;
     }
@@ -298,6 +305,10 @@ export class MainScene extends Phaser.Scene {
         delete enemyUnits[id];
         if (id in stealerUnits) {
             delete stealerUnits[id];
+            // If there are no more stealers, stop the sound
+            if (Object.keys(stealerUnits).length == 0) {
+                getSound(SoundEffect.StealerActive).stop();
+            }
         }
     }
 
@@ -308,9 +319,7 @@ export class MainScene extends Phaser.Scene {
         });
         if (unit.name != "bomb" && unit.name != "player") {
             gameResult.enemiesKilled++;
-            getSound(SoundEffect.EnemyDeath).play({
-                volume: 0.4
-            });
+            playSound(this, SoundEffect.EnemyDeath);
         }
     }
 
@@ -322,9 +331,7 @@ export class MainScene extends Phaser.Scene {
             gameResult.score = Math.floor(timer) / 1000.0;
             saveGameResult(gameResult);
             playerDeathEvent();
-            getSound(SoundEffect.Death).play({
-                volume: 0.8
-            });
+            playSound(this, SoundEffect.Death);
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],
@@ -406,7 +413,7 @@ export class MainScene extends Phaser.Scene {
             this.moveGems();
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
-                thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, delta);
+                thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, this, delta);
             if (isOutsideBounds(player.gameObj[0].body.center, killZoneTopLeft, killZoneBottomRight)) {
                 this.destroyPlayer();
             } else {

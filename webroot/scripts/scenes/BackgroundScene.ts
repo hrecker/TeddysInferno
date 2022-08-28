@@ -1,3 +1,5 @@
+import { config } from "../model/Config";
+
 let bgMusic: Phaser.Sound.BaseSound;
 
 /** Shader background shown for menu and for the main game */
@@ -12,7 +14,7 @@ export class BackgroundScene extends Phaser.Scene {
         bgMusic = this.sound.add('backgroundMusic');
         bgMusic.play({
             loop: true,
-            volume: 0.8
+            volume: config()["defaultMusicVolume"]
         });
     }
 
