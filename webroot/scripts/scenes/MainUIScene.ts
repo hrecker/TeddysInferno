@@ -13,14 +13,13 @@ let boostIconMask: Phaser.GameObjects.Graphics;
 let quickTurnIconMask: Phaser.GameObjects.Graphics;
 
 // Upgrade UI
-let levelProgressOutline: Phaser.GameObjects.Graphics;
+let levelProgressOutline: Phaser.GameObjects.Image;
 let levelProgress: Phaser.GameObjects.Graphics;
 let weaponLevelText: Phaser.GameObjects.Text;
-let maxLevelProgessWidth = 146;
 let bombCountText: Phaser.GameObjects.Text;
 
-const weaponUpgradeProgressColor = 0x38b031;
-const bombProgressColor = 0x00bcd9;
+const weaponUpgradeProgressColor = 0xB0EB93;
+const bombProgressColor = 0xACCCE4;
 let progressColor = weaponUpgradeProgressColor;
 
 // Leaderboard UI
@@ -35,8 +34,8 @@ let leaderboardTitle: Phaser.GameObjects.Text;
 let leaderboardNumbers: Phaser.GameObjects.Text[];
 let leaderboardRows: LeaderboardRow[];
 const leaderboardColumnMargin = 50;
-const defaultLeaderboardRowColor = "white";
-const highlightLeaderboardRowColor = "#8dff5c";
+const defaultLeaderboardRowColor = "#FFF7E4";
+const highlightLeaderboardRowColor = "#B0EB93";
 
 // Currently selected button
 let selectedButton: string;
@@ -79,8 +78,8 @@ export class MainUIScene extends Phaser.Scene {
     gemCountListener(gemCount: number, previousThreshold: number, nextThreshold: number, scene: MainUIScene) {
         levelProgress.clear();
         levelProgress.fillStyle(progressColor);
-        let rectWidth = maxLevelProgessWidth * ((gemCount - previousThreshold) / (nextThreshold - previousThreshold));
-        levelProgress.fillRect(132, 14, rectWidth, 20);
+        let rectWidth = (levelProgressOutline.width - 8) * ((gemCount - previousThreshold) / (nextThreshold - previousThreshold));
+        levelProgress.fillRect(levelProgressOutline.getTopLeft().x + 4, levelProgressOutline.getTopLeft().y + 5, rectWidth, levelProgressOutline.height - 10);
     }
 
     /** Listen for the player increasing weapon level */
@@ -204,7 +203,6 @@ export class MainUIScene extends Phaser.Scene {
         }
         leaderboardTitle.setVisible(isVisible);
         this.setRowVisible(leaderboardRows[0], isVisible);
-        let lastVisibleY = -1;
         for (let i = 1; i < leaderboardRows.length; i++) {
             // Don't show 0 second scores
             if (leaderboardRows[i].seconds.text == "0.000") {
@@ -213,9 +211,6 @@ export class MainUIScene extends Phaser.Scene {
             } else {
                 this.setRowVisible(leaderboardRows[i], isVisible);
                 leaderboardNumbers[i - 1].setVisible(isVisible);
-                if (isVisible) {
-                    lastVisibleY = leaderboardNumbers[i - 1].y;
-                }
             }
         }
         menuButton.setVisible(isVisible);
@@ -266,31 +261,30 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     create() {
-        timerText = this.add.text(this.game.renderer.width / 2, 24, "0.0", config()["timerFontStyle"]);
+        timerText = this.add.text(this.game.renderer.width / 2, 40, "0.0", config()["timerFontStyle"]);
         timerText.setOrigin(0.5);
         timerText.alpha = 0.75;
 
-        weaponLevelText = this.add.text(24, 24, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
-        bombCountText = this.add.text(24, 60, "", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
-        levelProgressOutline = this.add.graphics();
-        levelProgressOutline.lineStyle(4, 0xffffff, 0.75);
-        levelProgressOutline.strokeRect(130, 12, 150, 24);
+        weaponLevelText = this.add.text(8, 40, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
+        bombCountText = this.add.text(8, 80, "", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
+        // Level progress outline
+        levelProgressOutline = this.add.image(240, 40, "progressOutline");
         levelProgress = this.add.graphics();
 
-        leaderboardTitle = this.add.text(this.game.renderer.width / 2, 90, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
+        leaderboardTitle = this.add.text(this.game.renderer.width / 2, 95, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
         leaderboardNumbers = [];
         leaderboardRows = [];
         let labelRow = {
-            seconds: this.add.text(0, 180, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
-            gems: this.add.text(0, 180, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
-            kills: this.add.text(0, 180, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
-            shots: this.add.text(0, 180, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            seconds: this.add.text(0, 185, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
+            gems: this.add.text(0, 185, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            kills: this.add.text(0, 185, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            shots: this.add.text(0, 185, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
         };
         leaderboardRows.push(labelRow);
         let y;
         // Add one row under leaderboard count to show result of most recent game
         for (let i = 0; i < config()["leaderboardCount"] + 1; i++) {
-            y = 225 + (i * 55);
+            y = 230 + (i * 55);
             leaderboardNumbers.push(this.add.text(this.game.renderer.width / 2, y, (i + 1).toString(), config()["leaderboardRowStyle"]).setOrigin(0, 1));
             leaderboardRows.push({
                 seconds: this.add.text(0, y, "0.000", config()["leaderboardRowStyle"]).setOrigin(1, 1),
