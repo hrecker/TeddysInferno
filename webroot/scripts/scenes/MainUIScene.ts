@@ -268,8 +268,8 @@ export class MainUIScene extends Phaser.Scene {
         weaponLevelText = this.add.text(8, 40, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         bombCountText = this.add.text(8, 80, "", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         // Level progress outline
-        levelProgressOutline = this.add.image(240, 40, "progressOutline");
-        levelProgress = this.add.graphics();
+        levelProgressOutline = this.add.image(240, 40, "progressOutline").setAlpha(0.75);
+        levelProgress = this.add.graphics().setAlpha(0.75);
 
         leaderboardTitle = this.add.text(this.game.renderer.width / 2, 95, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
         leaderboardNumbers = [];
