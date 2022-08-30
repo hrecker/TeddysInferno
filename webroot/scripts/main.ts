@@ -6,6 +6,8 @@ import { MainScene } from "./scenes/MainScene";
 import { MainUIScene } from "./scenes/MainUIScene";
 import { MenuScene } from './scenes/MenuScene';
 
+import GlowFilterPipelinePlugin from 'phaser3-rex-plugins/plugins/glowfilterpipeline-plugin.js';
+
 var config: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 640,
@@ -24,7 +26,14 @@ var config: Phaser.Types.Core.GameConfig = {
         MenuScene,
         MainScene,
         MainUIScene
-    ]
+    ],
+    plugins: {
+        global: [{
+            key: 'rexGlowFilterPipeline',
+            plugin: GlowFilterPipelinePlugin,
+            start: true
+        }]
+    }
 };
 
 new Phaser.Game(config);

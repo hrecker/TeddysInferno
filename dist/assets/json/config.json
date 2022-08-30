@@ -1,5 +1,7 @@
 {
     "backgroundColor": "#28282e",
+    "glowStrength": 0.006,
+
     "timerFontStyle": { 
         "font": "36px verdana",
         "stroke": "black",

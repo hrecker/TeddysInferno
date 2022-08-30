@@ -180,6 +180,12 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
         this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
         this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
+
+        // Apply a glow effect to the scene
+        // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/shader-glowfilter/
+        this.plugins.get('rexGlowFilterPipeline').add(this.cameras.main, {
+            intensity: config()["glowStrength"]
+        });
         
         // Handle bullet hit on units
         this.physics.add.overlap(bulletsPhysicsGroup, unitsPhysicsGroup, handleBulletHit, null, this);
