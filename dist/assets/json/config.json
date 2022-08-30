@@ -155,12 +155,12 @@
     "bombRepelSpeed": 600,
     "bombDamage": 1,
 
-    "defaultMusicVolume": 0.8,
+    "defaultMusicVolume": 0.6,
     "defaultSfxVolume": {
         "Ability": 1,
         "BasicShot": 1,
         "ButtonClick": 1,
-        "Death": 0.8,
+        "Death": 1,
         "EnemyBomb": 1,
         "EnemyBombDrop": 0.7,
         "EnemyDeath": 0.45,
