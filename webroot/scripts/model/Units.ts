@@ -64,6 +64,7 @@ export type Unit = {
     flashDelayMs?: number;
     lifetimeMs?: number;
     state: UnitState;
+    spawnParticleColor: number;
 }
 
 /** Store unit json data for creating units */
@@ -95,6 +96,7 @@ export function loadUnitJson(unitJson) {
             textures: unitProps["textures"],
             flashDelayMs: unitProps["flashDelayMs"],
             lifetimeMs: unitProps["lifetimeMs"],
+            spawnParticleColor: parseInt(unitProps["spawnParticleColor"], 16),
             state: {}
         };
     };

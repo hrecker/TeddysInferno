@@ -17,6 +17,10 @@ export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade
         createBullet(scene, physicsGroup, spawnPos, randomBulletAngle(player.gameObj[0].rotation, config()["streamAngleSpread"]));
         player.state.weaponCooldownRemainingMs = getStreamCooldownMs(player);
         playSound(scene, SoundEffect.BasicShot);
+        let emitter = scene.getBulletParticleEmitter();
+        // Emit particles in a cone where the player is facing
+        emitter.setAngle({ min: player.gameObj[0].angle - 90, max: player.gameObj[0].angle + 90 });
+        emitter.explode(config()["bulletParticleCount"], spawnPos.x, spawnPos.y);
         return 1;
     } else if (shotgunWeaponKeyDown) {
         let spawnPos = getBulletSpawnPos(player);
@@ -25,6 +29,10 @@ export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade
         }
         player.state.weaponCooldownRemainingMs = getShotgunCooldownMs(player);
         playSound(scene, SoundEffect.ShotgunShot);
+        let emitter = scene.getBulletParticleEmitter();
+        // Emit particles in a cone where the player is facing
+        emitter.setAngle({ min: player.gameObj[0].angle - 90, max: player.gameObj[0].angle + 90 });
+        emitter.explode(config()["shotgunParticleCount"], spawnPos.x, spawnPos.y);
         return config()["shotgunBulletCount"];
     }
     return 0;

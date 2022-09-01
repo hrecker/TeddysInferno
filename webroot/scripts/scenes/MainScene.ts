@@ -50,6 +50,11 @@ let graphics;
 let gameResult: GameResult;
 let timer = 0;
 
+// FX
+let bulletParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+let spawnerParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+let spawnParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+
 // FPS timing for debugging
 //let fpsCount = 0;
 //let fpsTimer = -1;
@@ -88,6 +93,10 @@ export class MainScene extends Phaser.Scene {
 
     getEnemyKillZoneBottomRight() {
         return enemyKillZoneBottomRight;
+    }
+
+    getBulletParticleEmitter(): Phaser.GameObjects.Particles.ParticleEmitter {
+        return bulletParticleEmitter;
     }
 
     resetTimer() {
@@ -141,8 +150,6 @@ export class MainScene extends Phaser.Scene {
 
         // Create graphics and enable debug mode to show some more movement graphics
         //graphics = this.add.graphics();
-        this.createPlayerUnit();
-        this.cameras.main.startFollow(player.gameObj[0]);
 
         thrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         leftTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -155,7 +162,6 @@ export class MainScene extends Phaser.Scene {
         this.input.mouse.disableContextMenu();
 
         playerPhysicsGroup = this.createPhysicsGroup();
-        playerPhysicsGroup.add(player.gameObj[0]);
         unitsPhysicsGroup = this.createPhysicsGroup();
         bulletsPhysicsGroup = this.createPhysicsGroup();
         enemyBulletsPhysicsGroup = this.createPhysicsGroup();
@@ -181,6 +187,39 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
         //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
 
+        // Particle emitters
+        let particles = this.add.particles('particle');
+        bulletParticleEmitter = particles.createEmitter({
+            speed: 150,
+            gravityY: 0,
+            scale: 1.5,
+            tint: 0xF98284,
+            angle: { min: -90, max: 90 },
+            frequency: -1,
+            rotate: { min: 0, max: 360 }
+        }).setAlpha(function (p, k, t) {
+            return 1 - t;
+        });
+        spawnerParticleEmitter = particles.createEmitter({
+            speed: 150,
+            gravityY: 0,
+            scale: 2,
+            tint: 0xD9C8BF,
+            frequency: -1,
+            rotate: { min: 0, max: 360 }
+        }).setAlpha(function (p, k, t) {
+            return 1 - t;
+        });
+        spawnParticleEmitter = particles.createEmitter({
+            speed: 150,
+            gravityY: 0,
+            scale: 1.5,
+            frequency: -1,
+            rotate: { min: 0, max: 360 }
+        }).setAlpha(function (p, k, t) {
+            return 1 - t;
+        });
+
         // Apply a glow effect to the scene
         // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/shader-glowfilter/
         this.plugins.get('rexGlowFilterPipeline').add(this.cameras.main, {
@@ -197,6 +236,11 @@ export class MainScene extends Phaser.Scene {
         this.physics.add.overlap(playerPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
         // Handle gems hitting units
         this.physics.add.overlap(unitsPhysicsGroup, gemPhysicsGroup, handleGemHit, null, this);
+
+        // Create the player
+        this.createPlayerUnit();
+        playerPhysicsGroup.add(player.gameObj[0]);
+        this.cameras.main.startFollow(player.gameObj[0]);
     }
     
     /** Start the spawn animation for a set of units, preventing them from spawning on top of each other when possible */
@@ -239,6 +283,7 @@ export class MainScene extends Phaser.Scene {
         });
         startSpawn(name, location, portal);
         playSound(this, SoundEffect.Spawning);
+        spawnerParticleEmitter.explode(config()["spawnStartParticleCount"], location.x, location.y);
     }
 
     /** Wait for spawn animations to complete. If any complete, spawn the unit. */
@@ -256,6 +301,7 @@ export class MainScene extends Phaser.Scene {
         unit.gameObj.forEach(obj => {
             unitsPhysicsGroup.add(obj);
         });
+        this.spawnParticles(unit, location);
         //TODO if future stealers added, modify this
         if (unit.name == "stealer1") {
             stealerUnits[unit.id] = unit;
@@ -265,7 +311,14 @@ export class MainScene extends Phaser.Scene {
     }
 
     createPlayerUnit() {
-        player = createUnit("player", new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2), this);
+        let spawn = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
+        player = createUnit("player", spawn, this);
+        this.spawnParticles(player, spawn);
+    }
+
+    spawnParticles(unit: Unit, location: Phaser.Math.Vector2) {
+        spawnParticleEmitter.setTint(unit.spawnParticleColor);
+        spawnParticleEmitter.explode(config()["spawnCompleteParticleCount"], location.x, location.y);
     }
 
     getUnit(id: number) {

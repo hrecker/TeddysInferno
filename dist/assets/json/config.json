@@ -172,5 +172,11 @@
         "Spawning": 0.8,
         "StealerActive": 1,
         "StealerShot": 1
-    }
+    },
+
+    "spawnBubbleParticleColor": "0xD9C8BF",
+    "bulletParticleCount": 2,
+    "shotgunParticleCount": 8,
+    "spawnStartParticleCount": 8,
+    "spawnCompleteParticleCount": 4
 }

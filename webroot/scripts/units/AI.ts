@@ -98,4 +98,5 @@ export function handleUnitDestroy(unit: Unit, scene: MainScene) {
             gem.setVelocity(gemVel.x, gemVel.y);
         }
     }
+    scene.cameras.main.shake(250, 0.003);
 }
