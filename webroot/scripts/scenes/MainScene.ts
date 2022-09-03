@@ -174,19 +174,6 @@ export class MainScene extends Phaser.Scene {
         }
         loadSounds(this);
 
-        // For debugging
-        //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
-        //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
-        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
-        //this.addUnit("bomber", new Phaser.Math.Vector2(700, 400));
-        //this.addUnit("bomber", new Phaser.Math.Vector2(900, 400));
-        //this.addUnit("spawner1", new Phaser.Math.Vector2(600, 400));
-        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
-        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
-        //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
-
         // Particle emitters
         let particles = this.add.particles('particle');
         bulletParticleEmitter = particles.createEmitter({
@@ -241,6 +228,19 @@ export class MainScene extends Phaser.Scene {
         this.createPlayerUnit();
         playerPhysicsGroup.add(player.gameObj[0]);
         this.cameras.main.startFollow(player.gameObj[0]);
+
+        // For debugging
+        //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
+        //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(700, 400));
+        //this.addUnit("bomber", new Phaser.Math.Vector2(900, 400));
+        //this.addUnit("spawner1", new Phaser.Math.Vector2(600, 400));
+        //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
+        //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
+        //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
+        //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
     }
     
     /** Start the spawn animation for a set of units, preventing them from spawning on top of each other when possible */
@@ -371,7 +371,41 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
+    startUnitDeathAnimation(unitName: string, gameObj: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
+        let pos = gameObj.body.center;
+        let deathImages: Phaser.Types.Physics.Arcade.ImageWithDynamicBody[] = [];
+        deathImages.push(this.physics.add.image(pos.x, pos.y, unitName + "death1").setOrigin(1, 1).setAngle(gameObj.angle));
+        deathImages.push(this.physics.add.image(pos.x, pos.y, unitName + "death2").setOrigin(0, 1).setAngle(gameObj.angle));
+        deathImages.push(this.physics.add.image(pos.x, pos.y, unitName + "death3").setOrigin(0, 0).setAngle(gameObj.angle));
+        deathImages.push(this.physics.add.image(pos.x, pos.y, unitName + "death4").setOrigin(1, 0).setAngle(gameObj.angle));
+        // Spawn each death image on top of its starting position and then move in a random direction while fading out
+        deathImages.forEach(image => {
+            let randomVel = Phaser.Math.Vector2.RIGHT.clone().rotate(Math.random() * 2 * Math.PI).scale(40);
+            image.setVelocity(randomVel.x, randomVel.y);
+            this.tweens.add({
+                targets: image,
+                alpha: {
+                    from: 1,
+                    to: 0
+                },
+                duration: 1000
+            });
+            this.time.delayedCall(1000, () => {
+                image.destroy();
+            })
+        });
+    }
+
     destroyUnit(unit: Unit) {
+        if (! unit.skipDeathAnimation) {
+            this.startUnitDeathAnimation(unit.name, unit.gameObj[0]);
+            if (unit.name == "worm") {
+                for (let i = 1; i < unit.gameObj.length; i++) {
+                    this.startUnitDeathAnimation("wormsegment", unit.gameObj[i]);
+                }
+            }
+        }
+
         handleUnitDestroy(unit, this);
         unit.gameObj.forEach(obj => {
             obj.destroy();
@@ -380,6 +414,7 @@ export class MainScene extends Phaser.Scene {
             gameResult.enemiesKilled++;
             playSound(this, SoundEffect.EnemyDeath);
         }
+        this.cameras.main.shake(250, 0.003);
     }
 
     destroyPlayer() {

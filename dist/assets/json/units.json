@@ -159,7 +159,8 @@
         "flashDelayMs": 500,
         "textures": ["bomb", "bombflash"],
         "gemsDropped": 0,
-        "spawnParticleColor": "0xF98284"
+        "spawnParticleColor": "0xF98284",
+        "skipDeathAnimation": true
     },
     "stealer1": {
         "name": "stealer1",
