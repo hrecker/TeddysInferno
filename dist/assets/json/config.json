@@ -174,9 +174,9 @@
         "StealerShot": 1
     },
 
-    "spawnBubbleParticleColor": "0xD9C8BF",
     "bulletParticleCount": 2,
     "shotgunParticleCount": 8,
     "spawnStartParticleCount": 8,
-    "spawnCompleteParticleCount": 4
+    "spawnCompleteParticleCount": 4,
+    "gemParticleCount": 4
 }

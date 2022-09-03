@@ -52,6 +52,7 @@ let timer = 0;
 
 // FX
 let bulletParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+let gemParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let spawnerParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let spawnParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
@@ -206,6 +207,15 @@ export class MainScene extends Phaser.Scene {
         }).setAlpha(function (p, k, t) {
             return 1 - t;
         });
+        gemParticleEmitter = particles.createEmitter({
+            speed: 250,
+            gravityY: 0,
+            tint: 0xFFF7A0,
+            rotate: { min: 0, max: 360 },
+            frequency: -1
+        }).setAlpha(function (p, k, t) {
+            return 1 - t;
+        });
 
         // Apply a glow effect to the scene
         // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/shader-glowfilter/
@@ -301,7 +311,7 @@ export class MainScene extends Phaser.Scene {
         unit.gameObj.forEach(obj => {
             unitsPhysicsGroup.add(obj);
         });
-        this.spawnParticles(unit, location);
+        this.spawnParticles(unit.spawnParticleColor, location);
         //TODO if future stealers added, modify this
         if (unit.name == "stealer1") {
             stealerUnits[unit.id] = unit;
@@ -313,12 +323,16 @@ export class MainScene extends Phaser.Scene {
     createPlayerUnit() {
         let spawn = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
         player = createUnit("player", spawn, this);
-        this.spawnParticles(player, spawn);
+        this.spawnParticles(player.spawnParticleColor, spawn);
     }
 
-    spawnParticles(unit: Unit, location: Phaser.Math.Vector2) {
-        spawnParticleEmitter.setTint(unit.spawnParticleColor);
+    spawnParticles(color: number, location: Phaser.Math.Vector2) {
+        spawnParticleEmitter.setTint(color);
         spawnParticleEmitter.explode(config()["spawnCompleteParticleCount"], location.x, location.y);
+    }
+
+    gemParticles(location: Phaser.Math.Vector2) {
+        gemParticleEmitter.explode(config()["gemParticleCount"], location.x, location.y);
     }
 
     getUnit(id: number) {

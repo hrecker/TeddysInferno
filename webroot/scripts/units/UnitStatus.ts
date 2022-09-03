@@ -89,6 +89,7 @@ export function collectGem(unit: Unit, gem: Phaser.Types.Physics.Arcade.ImageWit
     }
     //TODO different sound when enemy collects?
     playSound(scene, SoundEffect.GemCollect);
+    scene.gemParticles(gem.body.center);
     scene.destroyGem(gem, collectedByPlayer);
 }
 
