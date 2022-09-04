@@ -79,6 +79,8 @@ function explodeBomb(bomb: Unit, scene: MainScene) {
         bomb.state.explosionSpawned = true;
         createExplosion(scene, scene.getEnemyBulletsPhysicsGroup(), bomb.gameObj[0].body.center);
         playSound(scene, SoundEffect.EnemyBomb);
+        // Use the gem particles for explosions
+        scene.gemParticles(bomb.gameObj[0].body.center, 20);
     }
 }
 

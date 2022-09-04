@@ -333,8 +333,11 @@ export class MainScene extends Phaser.Scene {
         spawnParticleEmitter.explode(config()["spawnCompleteParticleCount"], location.x, location.y);
     }
 
-    gemParticles(location: Phaser.Math.Vector2) {
-        gemParticleEmitter.explode(config()["gemParticleCount"], location.x, location.y);
+    gemParticles(location: Phaser.Math.Vector2, count?: number) {
+        if (! count) {
+            count = config()["gemParticleCount"];
+        }
+        gemParticleEmitter.explode(count, location.x, location.y);
     }
 
     getUnit(id: number) {
@@ -404,11 +407,11 @@ export class MainScene extends Phaser.Scene {
                     from: 1,
                     to: 0
                 },
-                duration: 1000
+                duration: 1000,
+                onComplete: () => {
+                    image.destroy();
+                }
             });
-            this.time.delayedCall(1000, () => {
-                image.destroy();
-            })
         });
     }
 

@@ -98,8 +98,23 @@ export function createExplosion(scene: Phaser.Scene, group: Phaser.Physics.Arcad
     explosion.setData("isBullet", true);
     explosion.setData("noDestroyOnHit", true);
     explosion.body.setCircle(config()["explosionBodyRadius"]);
-    // Destroy explosion after delay
-    scene.time.delayedCall(config()["explosionLifetimeMs"], () => explosion.destroy());
+    // Turn off explosion after delay so it doesn't do damage while mostly faded out
+    scene.time.delayedCall(config()["explosionLifetimeMs"], () => {
+        explosion.setData("isBullet", false);
+    });
+    // Fade out and destroy once faded out
+    scene.tweens.add({
+        targets: explosion,
+        alpha: {
+            from: 1,
+            to: 0
+        },
+        duration: config()["explosionLifetimeMs"] * 1.1,
+        ease: "Expo.easeIn",
+        onComplete: () => {
+            explosion.destroy();
+        }
+    });
     return explosion;
 }
 
