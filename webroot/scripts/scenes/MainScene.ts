@@ -51,10 +51,11 @@ let gameResult: GameResult;
 let timer = 0;
 
 // FX
+let particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
 let bulletParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let gemParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let spawnerParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
-let spawnParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
+let unitParticleEmitters: { [color: number]: Phaser.GameObjects.Particles.ParticleEmitter };
 
 let enemyDeathSoundsActive = 0;
 
@@ -178,7 +179,7 @@ export class MainScene extends Phaser.Scene {
         loadSounds(this);
 
         // Particle emitters
-        let particles = this.add.particles('particle');
+        particles = this.add.particles('particle');
         bulletParticleEmitter = particles.createEmitter({
             speed: 150,
             gravityY: 0,
@@ -200,15 +201,7 @@ export class MainScene extends Phaser.Scene {
         }).setAlpha(function (p, k, t) {
             return 1 - t;
         });
-        spawnParticleEmitter = particles.createEmitter({
-            speed: 150,
-            gravityY: 0,
-            scale: 1.5,
-            frequency: -1,
-            rotate: { min: 0, max: 360 }
-        }).setAlpha(function (p, k, t) {
-            return 1 - t;
-        });
+        unitParticleEmitters = {};
         gemParticleEmitter = particles.createEmitter({
             speed: 250,
             gravityY: 0,
@@ -329,8 +322,21 @@ export class MainScene extends Phaser.Scene {
     }
 
     spawnParticles(color: number, location: Phaser.Math.Vector2) {
-        spawnParticleEmitter.setTint(color);
-        spawnParticleEmitter.explode(config()["spawnCompleteParticleCount"], location.x, location.y);
+        if (! (color in unitParticleEmitters)) {
+            // Create separate particle emitters for each color
+            let newParticleEmitter = particles.createEmitter({
+                speed: 150,
+                gravityY: 0,
+                scale: 1.5,
+                frequency: -1,
+                tint: color,
+                rotate: { min: 0, max: 360 }
+            }).setAlpha(function (p, k, t) {
+                return 1 - t;
+            });
+            unitParticleEmitters[color] = newParticleEmitter;
+        }
+        unitParticleEmitters[color].explode(config()["spawnCompleteParticleCount"], location.x, location.y);
     }
 
     gemParticles(location: Phaser.Math.Vector2, count?: number) {

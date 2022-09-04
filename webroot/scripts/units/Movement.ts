@@ -29,6 +29,24 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         player.state.quickTurnCooldownRemainingMs= config()["playerQuickturnCooldownMs"];
         abilityEvent(Ability.QuickTurn, config()["playerQuickturnCooldownMs"]);
         playSound(scene, SoundEffect.Ability);
+        // Draw some echo images implying the turn and spawn some particles
+        for (let i = 2; i >= 1; i--) {
+            let rot = player.gameObj[0].rotation + (Math.PI / 2 * i);
+            let pos = player.gameObj[0].body.center.clone().add(Phaser.Math.Vector2.RIGHT.clone().rotate(rot).scale(5));
+            let echoImage = scene.add.image(pos.x, pos.y, "player").setRotation(rot);
+            scene.tweens.add({
+                targets: echoImage,
+                alpha: {
+                    from: 1,
+                    to: 0
+                },
+                duration: config()["playerBoostDurationMs"],
+                onComplete: () => {
+                    echoImage.destroy();
+                }
+            });
+        }
+        scene.spawnParticles(player.color, player.gameObj[0].body.center);
     } else {
         if (leftActive && !rightActive) {
             player.gameObj[0].setRotation(player.gameObj[0].rotation - config()["playerRotationSpeed"]);
@@ -44,6 +62,21 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         isBoosting = true;
         player.gameObj[0].setAcceleration(0, 0);
         player.gameObj[0].setVelocity(player.state.boostDirection.x, player.state.boostDirection.y);
+        // Draw some echo images and particles while boosting
+        let echoImage = scene.add.image(player.gameObj[0].body.center.x, player.gameObj[0].body.center.y, "player");
+        echoImage.setRotation(player.gameObj[0].rotation);
+        scene.tweens.add({
+            targets: echoImage,
+            alpha: {
+                from: 1,
+                to: 0
+            },
+            duration: config()["playerBoostDurationMs"],
+            onComplete: () => {
+                echoImage.destroy();
+            }
+        });
+        scene.spawnParticles(player.color, player.gameObj[0].body.center);
     }
 
     if (boostActive && canBoost) {
