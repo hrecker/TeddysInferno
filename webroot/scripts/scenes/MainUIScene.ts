@@ -1,7 +1,7 @@
 import { Ability, addAbilityListener, addBombCountListener, addGemCountListener,
          addPlayerDeathListener, addPlayerSpawnListener, addTimerListener, addWeaponLevelListener, clearListeners } from "../events/EventMessenger";
 import { config } from "../model/Config";
-import { playSound, SoundEffect } from "../model/Sound";
+import { getSound, playSound, SoundEffect } from "../model/Sound";
 import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from "../state/GameResultState";
 
 let timerText: Phaser.GameObjects.Text;
@@ -249,6 +249,8 @@ export class MainUIScene extends Phaser.Scene {
             case "menu":
                 // Back to the main menu
                 clearListeners();
+                // Stop the stealer sound if it's active
+                getSound(SoundEffect.StealerActive).stop();
                 this.scene.stop();
                 this.scene.stop("MainScene");
                 this.scene.start("MenuScene");

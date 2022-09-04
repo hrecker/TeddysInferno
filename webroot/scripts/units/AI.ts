@@ -78,7 +78,7 @@ function explodeBomb(bomb: Unit, scene: MainScene) {
     if (! bomb.state.explosionSpawned) {
         bomb.state.explosionSpawned = true;
         createExplosion(scene, scene.getEnemyBulletsPhysicsGroup(), bomb.gameObj[0].body.center);
-        playSound(scene, SoundEffect.EnemyDeath);
+        playSound(scene, SoundEffect.EnemyBomb);
     }
 }
 

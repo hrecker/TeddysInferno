@@ -56,6 +56,8 @@ let gemParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let spawnerParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let spawnParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
+let enemyDeathSoundsActive = 0;
+
 // FPS timing for debugging
 //let fpsCount = 0;
 //let fpsTimer = -1;
@@ -426,7 +428,11 @@ export class MainScene extends Phaser.Scene {
         });
         if (unit.name != "bomb" && unit.name != "player") {
             gameResult.enemiesKilled++;
-            playSound(this, SoundEffect.EnemyDeath);
+            // Don't let enemy death sounds stack too much or they can get very loud
+            if (enemyDeathSoundsActive < 3) {
+                enemyDeathSoundsActive++;
+                playSound(this, SoundEffect.EnemyDeath);
+            }
         }
         this.cameras.main.shake(250, 0.003);
     }
@@ -496,6 +502,7 @@ export class MainScene extends Phaser.Scene {
 
     /** Main game update loop */
     update(time, delta) {
+        enemyDeathSoundsActive = 0;
         // FPS timing for debugging
         //if (fpsTimer == -1) {
         //    fpsTimer = 0;

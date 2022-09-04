@@ -83,6 +83,7 @@ export class LoadingScene extends Phaser.Scene {
         this.load.audio("EnemyBomb", "assets/sfx/EnemyBomb.mp3");
         this.load.audio("EnemyBombDrop", "assets/sfx/EnemyBombDrop.mp3");
         this.load.audio("EnemyDeath", "assets/sfx/EnemyDeath.mp3");
+        this.load.audio("EnemyHit", "assets/sfx/EnemyHit.mp3");
         this.load.audio("EnemySpawned", "assets/sfx/EnemySpawned.mp3");
         this.load.audio("GemCollect", "assets/sfx/GemCollect.mp3");
         this.load.audio("LevelUp", "assets/sfx/LevelUp.mp3");

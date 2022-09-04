@@ -1,4 +1,5 @@
 import { config } from "../model/Config";
+import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { collectGem, getBulletDamage, takeDamage } from "./UnitStatus";
 
@@ -26,6 +27,7 @@ export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynam
     if (hitUnit) {
         let unit: Unit = this.getUnit(hitUnit.getData("id"));
         takeDamage(this, unit, getBulletDamage(this.getPlayer()));
+        playSound(this, SoundEffect.EnemyHit);
     }
 }
 

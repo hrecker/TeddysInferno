@@ -9,6 +9,7 @@ export enum SoundEffect {
     EnemyBomb = "EnemyBomb",
     EnemyBombDrop = "EnemyBombDrop",
     EnemyDeath = "EnemyDeath",
+    EnemyHit = "EnemyHit",
     EnemySpawned = "EnemySpawned",
     GemCollect = "GemCollect",
     LevelUp = "LevelUp",
@@ -30,6 +31,7 @@ export function loadSounds(scene: Phaser.Scene) {
     sounds[SoundEffect.EnemyBomb] = scene.sound.add("EnemyBomb");
     sounds[SoundEffect.EnemyBombDrop] = scene.sound.add("EnemyBombDrop");
     sounds[SoundEffect.EnemyDeath] = scene.sound.add("EnemyDeath");
+    sounds[SoundEffect.EnemyHit] = scene.sound.add("EnemyHit");
     sounds[SoundEffect.EnemySpawned] = scene.sound.add("EnemySpawned");
     sounds[SoundEffect.GemCollect] = scene.sound.add("GemCollect");
     sounds[SoundEffect.LevelUp] = scene.sound.add("LevelUp");
