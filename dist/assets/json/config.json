@@ -179,5 +179,8 @@
     "shotgunParticleCount": 8,
     "spawnStartParticleCount": 8,
     "spawnCompleteParticleCount": 4,
-    "gemParticleCount": 4
+    "gemParticleCount": 4,
+
+    "playerTrailPositionCount": 15,
+    "playerTrailStartingAlpha": 0.5
 }

@@ -148,6 +148,17 @@ export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, s
     clampSpeed(gem, config()["gemMaxSpeed"]);
 }
 
+/** Update the track of player movement */
+export function recordPlayerPosition(player: Unit) {
+    if (player.gameObj[0]) {
+        if (player.state.lastPositions.length >= config()["playerTrailPositionCount"]) {
+            player.state.lastPositions.shift();
+        }
+        let leftPos = player.gameObj[0].body.center.clone().add(Phaser.Math.Vector2.LEFT.clone().scale(11).rotate(player.gameObj[0].rotation));
+        player.state.lastPositions.push(leftPos);
+    }
+}
+
 /** Prevent unit from going over max speed */
 function clampUnitSpeed(unit: Unit) {
     clampSpeed(unit.gameObj[0], unit.maxSpeed);

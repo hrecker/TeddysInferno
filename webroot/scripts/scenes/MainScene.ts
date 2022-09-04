@@ -1,4 +1,4 @@
-import { moveUnit, movePlayerUnit, moveGem } from "../units/Movement";
+import { moveUnit, movePlayerUnit, moveGem, recordPlayerPosition } from "../units/Movement";
 import { updateUnitAI, handleUnitDestroy } from "../units/AI";
 import { activateBomb, fireEnemyWeapon, fireWeapon } from "../units/Weapon";
 import { Unit, createUnit } from "../model/Units";
@@ -313,7 +313,7 @@ export class MainScene extends Phaser.Scene {
         unit.gameObj.forEach(obj => {
             unitsPhysicsGroup.add(obj);
         });
-        this.spawnParticles(unit.spawnParticleColor, location);
+        this.spawnParticles(unit.color, location);
         //TODO if future stealers added, modify this
         if (unit.name == "stealer1") {
             stealerUnits[unit.id] = unit;
@@ -325,7 +325,7 @@ export class MainScene extends Phaser.Scene {
     createPlayerUnit() {
         let spawn = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
         player = createUnit("player", spawn, this);
-        this.spawnParticles(player.spawnParticleColor, spawn);
+        this.spawnParticles(player.color, spawn);
     }
 
     spawnParticles(color: number, location: Phaser.Math.Vector2) {
@@ -500,6 +500,25 @@ export class MainScene extends Phaser.Scene {
         return shotgunWeaponKey.isDown || this.input.activePointer.rightButtonDown();
     }
 
+    drawPlayerTrail() {
+        if (player.gameObj[0] && player.state.lastPositions.length > 1 && player.gameObj[0].body.velocity.length() > 0) {
+            let newGraphics = this.add.graphics();
+            newGraphics.lineStyle(4, player.color, config()["playerTrailStartingAlpha"]);
+            newGraphics.strokePoints(player.state.lastPositions);
+            this.tweens.add({
+                targets: newGraphics,
+                alpha: {
+                    from: config()["playerTrailStartingAlpha"],
+                    to: 0
+                },
+                duration: 1500,
+                onComplete: () => {
+                    newGraphics.destroy();
+                }
+            });
+        }
+    }
+
     /** Main game update loop */
     update(time, delta) {
         enemyDeathSoundsActive = 0;
@@ -542,6 +561,8 @@ export class MainScene extends Phaser.Scene {
                 // Spawning enemies
                 this.startUnitSpawns(getSpawns(timer));
             }
+            recordPlayerPosition(player);
+            this.drawPlayerTrail();
         } else {
             // Enemy movement
             this.moveUnits(finalPlayerPos, delta, bombRepelRemainingMs > 0);

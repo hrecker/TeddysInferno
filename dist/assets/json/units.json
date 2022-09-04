@@ -7,7 +7,7 @@
         "bodyType": "circle",
         "bodySize": 10,
         "bodyOffset": 6,
-        "spawnParticleColor": "0xF98284"
+        "color": "0xF98284"
     },
     "chaser1": {
         "name": "chaser1",
@@ -21,7 +21,7 @@
         "maxAngularSpeed": 1,
         "rotation": "true",
         "gemsDropped": 1,
-        "spawnParticleColor": "0xB0A9E4"
+        "color": "0xB0A9E4"
     },
     "chaser2": {
         "name": "chaser2",
@@ -35,7 +35,7 @@
         "maxAngularSpeed": 2.5,
         "rotation": "true",
         "gemsDropped": 1,
-        "spawnParticleColor": "0xB3E3DA"
+        "color": "0xB3E3DA"
     },
     "chaser3": {
         "name": "chaser3",
@@ -49,7 +49,7 @@
         "maxAngularSpeed": 5,
         "rotation": "true",
         "gemsDropped": 2,
-        "spawnParticleColor": "0xFEAAE4"
+        "color": "0xFEAAE4"
     },
     "spawner1": {
         "name": "spawner1",
@@ -65,7 +65,7 @@
         "spawnUnit": "chaser1",
         "spawnDelayMs": 2000,
         "gemsDropped": 1,
-        "spawnParticleColor": "0xB0A9E4"
+        "color": "0xB0A9E4"
     },
     "spawner2": {
         "name": "spawner2",
@@ -81,7 +81,7 @@
         "spawnUnit": "chaser2",
         "spawnDelayMs": 2500,
         "gemsDropped": 2,
-        "spawnParticleColor": "0xB3E3DA"
+        "color": "0xB3E3DA"
     },
     "spawner3": {
         "name": "spawner3",
@@ -97,7 +97,7 @@
         "spawnUnit": "chaser3",
         "spawnDelayMs": 5000,
         "gemsDropped": 3,
-        "spawnParticleColor": "0xFEAAE4"
+        "color": "0xFEAAE4"
     },
     "looper": {
         "name": "looper",
@@ -112,7 +112,7 @@
         "rotation": "true",
         "loopDurationMs": 5000,
         "gemsDropped": 1,
-        "spawnParticleColor": "0xACCCE4"
+        "color": "0xACCCE4"
     },
     "worm": {
         "name": "worm",
@@ -126,14 +126,14 @@
         "bodyOffset": 2,
         "rotation": "true",
         "gemsDropped": 5,
-        "spawnParticleColor": "0x87A889"
+        "color": "0x87A889"
     },
     "obstacle": {
         "name": "obstacle",
         "health": 1,
         "bodySize": 32,
         "gemsDropped": 0,
-        "spawnParticleColor": "0xB0EB93"
+        "color": "0xB0EB93"
     },
     "bomber": {
         "name": "bomber",
@@ -147,7 +147,7 @@
         "bodyOffset": 17,
         "spawnDelayMs": 3000,
         "gemsDropped": 2,
-        "spawnParticleColor": "0xDEA38B"
+        "color": "0xDEA38B"
     },
     "bomb": {
         "name": "bomb",
@@ -159,7 +159,7 @@
         "flashDelayMs": 500,
         "textures": ["bomb", "bombflash"],
         "gemsDropped": 0,
-        "spawnParticleColor": "0xF98284",
+        "color": "0xF98284",
         "skipDeathAnimation": true
     },
     "stealer1": {
@@ -168,6 +168,6 @@
         "bodySize": 64,
         "gemsDropped": 3,
         "weaponDelayMs": 2000,
-        "spawnParticleColor": "0xFFC384"
+        "color": "0xFFC384"
     }
 }

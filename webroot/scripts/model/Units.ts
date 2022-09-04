@@ -30,6 +30,7 @@ export type UnitState = {
     health?: number;
     weaponCooldownRemainingMs?: number;
     gemCount?: number;
+    lastPositions?: Phaser.Math.Vector2[];
 }
 
 /** A Unit in the main scene */
@@ -64,7 +65,7 @@ export type Unit = {
     flashDelayMs?: number;
     lifetimeMs?: number;
     state: UnitState;
-    spawnParticleColor: number;
+    color: number;
     skipDeathAnimation: boolean;
 }
 
@@ -97,7 +98,7 @@ export function loadUnitJson(unitJson) {
             textures: unitProps["textures"],
             flashDelayMs: unitProps["flashDelayMs"],
             lifetimeMs: unitProps["lifetimeMs"],
-            spawnParticleColor: parseInt(unitProps["spawnParticleColor"], 16),
+            color: parseInt(unitProps["color"], 16),
             skipDeathAnimation: unitProps["skipDeathAnimation"],
             state: {}
         };
@@ -145,6 +146,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     unit.state.currentLoopDurationMs = -1;
     unit.state.health = unit.maxHealth;
     unit.state.weaponCooldownRemainingMs = unit.weaponDelayMs;
+    unit.state.lastPositions = [];
 
     return unit;
 }
