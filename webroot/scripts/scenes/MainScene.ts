@@ -56,6 +56,8 @@ let bulletParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let gemParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let spawnerParticleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 let unitParticleEmitters: { [color: number]: Phaser.GameObjects.Particles.ParticleEmitter };
+let shakeIntensity: number;
+let shakeDuration: number;
 
 let enemyDeathSoundsActive = 0;
 
@@ -114,6 +116,16 @@ export class MainScene extends Phaser.Scene {
     setTimer(value: number) {
         timer = value;
         timerEvent(timer);
+    }
+
+    shake(durationMs: number, intensity: number) {
+        // Ensure lower intensity/duration shakes don't override a higher intensity/duration shake
+        if (intensity > shakeIntensity) {
+            shakeIntensity = intensity;
+        }
+        if (durationMs > shakeDuration) {
+            shakeDuration = durationMs;
+        }
     }
 
     create() {
@@ -448,7 +460,7 @@ export class MainScene extends Phaser.Scene {
                 playSound(this, SoundEffect.EnemyDeath);
             }
         }
-        this.cameras.main.shake(250, 0.003);
+        this.shake(250, 0.003);
     }
 
     destroyPlayer() {
@@ -535,6 +547,11 @@ export class MainScene extends Phaser.Scene {
 
     /** Main game update loop */
     update(time, delta) {
+        if (shakeDuration > 0) {
+            this.cameras.main.shake(shakeDuration, shakeIntensity);
+        }
+        shakeIntensity = -1;
+        shakeDuration = -1;
         enemyDeathSoundsActive = 0;
         // FPS timing for debugging
         //if (fpsTimer == -1) {

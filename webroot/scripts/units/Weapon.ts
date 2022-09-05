@@ -58,7 +58,7 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
         player.state.bombCooldownRemainingMs = config()["bombCooldownMs"];
         player.state.bombCount--;
         bombCountEvent(player.state.bombCount);
-        scene.cameras.main.shake(config()["bombRepelDurationMs"], 0.004);
+        scene.shake(config()["bombRepelDurationMs"], 0.008);
         scene.cameras.main.flash(config()["bombRepelDurationMs"], 100, 100, 100);
         playSound(scene, SoundEffect.PlayerBomb);
         return true;
