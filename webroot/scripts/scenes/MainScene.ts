@@ -321,7 +321,7 @@ export class MainScene extends Phaser.Scene {
         this.explodeParticlesColor(player.color, spawn);
     }
 
-    explodeParticlesColor(color: number, location: Phaser.Math.Vector2) {
+    explodeParticlesColor(color: number, location: Phaser.Math.Vector2, quantity?: number) {
         if (! (color in unitParticleEmitters)) {
             // Create separate particle emitters for each color
             let newParticleEmitter = particles.createEmitter({
@@ -336,7 +336,10 @@ export class MainScene extends Phaser.Scene {
             });
             unitParticleEmitters[color] = newParticleEmitter;
         }
-        unitParticleEmitters[color].explode(config()["spawnCompleteParticleCount"], location.x, location.y);
+        if (! quantity) {
+            quantity = config()["spawnCompleteParticleCount"];
+        }
+        unitParticleEmitters[color].explode(quantity, location.x, location.y);
     }
 
     gemParticles(location: Phaser.Math.Vector2, count?: number) {

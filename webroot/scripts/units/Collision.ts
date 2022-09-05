@@ -27,12 +27,7 @@ export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynam
     // Bullets can only hit one enemy. If a bullet hits two enemies the second might be null here.
     if (hitUnit) {
         let unit: Unit = this.getUnit(hitUnit.getData("id"));
-        if (takeDamage(this, unit, getBulletDamage(this.getPlayer())) > 0) {
-            // If enemy survives the hit, flash the enemy sprite to indicate a hit
-            unit.gameObj.forEach(obj => {
-                flashSprite(obj, 50, this);
-            });
-        }
+        takeDamage(this, unit, getBulletDamage(this.getPlayer()));
         playSound(this, SoundEffect.EnemyHit);
     }
 }

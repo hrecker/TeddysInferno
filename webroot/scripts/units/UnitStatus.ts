@@ -3,6 +3,7 @@ import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { flashSprite } from "../util/Util";
 
 let upgradeGemCountCache: { [upgradesComplete: number]: number } = {};
 
@@ -24,6 +25,10 @@ export function takeDamage(scene: MainScene, unit: Unit, damage: number): number
     if (damage <= 0) {
         return unit.state.health;
     }
+    // If enemy survives the hit, flash the enemy sprite to indicate a hit
+    unit.gameObj.forEach(obj => {
+        flashSprite(obj, 50, scene);
+    });
     return updateHealth(scene, unit, unit.state.health - damage);
 }
 
@@ -67,14 +72,17 @@ function collectGemPlayer(player: Unit, scene: MainScene) {
             // Upgrade weapon
             player.state.weaponLevel++;
             weaponLevelEvent(player.state.weaponLevel);
-            playSound(scene, SoundEffect.LevelUp);
+            scene.explodeParticlesColor(parseInt(config()["weaponUpgradeProgressColor"], 16), player.gameObj[0].body.center, 100);
         } else {
             // Add bomb
             player.state.bombCount++;
             player.state.bombsEarned++;
             bombCountEvent(player.state.bombCount);
-            playSound(scene, SoundEffect.LevelUp);
+            scene.explodeParticlesColor(parseInt(config()["bombProgressColor"], 16), player.gameObj[0].body.center, 50);
         }
+        // Common effects for bomb and level ups
+        playSound(scene, SoundEffect.LevelUp);
+        flashSprite(player.gameObj[0], 100, scene);
     }
     gemCountEvent(player.state.gemCount, getPreviousUpgradeThreshold(player), getNextUpgradeThreshold(player));
 }

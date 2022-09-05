@@ -17,10 +17,7 @@ let levelProgressOutline: Phaser.GameObjects.Image;
 let levelProgress: Phaser.GameObjects.Graphics;
 let weaponLevelText: Phaser.GameObjects.Text;
 let bombCountText: Phaser.GameObjects.Text;
-
-const weaponUpgradeProgressColor = 0xB0EB93;
-const bombProgressColor = 0xACCCE4;
-let progressColor = weaponUpgradeProgressColor;
+let progressColor: number;
 
 // Leaderboard UI
 type LeaderboardRow = {
@@ -88,7 +85,7 @@ export class MainUIScene extends Phaser.Scene {
         weaponLevelText.setText("Level " + (weaponLevel + 1));
         if (weaponLevel == config()["weaponUpgradeThresholds"].length) {
             // Max level
-            progressColor = bombProgressColor;
+            progressColor = parseInt(config()["bombProgressColor"], 16);
         }
     }
 
@@ -258,14 +255,22 @@ export class MainUIScene extends Phaser.Scene {
             case "retry":
                 // Restart game scene
                 this.scene.get("MainScene").scene.restart();
+                this.resetUIElements();
                 break;
         }
+    }
+
+    resetUIElements() {
+        progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
+        weaponLevelText.setText("Level 1");
+        bombCountText.setText("");
     }
 
     create() {
         timerText = this.add.text(this.game.renderer.width / 2, 40, "0.0", config()["timerFontStyle"]);
         timerText.setOrigin(0.5);
         timerText.alpha = 0.75;
+        progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
 
         weaponLevelText = this.add.text(8, 40, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         bombCountText = this.add.text(8, 80, "", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
