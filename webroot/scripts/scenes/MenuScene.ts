@@ -47,7 +47,7 @@ export class MenuScene extends Phaser.Scene {
         lifetimeStatsGroup.add(backButton);
 
         // Controls
-        let controlsMargin = 40;
+        let controlsMargin = 35;
         let controlsYAnchor = buttonYAnchor + buttonMargin + 75;
         mainMenuGroup.add(this.add.text(centerX, controlsYAnchor, "Controls:", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0.5));
         mainMenuGroup.add(this.add.text(centerX, controlsYAnchor + controlsMargin, "- W to activate thrust", config()["controlsStyle"]).setOrigin(0.5));
@@ -56,6 +56,7 @@ export class MenuScene extends Phaser.Scene {
         mainMenuGroup.add(this.add.text(centerX, controlsYAnchor + controlsMargin * 4, "- P or right click to fire blast of bullets", config()["controlsStyle"]).setOrigin(0.5));
         mainMenuGroup.add(this.add.text(centerX, controlsYAnchor + controlsMargin * 5, "- Q to quickturn", config()["controlsStyle"]).setOrigin(0.5));
         mainMenuGroup.add(this.add.text(centerX, controlsYAnchor + controlsMargin * 6, "- E to boost", config()["controlsStyle"]).setOrigin(0.5));
+        mainMenuGroup.add(this.add.text(centerX, controlsYAnchor + controlsMargin * 7, "- Space to activate bomb", config()["controlsStyle"]).setOrigin(0.5));
 
         // Lifetime stats
         let lifetimeStats = getLifetimeStats();
