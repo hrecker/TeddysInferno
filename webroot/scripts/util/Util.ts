@@ -21,3 +21,11 @@ export function isOutsideBounds(pos: Phaser.Math.Vector2, topLeft: Phaser.Types.
     return pos.x < topLeft.x || pos.x > bottomRight.x ||
            pos.y < topLeft.y || pos.y > bottomRight.y;
 }
+
+/** Set a sprite to full white for a time */
+export function flashSprite(sprite: Phaser.Physics.Arcade.Image, durationMs: number, scene: Phaser.Scene) {
+    sprite.setTintFill(0xffffff);
+    scene.time.delayedCall(durationMs, () => {
+        sprite.clearTint();
+    });
+}

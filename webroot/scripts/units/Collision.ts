@@ -1,6 +1,7 @@
 import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
+import { flashSprite } from "../util/Util";
 import { collectGem, getBulletDamage, takeDamage } from "./UnitStatus";
 
 /** Should be used as an overlap callback, to handle when a unit hits another unit */
@@ -26,7 +27,12 @@ export function handleBulletHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynam
     // Bullets can only hit one enemy. If a bullet hits two enemies the second might be null here.
     if (hitUnit) {
         let unit: Unit = this.getUnit(hitUnit.getData("id"));
-        takeDamage(this, unit, getBulletDamage(this.getPlayer()));
+        if (takeDamage(this, unit, getBulletDamage(this.getPlayer())) > 0) {
+            // If enemy survives the hit, flash the enemy sprite to indicate a hit
+            unit.gameObj.forEach(obj => {
+                flashSprite(obj, 50, this);
+            });
+        }
         playSound(this, SoundEffect.EnemyHit);
     }
 }

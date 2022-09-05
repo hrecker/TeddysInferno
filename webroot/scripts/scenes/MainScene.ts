@@ -10,7 +10,7 @@ import { getSpawns, resetSpawnset } from "../model/Spawnset";
 import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
-import { getRandomArrayElements, isOutsideBounds } from "../util/Util";
+import { flashSprite, getRandomArrayElements, isOutsideBounds } from "../util/Util";
 import { getSound, loadSounds, playSound, SoundEffect } from "../model/Sound";
 
 // Units
@@ -244,7 +244,7 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 600));
+        //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
     }
     
@@ -306,7 +306,7 @@ export class MainScene extends Phaser.Scene {
         unit.gameObj.forEach(obj => {
             unitsPhysicsGroup.add(obj);
         });
-        this.spawnParticles(unit.color, location);
+        this.explodeParticlesColor(unit.color, location);
         //TODO if future stealers added, modify this
         if (unit.name == "stealer1") {
             stealerUnits[unit.id] = unit;
@@ -318,10 +318,10 @@ export class MainScene extends Phaser.Scene {
     createPlayerUnit() {
         let spawn = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
         player = createUnit("player", spawn, this);
-        this.spawnParticles(player.color, spawn);
+        this.explodeParticlesColor(player.color, spawn);
     }
 
-    spawnParticles(color: number, location: Phaser.Math.Vector2) {
+    explodeParticlesColor(color: number, location: Phaser.Math.Vector2) {
         if (! (color in unitParticleEmitters)) {
             // Create separate particle emitters for each color
             let newParticleEmitter = particles.createEmitter({
@@ -418,6 +418,8 @@ export class MainScene extends Phaser.Scene {
                     image.destroy();
                 }
             });
+            // Flash death images white for a moment
+            flashSprite(image, 200, this);
         });
     }
 

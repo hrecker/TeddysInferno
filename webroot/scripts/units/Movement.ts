@@ -46,7 +46,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
                 }
             });
         }
-        scene.spawnParticles(player.color, player.gameObj[0].body.center);
+        scene.explodeParticlesColor(player.color, player.gameObj[0].body.center);
     } else {
         if (leftActive && !rightActive) {
             player.gameObj[0].setRotation(player.gameObj[0].rotation - config()["playerRotationSpeed"]);
@@ -76,7 +76,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
                 echoImage.destroy();
             }
         });
-        scene.spawnParticles(player.color, player.gameObj[0].body.center);
+        scene.explodeParticlesColor(player.color, player.gameObj[0].body.center);
     }
 
     if (boostActive && canBoost) {
