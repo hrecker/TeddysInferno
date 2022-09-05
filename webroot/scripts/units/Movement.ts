@@ -187,7 +187,7 @@ export function recordPlayerPosition(player: Unit) {
         if (player.state.lastPositions.length >= config()["playerTrailPositionCount"]) {
             player.state.lastPositions.shift();
         }
-        let leftPos = player.gameObj[0].body.center.clone().add(Phaser.Math.Vector2.LEFT.clone().scale(11).rotate(player.gameObj[0].rotation));
+        let leftPos = player.gameObj[0].body.center.clone().add(Phaser.Math.Vector2.LEFT.clone().scale(9).rotate(player.gameObj[0].rotation));
         player.state.lastPositions.push(leftPos);
     }
 }
