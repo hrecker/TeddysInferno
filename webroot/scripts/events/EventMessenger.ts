@@ -1,3 +1,5 @@
+import { Settings } from "../state/Settings"
+
 // This file is used for defining callbacks for events, useful for communicating between scenes
 export enum Ability {
     QuickTurn = "QuickTurn",
@@ -21,6 +23,10 @@ type GemCountCallback = {
     callback: (gemCount: number, previousThreshold: number, nextThreshold: number, scene: Phaser.Scene) => void;
     scene: Phaser.Scene;
 }
+type SettingsCallback = {
+    callback: (newSettings: Settings, scene: Phaser.Scene) => void;
+    scene: Phaser.Scene;
+}
 
 // Callback lists
 let timerCallbacks: NumberCallback[] = [];
@@ -30,6 +36,7 @@ let playerDeathCallbacks: NoArgumentCallback[] = [];
 let gemCountCallbacks: GemCountCallback[] = [];
 let weaponLevelCallbacks: NumberCallback[] = [];
 let bombCountCallbacks: NumberCallback[] = [];
+let settingsCallbacks: SettingsCallback[] = [];
 
 /** Clear out any active listeners */
 export function clearListeners() {
@@ -40,6 +47,7 @@ export function clearListeners() {
     gemCountCallbacks = [];
     weaponLevelCallbacks = [];
     bombCountCallbacks = [];
+    // Don't clear settings callbacks since only the background scene listens to the settings
 }
 
 /** Add a callback listening for timer changes */
@@ -98,6 +106,14 @@ export function addBombCountListener(callback: (bombCount: number, scene: Phaser
     });
 }
 
+/** Add a callback listening for settings changes */
+export function addSettingsListener(callback: (newSettings: Settings, scene: Phaser.Scene) => void, scene: Phaser.Scene) {
+    settingsCallbacks.push({ 
+        callback: callback,
+        scene: scene
+    });
+}
+
 /** Call any listeners for ability usage */
 export function timerEvent(timer: number) {
     timerCallbacks.forEach(callback => 
@@ -138,4 +154,10 @@ export function weaponLevelEvent(level: number) {
 export function bombCountEvent(bombCount: number) {
     bombCountCallbacks.forEach(callback => 
         callback.callback(bombCount, callback.scene));
+}
+
+/** Call any callbacks listening for settings changes */
+export function settingsEvent(newSettings: Settings) {
+    settingsCallbacks.forEach(callback => 
+        callback.callback(newSettings, callback.scene));
 }

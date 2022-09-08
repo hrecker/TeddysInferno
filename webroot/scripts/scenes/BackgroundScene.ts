@@ -1,4 +1,7 @@
+import { addSettingsListener } from "../events/EventMessenger";
 import { config } from "../model/Config";
+import { stopAllSounds } from "../model/Sound";
+import { getSettings, Settings } from "../state/Settings";
 
 let bgMusic: Phaser.Sound.BaseSound;
 
@@ -10,15 +13,27 @@ export class BackgroundScene extends Phaser.Scene {
         });
     }
 
+    getMusicVolume() {
+        if (getSettings().musicEnabled) {
+            return config()["defaultMusicVolume"];
+        } else {
+            return 0;
+        }
+    }
+
     create() {
         bgMusic = this.sound.add('backgroundMusic');
         bgMusic.play({
             loop: true,
-            volume: config()["defaultMusicVolume"]
+            volume: this.getMusicVolume()
         });
+        addSettingsListener(this.settingsListener, this);
     }
 
-    update() {
-        //console.log(vector2Str(shader));
+    settingsListener(newSettings: Settings, scene: Phaser.Scene) {
+        bgMusic.setVolume(scene.getMusicVolume());
+        if (! newSettings.sfxEnabled) {
+            stopAllSounds();
+        }
     }
 }

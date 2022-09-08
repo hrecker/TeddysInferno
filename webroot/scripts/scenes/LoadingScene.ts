@@ -1,6 +1,7 @@
 import { loadConfig } from "../model/Config";
 import { loadSpawnset } from "../model/Spawnset";
 import { loadUnitJson } from "../model/Units";
+import { loadSavedSettings } from "../state/Settings";
 
 /** Load json and assets */
 export class LoadingScene extends Phaser.Scene {
@@ -56,12 +57,20 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("boostIcon", "assets/sprites/ui/boostIcon.png");
         this.load.image("menuButton", "assets/sprites/ui/menuButton.png");
         this.load.image("menuButtonDown", "assets/sprites/ui/menuButtonDown.png");
+        this.load.image('musicOffButton', 'assets/sprites/ui/music_off_button.png');
+        this.load.image('musicOffButtonDown', 'assets/sprites/ui/music_off_button_down.png');
+        this.load.image('musicOnButton', 'assets/sprites/ui/music_on_button.png');
+        this.load.image('musicOnButtonDown', 'assets/sprites/ui/music_on_button_down.png');
         this.load.image("playButton", "assets/sprites/ui/playButton.png");
         this.load.image("playButtonDown", "assets/sprites/ui/playButtonDown.png");
         this.load.image("progressOutline", "assets/sprites/ui/progressOutline.png");
         this.load.image("quickTurnIcon", "assets/sprites/ui/quickTurnIcon.png");
         this.load.image("retryButton", "assets/sprites/ui/retryButton.png");
         this.load.image("retryButtonDown", "assets/sprites/ui/retryButtonDown.png");
+        this.load.image('soundOffButton', 'assets/sprites/ui/sound_off_button.png');
+        this.load.image('soundOffButtonDown', 'assets/sprites/ui/sound_off_button_down.png');
+        this.load.image('soundOnButton', 'assets/sprites/ui/sound_on_button.png');
+        this.load.image('soundOnButtonDown', 'assets/sprites/ui/sound_on_button_down.png');
         this.load.image("statsButton", "assets/sprites/ui/statsButton.png");
         this.load.image("statsButtonDown", "assets/sprites/ui/statsButtonDown.png");
 
@@ -103,6 +112,7 @@ export class LoadingScene extends Phaser.Scene {
         loadUnitJson(this.cache.json.get("units"));
         loadConfig(this.cache.json.get("config"));
         loadSpawnset(this.cache.json.get("spawnset"));
+        loadSavedSettings();
         this.scene.start("BackgroundScene")
                   .start("MenuScene")
                   .stop();

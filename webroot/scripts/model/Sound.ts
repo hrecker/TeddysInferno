@@ -1,4 +1,5 @@
 import { MainScene } from "../scenes/MainScene";
+import { getSettings } from "../state/Settings";
 import { config } from "./Config";
 
 export enum SoundEffect {
@@ -48,6 +49,10 @@ export function getSound(sound: SoundEffect): Phaser.Sound.BaseSound {
 
 /** Get a given sound */
 export function playSound(scene: Phaser.Scene, sound: SoundEffect, loop?: boolean) {
+    if (! getSettings().sfxEnabled) {
+        return;
+    }
+
     if (loop) {
         // Play the cached sound when looping so that it can be stopped later
         sounds[sound].play({
@@ -59,4 +64,11 @@ export function playSound(scene: Phaser.Scene, sound: SoundEffect, loop?: boolea
             volume: config()["defaultSfxVolume"][sound]
         });
     }
+}
+
+/** Stop any playing sounds */
+export function stopAllSounds() {
+    Object.keys(sounds).forEach(soundEffect => {
+        sounds[soundEffect].stop();
+    })
 }

@@ -1,9 +1,12 @@
 import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { getLifetimeStats } from "../state/GameResultState";
+import { getSettings, setMusicEnabled, setSfxEnabled } from "../state/Settings";
 
 // Currently selected button
 let selectedButton: string;
+const musicControlButtonName = "musicControlButton";
+const sfxControlButtonName = "sfxControlButton";
 
 // Groups to allow easily showing and hiding multiple UI elements
 let mainMenuGroup: Phaser.GameObjects.Group;
@@ -23,6 +26,24 @@ export class MenuScene extends Phaser.Scene {
         });
     }
 
+    getMusicButtonTexture() {
+        return getSettings().musicEnabled ? "musicOnButton" : "musicOffButton";
+    }
+
+    getSfxButtonTexture() {
+        return getSettings().sfxEnabled ? "soundOnButton" : "soundOffButton";
+    }
+
+    getDefaultTexture(buttonName: string) {
+        if (buttonName == musicControlButtonName) {
+            return this.getMusicButtonTexture();
+        }
+        if (buttonName == sfxControlButtonName) {
+            return this.getSfxButtonTexture();
+        }
+        return buttonName;
+    }
+
     create() {
         mainMenuGroup = this.add.group();
         lifetimeStatsGroup = this.add.group();
@@ -39,12 +60,18 @@ export class MenuScene extends Phaser.Scene {
         let playButton = this.add.image(centerX, buttonYAnchor, "playButton").setScale(1.5);
         let statsButton = this.add.image(centerX, buttonYAnchor + buttonMargin, "statsButton").setScale(1.5);
         let backButton = this.add.image(centerX, buttonYAnchor + buttonMargin * 3, "backButton").setScale(1.5);
-        this.configureButton(playButton, "play", "playButton", "playButtonDown");
-        this.configureButton(statsButton, "stats", "statsButton", "statsButtonDown");
-        this.configureButton(backButton, "back", "backButton", "backButtonDown");
+        this.configureButton(playButton, "playButton");
+        this.configureButton(statsButton, "statsButton");
+        this.configureButton(backButton, "backButton");
         mainMenuGroup.add(playButton);
         mainMenuGroup.add(statsButton);
         lifetimeStatsGroup.add(backButton);
+        
+        // Audio control buttons
+        let musicControlButton = this.add.image(5, this.game.renderer.height - 60, this.getMusicButtonTexture()).setOrigin(0, 1);
+        this.configureButton(musicControlButton, musicControlButtonName);
+        let sfxControlButton = this.add.image(5, this.game.renderer.height - 5, this.getSfxButtonTexture()).setOrigin(0, 1);
+        this.configureButton(sfxControlButton, sfxControlButtonName);
 
         // Controls
         let controlsMargin = 35;
@@ -83,14 +110,14 @@ export class MenuScene extends Phaser.Scene {
         //this.handleButtonClick("play");
     }
 
-    configureButton(button: Phaser.GameObjects.Image, buttonName: string, defaultTexture: string, downTexture: string) {
+    configureButton(button: Phaser.GameObjects.Image, buttonName: string) {
         button.setInteractive();
         button.on('pointerout', () => {
-            button.setTexture(defaultTexture); 
+            button.setTexture(this.getDefaultTexture(buttonName)); 
             selectedButton = null;
         });
         button.on('pointerdown', () => {
-            button.setTexture(downTexture);
+            button.setTexture(this.getDefaultTexture(buttonName) + "Down"); 
             selectedButton = buttonName;
             playSound(this, SoundEffect.ButtonClick);
         });
@@ -98,25 +125,33 @@ export class MenuScene extends Phaser.Scene {
             if (selectedButton === buttonName) {
                 this.handleButtonClick(buttonName);
             }
-            button.setTexture(defaultTexture);
+            button.setTexture(this.getDefaultTexture(buttonName)); 
             selectedButton = null;
         });
     }
 
     handleButtonClick(buttonName) {
         switch (buttonName) {
-            case "back":
+            case "backButton":
                 // Back to the main menu from the stats menu
                 mainMenuGroup.setVisible(true);
                 lifetimeStatsGroup.setVisible(false);
                 break;
-            case "play":
+            case "playButton":
                 // Start game
                 this.scene.start("MainScene")
                           .start("MainUIScene")
                           .stop();
                 break;
-            case "stats":
+            case musicControlButtonName:
+                // Toggle music
+                setMusicEnabled(!getSettings().musicEnabled);
+                break;
+            case sfxControlButtonName:
+                // Toggle sfx
+                setSfxEnabled(!getSettings().sfxEnabled);
+                break;
+            case "statsButton":
                 // Show stats
                 mainMenuGroup.setVisible(false);
                 lifetimeStatsGroup.setVisible(true);
