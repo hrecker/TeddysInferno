@@ -17,6 +17,7 @@ let timeSurvivedText: Phaser.GameObjects.Text;
 let gemsCollectedText: Phaser.GameObjects.Text;
 let enemiesKilledText: Phaser.GameObjects.Text;
 let shotsFiredText: Phaser.GameObjects.Text;
+let deathsText: Phaser.GameObjects.Text;
 
 /** Main Menu scene */
 export class MenuScene extends Phaser.Scene {
@@ -59,7 +60,7 @@ export class MenuScene extends Phaser.Scene {
         let buttonMargin = 90;
         let playButton = this.add.image(centerX, buttonYAnchor, "playButton").setScale(1.5);
         let statsButton = this.add.image(centerX, buttonYAnchor + buttonMargin, "statsButton").setScale(1.5);
-        let backButton = this.add.image(centerX, buttonYAnchor + buttonMargin * 3, "backButton").setScale(1.5);
+        let backButton = this.add.image(centerX, buttonYAnchor + buttonMargin * 3 + 50, "backButton").setScale(1.5);
         this.configureButton(playButton, "playButton");
         this.configureButton(statsButton, "statsButton");
         this.configureButton(backButton, "backButton");
@@ -94,14 +95,17 @@ export class MenuScene extends Phaser.Scene {
         lifetimeStatsGroup.add(this.add.text(centerX - 320, buttonYAnchor + statsMargin, "Gems collected", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
         lifetimeStatsGroup.add(this.add.text(centerX - 320, buttonYAnchor + statsMargin * 2, "Enemies killed", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
         lifetimeStatsGroup.add(this.add.text(centerX - 320, buttonYAnchor + statsMargin * 3, "Shots fired", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 320, buttonYAnchor + statsMargin * 4, "Deaths", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
         timeSurvivedText = this.add.text(centerX + 320, buttonYAnchor, lifetimeStats.score.toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
         gemsCollectedText = this.add.text(centerX + 320, buttonYAnchor + statsMargin, lifetimeStats.gemsCollected.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
         enemiesKilledText = this.add.text(centerX + 320, buttonYAnchor + statsMargin * 2, lifetimeStats.enemiesKilled.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
         shotsFiredText = this.add.text(centerX + 320, buttonYAnchor + statsMargin * 3, lifetimeStats.shotsFired.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        deathsText = this.add.text(centerX + 320, buttonYAnchor + statsMargin * 4, lifetimeStats.deaths.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
         lifetimeStatsGroup.add(timeSurvivedText);
         lifetimeStatsGroup.add(gemsCollectedText);
         lifetimeStatsGroup.add(enemiesKilledText);
         lifetimeStatsGroup.add(shotsFiredText);
+        lifetimeStatsGroup.add(deathsText);
 
         lifetimeStatsGroup.setVisible(false);
         //TODO credits - button is from Kenney asset pack

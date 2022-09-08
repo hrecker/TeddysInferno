@@ -4,4 +4,5 @@ export type GameResult = {
     gemsCollected: number;
     enemiesKilled: number;
     shotsFired: number;
+    deaths: number;
 };

@@ -136,7 +136,8 @@ export class MainScene extends Phaser.Scene {
             score: 0,
             gemsCollected: 0,
             enemiesKilled: 0,
-            shotsFired: 0
+            shotsFired: 0,
+            deaths: 0
         };
         this.resetTimer();
         resetSpawnset();
@@ -471,6 +472,7 @@ export class MainScene extends Phaser.Scene {
             this.destroyUnit(player);
             player.gameObj[0] = null;
             gameResult.score = Math.floor(timer) / 1000.0;
+            gameResult.deaths = 1;
             saveGameResult(gameResult);
             playerDeathEvent();
             playSound(this, SoundEffect.Death);

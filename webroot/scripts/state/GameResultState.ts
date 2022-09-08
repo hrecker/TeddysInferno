@@ -33,6 +33,7 @@ export function saveGameResult(gameResult: GameResult): GameResult[] {
     lifetimeStats.gemsCollected += latestGameResult.gemsCollected;
     lifetimeStats.enemiesKilled += latestGameResult.enemiesKilled;
     lifetimeStats.shotsFired += latestGameResult.shotsFired;
+    lifetimeStats.deaths += latestGameResult.deaths;
     localStorage.setItem(resultsKey, JSON.stringify(currentResults));
     localStorage.setItem(lifetimeStatsKey, JSON.stringify(lifetimeStats));
     return currentResults;
@@ -44,21 +45,32 @@ export function getGameResults(): GameResult[] {
     if (! results) {
         return [];
     }
-    return JSON.parse(results);
+    let parsed = JSON.parse(results);
+    let gameResults: GameResult[] = [];
+    parsed.forEach(gameResult => {
+        gameResults.push(parseGameResult(gameResult));
+    });
+    return gameResults;
+}
+
+/** Parse a game result from an object, setting default values for anything undefined */
+function parseGameResult(json: any): GameResult {
+    return {
+        score: "score" in json ? json.score : 0,
+        gemsCollected: "gemsCollected" in json ? json.gemsCollected : 0,
+        enemiesKilled: "enemiesKilled" in json ? json.enemiesKilled : 0,
+        shotsFired: "shotsFired" in json ? json.shotsFired : 0,
+        deaths: "deaths" in json ? json.deaths : 0
+    };
 }
 
 /** Get lifetime stats for the player */
 export function getLifetimeStats(): GameResult {
     let results = localStorage.getItem(lifetimeStatsKey)
     if (! results) {
-        return {
-            score: 0,
-            gemsCollected: 0,
-            enemiesKilled: 0,
-            shotsFired: 0
-        };
+        return parseGameResult({});
     }
-    return JSON.parse(results);
+    return parseGameResult(JSON.parse(results));
 }
 
 /** Get the index of the latest game result in the stored array */
