@@ -422,15 +422,17 @@ export class MainScene extends Phaser.Scene {
         deathImages.forEach(image => {
             let randomVel = Phaser.Math.Vector2.RIGHT.clone().rotate(Math.random() * 2 * Math.PI).scale(40);
             image.setVelocity(randomVel.x, randomVel.y);
+            image.setDrag(30);
             this.tweens.add({
                 targets: image,
                 alpha: {
                     from: 1,
-                    to: 0
+                    to: 0.1
                 },
                 duration: 1000,
                 onComplete: () => {
-                    image.destroy();
+                    // Turn off physics and leave the broken pieces there
+                    image.disableBody();
                 }
             });
             // Flash death images white for a moment
