@@ -30,6 +30,33 @@
             "spawner1",
             "spawner2",
             "spawner3"
+        ],
+        "90": [
+            "loop"
+        ]
+    },
+    "loopInterval": 10,
+    "loopSpeedMultiplier": 0.9,
+    "loopSpawnTimes": {
+        "0": [
+            "spawner1",
+            "spawner2",
+            "spawner3"
+        ],
+        "5": [
+            "stealer1",
+            "worm"
+        ],
+        "10": [
+            "looper",
+            "looper",
+            "looper",
+            "worm"
+        ],
+        "15": [
+            "bomber",
+            "bomber",
+            "spawner3"
         ]
     }
 }
