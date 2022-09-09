@@ -428,12 +428,11 @@ export class MainScene extends Phaser.Scene {
                 targets: image,
                 alpha: {
                     from: 1,
-                    to: 0.1
+                    to: 0
                 },
                 duration: 1000,
                 onComplete: () => {
-                    // Turn off physics and leave the broken pieces there
-                    image.disableBody();
+                    image.destroy();
                 }
             });
             // Flash death images white for a moment

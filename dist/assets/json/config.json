@@ -117,8 +117,8 @@
     "bulletSpeed": 1000,
     "bulletLifetimeMs": 3000,
     "explosionLifetimeMs": 2000,
-    "flameSpeed": 500,
-    "flameLifetimeMs": 5000,
+    "flameSpeed": 200,
+    "flameLifetimeMs": 10000,
 
     "shotgunBulletCount": 5,
     "streamAngleSpread": 0.1,
