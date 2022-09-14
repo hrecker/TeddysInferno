@@ -12,6 +12,10 @@ type Spawn = {
     rotation?: number;
 }
 
+export function resetSpawns() {
+    scheduledSpawns = {};
+}
+
 export function startSpawn(unitName: string, location: Phaser.Math.Vector2, images: Phaser.GameObjects.Image[], rotation?: number) {
     // Add a Spawn
     let newSpawn: Spawn = {

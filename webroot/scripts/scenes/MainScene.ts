@@ -5,7 +5,7 @@ import { Unit, createUnit, getWormSegmentLocations } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } from "../units/Collision";
 import { config } from "../model/Config";
 import { createGem } from "../model/Gem";
-import { countdownSpawns, startSpawn } from "../units/Spawn";
+import { countdownSpawns, resetSpawns, startSpawn } from "../units/Spawn";
 import { getSpawns, resetSpawnset } from "../model/Spawnset";
 import { saveGameResult } from "../state/GameResultState";
 import { GameResult } from "../model/GameResult";
@@ -141,6 +141,7 @@ export class MainScene extends Phaser.Scene {
         };
         this.resetTimer();
         resetSpawnset();
+        resetSpawns();
         playerSpawnEvent();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         this.add.shader("Tunnel", config()["gameAreaWidth"] / 2, config()["gameAreaHeight"] / 2,
