@@ -95,6 +95,8 @@
     "unitDrag": 250,
     "unitSpawnDurationMs": 2000,
     "unitSpawnTweenLoopMs": 500,
+    "wormSegmentCount": 9,
+    "wormSegmentMargin": 32,
 
     "gemAcceleration": 800,
     "gemMaxSpeed": 400,

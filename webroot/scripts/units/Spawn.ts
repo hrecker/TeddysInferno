@@ -7,17 +7,19 @@ let scheduledSpawns: { [spawnId: string]: Spawn } = {};
 type Spawn = {
     name: string;
     location: Phaser.Math.Vector2;
-    image: Phaser.GameObjects.Image;
+    images: Phaser.GameObjects.Image[];
     spawnCooldownRemainingMs: number;
+    rotation?: number;
 }
 
-export function startSpawn(unitName: string, location: Phaser.Math.Vector2, image: Phaser.GameObjects.Image) {
+export function startSpawn(unitName: string, location: Phaser.Math.Vector2, images: Phaser.GameObjects.Image[], rotation?: number) {
     // Add a Spawn
     let newSpawn: Spawn = {
         name: unitName,
         location: location,
-        image: image,
-        spawnCooldownRemainingMs: config()["unitSpawnDurationMs"]
+        images: images,
+        spawnCooldownRemainingMs: config()["unitSpawnDurationMs"],
+        rotation: rotation
     };
     scheduledSpawns[getNewId()] = newSpawn;
 }
@@ -30,7 +32,9 @@ export function countdownSpawns(delta: number): Spawn[] {
         if (scheduledSpawns[id].spawnCooldownRemainingMs <= 0) {
             completedIds.push(id);
             // Destroy the spawn image
-            scheduledSpawns[id].image.destroy();
+            scheduledSpawns[id].images.forEach(image => {
+                image.destroy();
+            });
         }
     });
 

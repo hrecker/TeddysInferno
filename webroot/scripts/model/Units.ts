@@ -106,7 +106,7 @@ export function loadUnitJson(unitJson) {
 }
 
 /** Create a Phaser ImageWithDynamicBody for the unit defined with the given name in units.json */
-export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene) : Unit {
+export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene, rotation?: number) : Unit {
     let unitJson = unitCache[name];
     if (!unitJson) {
         return null;
@@ -115,19 +115,17 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
 
     // Create the actual Phaser ImageWithDynamicBody
     let unitId = getNewId();
-    let unitImage = createUnitImage(unitJson, name, unitId, location, scene, ! unit.disableDrag);
-    
+    let unitImage = createUnitImage(unitJson, name, unitId, location, scene, ! unit.disableDrag, rotation);
+
     unit.id = unitId;
     unit.gameObj = [unitImage];
 
     // For worm units, need to create the body pieces
     if (name == "worm") {
-        for (let i = 1; i <= 9; i++) {
-            // TODO allow for different spawning for the tail? Not just straight horizontal worm?
-            let segmentLocation = { x: (location.x + (i * -unitImage.width)), y: location.y};
+        getWormSegmentLocations(location, rotation).forEach(segmentLocation => {
             let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene, ! unit.disableDrag);
             unit.gameObj.push(segment);
-        }
+        });
     }
 
     // Initialize unit state
@@ -151,8 +149,18 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     return unit;
 }
 
+/** Get the locations for all the segments of a worm unit */
+export function getWormSegmentLocations(location: Phaser.Types.Math.Vector2Like, rotation: number): Phaser.Types.Math.Vector2Like[] {
+    let locations = [];
+    let marginVector = Phaser.Math.Vector2.LEFT.clone().rotate(rotation).scale(config()["wormSegmentMargin"]);
+    for (let i = 1; i <= config()["wormSegmentCount"]; i++) {
+        locations.push(marginVector.clone().scale(i).add(location));
+    }
+    return locations;
+}
+
 /** Create the Phaser ImageWithDynamicBody for the Unit */
-function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene, shouldDrag: boolean) {
+function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene, shouldDrag: boolean, rotation?: number) {
     let unitImage = scene.physics.add.image(location.x, location.y, name);
     unitImage.setData("id", unitId);
     unitImage.setName(name);
@@ -165,6 +173,9 @@ function createUnitImage(unitJson, name: string, unitId: number, location: Phase
         unitImage.setDrag(config()["unitDrag"]);
     } else {
         unitImage.setDrag(0);
+    }
+    if (rotation) {
+        unitImage.setRotation(rotation);
     }
     return unitImage;
 }

@@ -1,7 +1,7 @@
 import { moveUnit, movePlayerUnit, moveGem, recordPlayerPosition } from "../units/Movement";
 import { updateUnitAI, handleUnitDestroy } from "../units/AI";
 import { activateBomb, fireEnemyWeapon, fireWeapon } from "../units/Weapon";
-import { Unit, createUnit } from "../model/Units";
+import { Unit, createUnit, getWormSegmentLocations } from "../model/Units";
 import { handleBulletHit, handleEnemyBulletHit, handleUnitHit, handleGemHit } from "../units/Collision";
 import { config } from "../model/Config";
 import { createGem } from "../model/Gem";
@@ -288,6 +288,20 @@ export class MainScene extends Phaser.Scene {
             let randomY = (Math.random() * (killZoneBottomRight.y - killZoneTopLeft.y - (2 * spawnMargin))) + spawnMargin + killZoneTopLeft.y;
             location = new Phaser.Math.Vector2(randomX, randomY);
         }
+        let portals = [this.createSpawnPortal(location)];
+        spawnerParticleEmitter.explode(config()["spawnStartParticleCount"], location.x, location.y);
+        let randomRotation = -Math.PI + (Math.random() * 2 * Math.PI);
+        if (name == "worm") {
+            getWormSegmentLocations(location, randomRotation).forEach(segmentLocation => {
+                portals.push(this.createSpawnPortal(segmentLocation));
+                spawnerParticleEmitter.explode(config()["spawnStartParticleCount"], segmentLocation.x, segmentLocation.y);
+            });
+        }
+        startSpawn(name, location, portals, randomRotation);
+        playSound(this, SoundEffect.Spawning);
+    }
+
+    createSpawnPortal(location: Phaser.Types.Math.Vector2Like): Phaser.GameObjects.Image {
         let portal = this.add.image(location.x, location.y, "spawnportal").setAlpha(0);
         this.tweens.add({
             targets: portal,
@@ -299,27 +313,30 @@ export class MainScene extends Phaser.Scene {
             yoyo: true,
             loop: 100,
         });
-        startSpawn(name, location, portal);
-        playSound(this, SoundEffect.Spawning);
-        spawnerParticleEmitter.explode(config()["spawnStartParticleCount"], location.x, location.y);
+        return portal;
     }
 
     /** Wait for spawn animations to complete. If any complete, spawn the unit. */
     updateSpawns(delta: number) {
         let completed = countdownSpawns(delta);
         completed.forEach(spawn => {
-            this.addUnit(spawn.name, spawn.location);
+            this.addUnit(spawn.name, spawn.location, spawn.rotation);
             playSound(this, SoundEffect.EnemySpawned);
         });
     }
 
-    addUnit(name: string, location: Phaser.Math.Vector2): Unit {
-        let unit = createUnit(name, location, this);
+    addUnit(name: string, location: Phaser.Math.Vector2, rotation?: number): Unit {
+        let unit = createUnit(name, location, this, rotation);
         enemyUnits[unit.id] = unit;
         unit.gameObj.forEach(obj => {
             unitsPhysicsGroup.add(obj);
         });
         this.explodeParticlesColor(unit.color, location);
+        if (name == "worm") {
+            getWormSegmentLocations(location, rotation).forEach(segmentLocation => {
+               this.explodeParticlesColor(unit.color, segmentLocation);
+            });
+        }
         //TODO if future stealers added, modify this
         if (unit.name == "stealer1") {
             stealerUnits[unit.id] = unit;
@@ -334,7 +351,7 @@ export class MainScene extends Phaser.Scene {
         this.explodeParticlesColor(player.color, spawn);
     }
 
-    explodeParticlesColor(color: number, location: Phaser.Math.Vector2, quantity?: number) {
+    explodeParticlesColor(color: number, location: Phaser.Types.Math.Vector2Like, quantity?: number) {
         if (! (color in unitParticleEmitters)) {
             // Create separate particle emitters for each color
             let newParticleEmitter = particles.createEmitter({
