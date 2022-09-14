@@ -12,6 +12,15 @@ export class LoadingScene extends Phaser.Scene {
     }
 
     preload() {
+        // Loading message
+        // Have to hard-code this because the config isn't loaded yet
+        this.cameras.main.setBackgroundColor("#28282e");
+        this.add.text(this.game.renderer.width / 2, this.game.renderer.height / 2, "Loading...",
+            { font: "bold 64px Verdana",
+            stroke: "black",
+            strokeThickness: 3,
+            color: "#FFF7E4" }).setOrigin(0.5, 0.5);
+
         // Load sprites
         let baseUnitSprites = [ 
             "bomber",
