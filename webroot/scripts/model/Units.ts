@@ -48,6 +48,7 @@ export type Unit = {
     maxAngularSpeed?: number;
     rotation: boolean;
     disableDrag: boolean;
+    inaccuracyRange: number;
     inaccuracy?: Phaser.Math.Vector2;
     loopDurationMs?: number;
     // Health props
@@ -87,6 +88,7 @@ export function loadUnitJson(unitJson) {
             maxAngularSpeed: unitProps["maxAngularSpeed"],
             rotation: unitProps["rotation"],
             disableDrag: unitProps["disableDrag"],
+            inaccuracyRange: unitProps["inaccuracyRange"],
             loopDurationMs: unitProps["loopDurationMs"],
             maxHealth: unitProps["health"],
             spawnUnit: unitProps["spawnUnit"],

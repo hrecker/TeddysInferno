@@ -35,9 +35,10 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
     let randomRotation = Math.random() * 2 * Math.PI;
     let unit = scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
     unit.gameObj[0].setRotation(randomRotation);
-    let inaccuracyRange = config()["unitInaccuracyRange"];
-    unit.inaccuracy = new Phaser.Math.Vector2((Math.random() * inaccuracyRange) - (inaccuracyRange / 2), 
-            (Math.random() * inaccuracyRange) - (inaccuracyRange / 2));
+    if (unit.inaccuracyRange > 0) {
+        unit.inaccuracy = new Phaser.Math.Vector2((Math.random() * unit.inaccuracyRange) - (unit.inaccuracyRange / 2), 
+                (Math.random() * unit.inaccuracyRange) - (unit.inaccuracyRange / 2));
+    }
     spawner.state.spawnCooldownRemainingMs = spawner.spawnDelayMs;
 
     if (spawner.name == "bomber") {
