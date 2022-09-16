@@ -252,11 +252,13 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
         //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
+        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
+
+
         //this.addUnit("bomber", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(900, 400));
         //this.addUnit("spawner1", new Phaser.Math.Vector2(600, 400));
         //this.addUnit("spawner2", new Phaser.Math.Vector2(500, 400));
-        //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
         //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("stealer2", new Phaser.Math.Vector2(500, 600));
@@ -301,6 +303,11 @@ export class MainScene extends Phaser.Scene {
                 spawnerParticleEmitter.explode(config()["spawnStartParticleCount"], segmentLocation.x, segmentLocation.y);
             });
         }
+        if (name in config()["spawnPortalScale"]) {
+            portals.forEach(portal => {
+                portal.setScale(config()["spawnPortalScale"][name]);
+            });
+        }
         startSpawn(name, location, portals, randomRotation);
         playSound(this, SoundEffect.Spawning);
     }
@@ -330,6 +337,9 @@ export class MainScene extends Phaser.Scene {
     }
 
     addUnit(name: string, location: Phaser.Math.Vector2, rotation?: number): Unit {
+        if (! rotation) {
+            rotation = 0;
+        }
         let unit = createUnit(name, location, this, rotation);
         enemyUnits[unit.id] = unit;
         unit.gameObj.forEach(obj => {

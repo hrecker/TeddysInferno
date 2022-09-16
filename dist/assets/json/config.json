@@ -200,5 +200,11 @@
     "gemParticleCount": 4,
 
     "playerTrailPositionCount": 15,
-    "playerTrailStartingAlpha": 0.5
+    "playerTrailStartingAlpha": 0.5,
+
+    "spawnPortalScale": {
+        "stealer1": 1.5,
+        "spawner3": 2,
+        "stealer2": 2.5
+    }
 }

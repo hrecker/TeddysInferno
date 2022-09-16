@@ -51,6 +51,7 @@ export type Unit = {
     inaccuracyRange: number;
     inaccuracy?: Phaser.Math.Vector2;
     loopDurationMs?: number;
+    randomSpawnRotation: boolean;
     // Health props
     maxHealth: number;
     // Weapon props
@@ -90,6 +91,7 @@ export function loadUnitJson(unitJson) {
             disableDrag: unitProps["disableDrag"],
             inaccuracyRange: unitProps["inaccuracyRange"],
             loopDurationMs: unitProps["loopDurationMs"],
+            randomSpawnRotation: unitProps["randomSpawnRotation"],
             maxHealth: unitProps["health"],
             spawnUnit: unitProps["spawnUnit"],
             spawnDelayMs: unitProps["spawnDelayMs"],
@@ -176,7 +178,7 @@ function createUnitImage(unitJson, name: string, unitId: number, location: Phase
     } else {
         unitImage.setDrag(0);
     }
-    if (rotation) {
+    if (rotation && unitJson["randomSpawnRotation"]) {
         unitImage.setRotation(rotation);
     }
     return unitImage;

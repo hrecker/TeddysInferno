@@ -32,9 +32,12 @@ function spawnerUpdate(spawner: Unit, spawnedUnitName: string, scene: MainScene,
         return;
     }
 
-    let randomRotation = Math.random() * 2 * Math.PI;
     let unit = scene.addUnit(spawnedUnitName, spawner.gameObj[0].body.center);
-    unit.gameObj[0].setRotation(randomRotation);
+    // Don't rotate bombs since they use a square hitbox, which arcade physics can't rotate
+    if (spawner.name != "bomber") {
+        let randomRotation = Math.random() * 2 * Math.PI;
+        unit.gameObj[0].setRotation(randomRotation);
+    }
     if (unit.inaccuracyRange > 0) {
         unit.inaccuracy = new Phaser.Math.Vector2((Math.random() * unit.inaccuracyRange) - (unit.inaccuracyRange / 2), 
                 (Math.random() * unit.inaccuracyRange) - (unit.inaccuracyRange / 2));
