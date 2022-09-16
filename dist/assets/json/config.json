@@ -203,8 +203,8 @@
     "playerTrailStartingAlpha": 0.5,
 
     "spawnPortalScale": {
-        "stealer1": 1.5,
-        "spawner3": 2,
-        "stealer2": 2.5
+        "stealer1": 2,
+        "spawner3": 3,
+        "stealer2": 4
     }
 }

@@ -305,7 +305,7 @@ export class MainScene extends Phaser.Scene {
         }
         if (name in config()["spawnPortalScale"]) {
             portals.forEach(portal => {
-                portal.setScale(config()["spawnPortalScale"][name]);
+                portal.setTexture("spawnportalx" + config()["spawnPortalScale"][name]);
             });
         }
         startSpawn(name, location, portals, randomRotation);
