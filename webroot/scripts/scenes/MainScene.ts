@@ -284,7 +284,10 @@ export class MainScene extends Phaser.Scene {
 
     /** Start the spawn animation for a unit */
     startUnitSpawn(name: string, location?: Phaser.Math.Vector2) {
-        if (! location) {
+        // Spawn stealer2 in the very center
+        if (name == "stealer2") {
+            location = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
+        } else if (! location) {
             let randomX = (Math.random() * (killZoneBottomRight.x - killZoneTopLeft.x - (2 * spawnMargin))) + spawnMargin + killZoneTopLeft.x;
             let randomY = (Math.random() * (killZoneBottomRight.y - killZoneTopLeft.y - (2 * spawnMargin))) + spawnMargin + killZoneTopLeft.y;
             location = new Phaser.Math.Vector2(randomX, randomY);

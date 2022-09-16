@@ -112,6 +112,7 @@
 
     "gemAcceleration": 800,
     "gemMaxSpeed": 400,
+    "gemMaxSpeedToStealer": 100,
     "gemDrag": 200,
     "gemSpawnSpeed": 150,
     "gemLifetimeMs": 10000,
@@ -129,7 +130,7 @@
     "playerBoostSpeed": 1000,
 
     "bulletSpeed": 1000,
-    "bulletLifetimeMs": 3000,
+    "bulletLifetimeMs": 2000,
     "explosionLifetimeMs": 2000,
     "flameSpeed": 200,
     "flameLifetimeMs": 10000,
@@ -139,9 +140,9 @@
     "shotgunAngleSpread": 0.3,
 
     "weaponUpgradeThresholds": [
-        50,
-        150,
-        350
+        30,
+        90,
+        180
     ],
     "weaponLevelValues": [
         {
@@ -150,22 +151,22 @@
             "shotgunCooldownMs": 500
         },
         {
-            "bulletDamage": 2,
-            "streamCooldownMs": 90,
-            "shotgunCooldownMs": 450
+            "bulletDamage": 1,
+            "streamCooldownMs": 80,
+            "shotgunCooldownMs": 400
         },
         {
-            "bulletDamage": 3,
-            "streamCooldownMs": 75,
-            "shotgunCooldownMs": 375
+            "bulletDamage": 1,
+            "streamCooldownMs": 60,
+            "shotgunCooldownMs": 300
         },
         {
-            "bulletDamage": 5,
-            "streamCooldownMs": 50,
-            "shotgunCooldownMs": 250
+            "bulletDamage": 1,
+            "streamCooldownMs": 40,
+            "shotgunCooldownMs": 200
         }
     ],
-    "baseGemsForBomb": 20,
+    "baseGemsForBomb": 15,
     "gemsForBombGrowthRate": 1.1,
     "bombCooldownMs": 500,
     "bombRepelDurationMs": 250,

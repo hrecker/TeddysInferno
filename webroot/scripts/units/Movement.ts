@@ -178,7 +178,12 @@ export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, s
     } else {
         gem.setAcceleration(0);
     }
-    clampSpeed(gem, config()["gemMaxSpeed"]);
+    if (isHomingOnStealer) {
+        // Move gems towards stealers more slowly to give more time for the player to react
+        clampSpeed(gem, config()["gemMaxSpeedToStealer"]);
+    } else {
+        clampSpeed(gem, config()["gemMaxSpeed"]);
+    }
 }
 
 /** Update the track of player movement */

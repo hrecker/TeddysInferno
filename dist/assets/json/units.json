@@ -66,7 +66,7 @@
         "bodyOffset": 12,
         "ai": "spawner",
         "spawnUnit": "chaser1",
-        "spawnDelayMs": 2000,
+        "spawnDelayMs": 3000,
         "gemsDropped": 1,
         "color": "0xB0A9E4"
     },
@@ -82,7 +82,7 @@
         "bodyOffset": 12,
         "ai": "spawner",
         "spawnUnit": "chaser2",
-        "spawnDelayMs": 2500,
+        "spawnDelayMs": 3500,
         "gemsDropped": 2,
         "color": "0xB3E3DA"
     },
@@ -98,7 +98,7 @@
         "bodyOffset": 24,
         "ai": "spawner",
         "spawnUnit": "chaser3",
-        "spawnDelayMs": 5000,
+        "spawnDelayMs": 4500,
         "gemsDropped": 3,
         "color": "0xFEAAE4"
     },
@@ -107,7 +107,7 @@
         "movement": "loop",
         "maxSpeed": 150,
         "maxAngularSpeed": 1,
-        "health": 3,
+        "health": 2,
         "bodyType": "circle",
         "bodySize": 9,
         "bodyOffset": 7,
@@ -143,7 +143,7 @@
         "movement": "bomber",
         "maxSpeed": 100,
         "rotation": "true",
-        "health": 10,
+        "health": 8,
         "bodySize": 15,
         "bodyType": "circle",
         "ai": "bomber",
@@ -167,7 +167,7 @@
     },
     "stealer1": {
         "name": "stealer1",
-        "health": 8,
+        "health": 10,
         "bodySize": 64,
         "gemsDropped": 3,
         "weaponDelayMs": 2000,
@@ -175,7 +175,7 @@
     },
     "stealer2": {
         "name": "stealer2",
-        "health": 24,
+        "health": 350,
         "bodySize": 128,
         "gemsDropped": 8,
         "weaponDelayMs": 4000,
