@@ -45,7 +45,15 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
         return false;
     }
     if (bombKeyDown && player.state.bombCount > 0) {
-        // Activate bomb, repelling and damaging all units in the scene
+        // Activate bomb, repelling and damaging all units in the scene, along with destroying any enemy bullets (explosions and flames)
+        // Create a copy of the objects in the group so that they can be destroyed while iterating.
+        let toDestroy: Phaser.GameObjects.GameObject[] = [];
+        scene.getEnemyBulletsPhysicsGroup().getChildren().forEach(enemyBullet => {
+            toDestroy.push(enemyBullet);
+        });
+        toDestroy.forEach(enemyBullet => {
+            enemyBullet.destroy();
+        });
         scene.getEnemyUnits().forEach(unit => {
             let health = takeDamage(scene, unit, config()["bombDamage"]);
             if (health > 0 && unit.maxSpeed > 0) {
