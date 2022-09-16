@@ -199,8 +199,8 @@
     "spawnCompleteParticleCount": 4,
     "gemParticleCount": 4,
 
-    "playerTrailPositionCount": 15,
-    "playerTrailStartingAlpha": 0.5,
+    "playerTrailPositionCount": 2,
+    "playerTrailStartingAlpha": 1,
 
     "spawnPortalScale": {
         "stealer1": 2,

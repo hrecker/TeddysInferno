@@ -562,15 +562,16 @@ export class MainScene extends Phaser.Scene {
     drawPlayerTrail() {
         if (player.gameObj[0] && player.state.lastPositions.length > 1 && player.gameObj[0].body.velocity.length() > 0) {
             let newGraphics = this.add.graphics();
+            // Draw a line between the last two player positions each frame
             newGraphics.lineStyle(4, player.color, config()["playerTrailStartingAlpha"]);
-            newGraphics.strokePoints(player.state.lastPositions);
+            newGraphics.lineBetween(player.state.lastPositions[0].x, player.state.lastPositions[0].y, player.state.lastPositions[1].x, player.state.lastPositions[1].y)
             this.tweens.add({
                 targets: newGraphics,
                 alpha: {
                     from: config()["playerTrailStartingAlpha"],
                     to: 0
                 },
-                duration: 1500,
+                duration: 1000,
                 onComplete: () => {
                     newGraphics.destroy();
                 }
@@ -594,7 +595,8 @@ export class MainScene extends Phaser.Scene {
         //fpsTimer += delta;
         //if (fpsTimer >= 1000) {
         //    fpsTimer = fpsTimer - 1000;
-        //    console.log("FPS: " + fpsCount);
+        //    if (fpsCount < 50)
+        //        console.log("low FPS: " + fpsCount);
         //    fpsCount = 0;
         //}
 

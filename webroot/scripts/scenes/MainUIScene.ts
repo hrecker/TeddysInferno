@@ -49,7 +49,7 @@ export class MainUIScene extends Phaser.Scene {
 
     /** Update the text of the timer */
     setTimerText(text) {
-        if (timerText) {
+        if (timerText && timerText.text !== text) {
             timerText.setText(text);
         }
     }
