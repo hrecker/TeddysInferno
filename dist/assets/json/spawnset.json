@@ -166,28 +166,40 @@
             "loop"
         ]
     },
-    "loopInterval": 10,
+    "loopInterval": 15,
     "loopSpeedMultiplier": 0.9,
     "loopSpawnTimes": {
         "0": [
             "spawner1",
+            "spawner1"
+        ],
+        "7": [
             "spawner2",
-            "spawner3"
-        ],
-        "5": [
-            "stealer1",
-            "worm"
-        ],
-        "10": [
-            "looper",
-            "looper",
-            "looper",
-            "worm"
+            "spawner2"
         ],
         "15": [
+            "spawner3",
+            "stealer1"
+        ],
+        "20": [
+            "worm",
+            "worm"
+        ],
+        "25": [
             "bomber",
-            "bomber",
-            "spawner3"
+            "looper",
+            "looper"
+        ],
+        "35": [
+            "stealer1"
+        ],
+        "42": [
+            "spawner1",
+            "spawner2"
+        ],
+        "50": [
+            "spawner3",
+            "worm"
         ]
     }
 }

@@ -166,7 +166,7 @@
             "shotgunCooldownMs": 200
         }
     ],
-    "baseGemsForBomb": 15,
+    "baseGemsForBomb": 10,
     "gemsForBombGrowthRate": 1.1,
     "bombCooldownMs": 500,
     "bombRepelDurationMs": 250,
