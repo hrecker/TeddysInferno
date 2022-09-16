@@ -129,6 +129,9 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
+        this.physics.world.timeScale = 1;
+        this.time.timeScale = 1;
+        this.tweens.timeScale = 1;
         enemyUnits = {};
         stealerUnits = {};
         gems = {};
@@ -505,6 +508,10 @@ export class MainScene extends Phaser.Scene {
             saveGameResult(gameResult);
             playerDeathEvent();
             playSound(this, SoundEffect.Death);
+            // slowmo effect
+            this.physics.world.timeScale = 2;
+            this.time.timeScale = 0.5;
+            this.tweens.timeScale = 0.5;
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],
