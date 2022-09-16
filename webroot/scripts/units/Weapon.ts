@@ -122,13 +122,16 @@ export function createExplosion(scene: Phaser.Scene, group: Phaser.Physics.Arcad
 export function fireEnemyWeapon(unit: Unit, player: Unit, scene: MainScene, delta: number) {
     switch (unit.name) {
         case "stealer1":
-            fireGemStealerWeapon(unit, player, scene, delta);
+            fireGemStealer1Weapon(unit, player, scene, delta);
+            break;
+        case "stealer2":
+            fireGemStealer2Weapon(unit, player, scene, delta);
             break;
     }
 }
 
-/** Fire gem stealer weapon when appropriate for one frame*/
-export function fireGemStealerWeapon(stealerUnit: Unit, player: Unit, scene: MainScene, delta: number) {
+/** Fire gem stealer1 weapon when appropriate for one frame*/
+export function fireGemStealer1Weapon(stealerUnit: Unit, player: Unit, scene: MainScene, delta: number) {
     if (stealerUnit.state.gemCount <= 0) {
         return;
     }
@@ -139,20 +142,53 @@ export function fireGemStealerWeapon(stealerUnit: Unit, player: Unit, scene: Mai
     }
 
     // Create flame projectile
-    let flame = scene.physics.add.image(stealerUnit.gameObj[0].body.center.x, stealerUnit.gameObj[0].body.center.y, "flame");
+    let direction = player.gameObj[0].body.center.clone().subtract(stealerUnit.gameObj[0].body.center);
+    createFlame(scene, stealerUnit.gameObj[0].body.center, direction);
+
+    stealerUnit.state.weaponCooldownRemainingMs = stealerUnit.weaponDelayMs;
+    stealerUnit.state.gemCount--;
+
+    playSound(scene, SoundEffect.StealerShot);
+}
+
+const numFlames = 6;
+const rotationPerFlame = 2 * Math.PI / numFlames;
+/** Fire gem stealer2 weapon when appropriate for one frame*/
+export function fireGemStealer2Weapon(stealerUnit: Unit, player: Unit, scene: MainScene, delta: number) {
+    if (stealerUnit.state.gemCount <= 0) {
+        return;
+    }
+
+    if (stealerUnit.state.weaponCooldownRemainingMs > 0) {
+        stealerUnit.state.weaponCooldownRemainingMs -= delta;
+        return;
+    }
+
+    // Create six flame projectiles
+    // Pick a random direction to start with, then make 5 more to form the six directions
+    let initial = Phaser.Math.Vector2.RIGHT.clone().rotate(Math.random() * 2 * Math.PI);
+    for (let i = 0; i < numFlames; i++) {
+        let direction = initial.clone().rotate(rotationPerFlame * i);
+        createFlame(scene, stealerUnit.gameObj[0].body.center, direction);
+    }
+
+    stealerUnit.state.weaponCooldownRemainingMs = stealerUnit.weaponDelayMs;
+    stealerUnit.state.gemCount--;
+
+    playSound(scene, SoundEffect.StealerShot);
+}
+
+/** Create flame projectile fired by stealer1 and stealer2 */
+function createFlame(scene: MainScene, origin: Phaser.Types.Math.Vector2Like, direction: Phaser.Math.Vector2): Phaser.Types.Physics.Arcade.ImageWithDynamicBody {
+    let flame = scene.physics.add.image(origin.x, origin.y, "flame");
     scene.getEnemyBulletsPhysicsGroup().add(flame);
     flame.setData("isBullet", true);
     flame.body.setOffset(config()["flameBodyOffset"]);
     flame.body.setCircle(config()["flameBodyRadius"]);
-    // Fire flame towards player
-    let velocity = player.gameObj[0].body.center.clone().subtract(stealerUnit.gameObj[0].body.center).normalize().scale(config()["flameSpeed"]);
+    // Set flame direction
+    let velocity = direction.normalize().scale(config()["flameSpeed"]);
     flame.setVelocity(velocity.x, velocity.y);
     // Ensure flames are eventually destroyed
     scene.time.delayedCall(config()["flameLifetimeMs"], () => flame.destroy());
-
-    stealerUnit.state.weaponCooldownRemainingMs = stealerUnit.weaponDelayMs;
-    stealerUnit.state.gemCount--;
-    scene.getEnemyBulletsPhysicsGroup();
-
-    playSound(scene, SoundEffect.StealerShot);
+    return flame;
 }

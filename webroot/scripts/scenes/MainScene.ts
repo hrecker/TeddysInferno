@@ -259,7 +259,7 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("obstacle", new Phaser.Math.Vector2(500, 600));
         //this.addUnit("stealer1", new Phaser.Math.Vector2(700, 400));
-        //this.addUnit("stealer1", new Phaser.Math.Vector2(500, 600));
+        //this.addUnit("stealer2", new Phaser.Math.Vector2(500, 600));
     }
     
     /** Start the spawn animation for a set of units, preventing them from spawning on top of each other when possible */
@@ -338,8 +338,7 @@ export class MainScene extends Phaser.Scene {
                this.explodeParticlesColor(unit.color, segmentLocation);
             });
         }
-        //TODO if future stealers added, modify this
-        if (unit.name == "stealer1") {
+        if (unit.name.startsWith("stealer")) {
             stealerUnits[unit.id] = unit;
             playSound(this, SoundEffect.StealerActive, true);
         }

@@ -74,7 +74,7 @@ export function handleGemHit(obj1: Phaser.Types.Physics.Arcade.ImageWithDynamicB
         gem = obj2;
     }
 
-    if (unit.name == "player" || unit.name == "stealer1") {
+    if (unit.name == "player" || unit.name.startsWith("stealer")) {
         collectGem(unit, gem, this);
     }
 

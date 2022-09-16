@@ -34,6 +34,7 @@ export class LoadingScene extends Phaser.Scene {
             "spawner2",
             "spawner3",
             "stealer1",
+            "stealer2",
             "worm",
             "wormsegment"
         ];

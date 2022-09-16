@@ -172,5 +172,13 @@
         "gemsDropped": 3,
         "weaponDelayMs": 2000,
         "color": "0xFFC384"
+    },
+    "stealer2": {
+        "name": "stealer2",
+        "health": 24,
+        "bodySize": 128,
+        "gemsDropped": 8,
+        "weaponDelayMs": 4000,
+        "color": "0xFFC384"
     }
 }
