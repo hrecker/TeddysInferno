@@ -2,12 +2,6 @@
     "backgroundColor": "#28282e",
     "glowStrength": 0.01,
 
-    "timerFontStyle": { 
-        "font": "44px verdana",
-        "stroke": "black",
-        "strokeThickness": 3,
-        "color": "#FFF7E4"
-    },
     "weaponUpgradeStatusFontStyle": { 
         "font": "30px verdana",
         "stroke": "black",

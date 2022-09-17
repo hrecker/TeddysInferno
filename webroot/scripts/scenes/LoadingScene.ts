@@ -92,6 +92,8 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("statsButton", "assets/sprites/ui/statsButton.png");
         this.load.image("statsButtonDown", "assets/sprites/ui/statsButtonDown.png");
 
+        this.load.bitmapFont('timerFont', 'assets/fonts/timerFont.png', 'assets/fonts/timerFont.xml');
+
         // Load background
         this.load.image("background", "assets/sprites/background.png");
         this.load.image("shaderTexture", "assets/sprites/shaderTexture.png");

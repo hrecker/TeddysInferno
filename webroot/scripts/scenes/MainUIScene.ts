@@ -4,7 +4,7 @@ import { config } from "../model/Config";
 import { getSound, playSound, SoundEffect } from "../model/Sound";
 import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from "../state/GameResultState";
 
-let timerText: Phaser.GameObjects.Text;
+let timerText: Phaser.GameObjects.BitmapText;
 
 // Ability icons and masks for cooldown
 let boostIcon: Phaser.GameObjects.Image;
@@ -152,7 +152,8 @@ export class MainUIScene extends Phaser.Scene {
                         score: 0,
                         gemsCollected: 0,
                         enemiesKilled: 0,
-                        shotsFired: 0
+                        shotsFired: 0,
+                        deaths: 0
                     };
                 }
             }
@@ -267,7 +268,7 @@ export class MainUIScene extends Phaser.Scene {
     }
 
     create() {
-        timerText = this.add.text(this.game.renderer.width / 2, 40, "0.0", config()["timerFontStyle"]);
+        timerText = this.add.bitmapText(this.game.renderer.width / 2, 32, "timerFont", "0.0", 48).setTintFill(0xFFF7E4);
         timerText.setOrigin(0.5);
         timerText.alpha = 0.75;
         progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
