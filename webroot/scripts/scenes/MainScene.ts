@@ -128,10 +128,16 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
+    // Set the scene timescale - 0.5 is half speed, 1 is normal speed, 2 is double speed, etc.
+    setTimescale(timescale: number) {
+        // Physics world uses the inverse value
+        this.physics.world.timeScale = timescale == 0 ? 1 / Number.MAX_SAFE_INTEGER : 1 / timescale;
+        this.time.timeScale = timescale;
+        this.tweens.timeScale = timescale;
+    }
+
     create() {
-        this.physics.world.timeScale = 1;
-        this.time.timeScale = 1;
-        this.tweens.timeScale = 1;
+        this.setTimescale(1);
         enemyUnits = {};
         stealerUnits = {};
         gems = {};
@@ -509,9 +515,7 @@ export class MainScene extends Phaser.Scene {
             playerDeathEvent();
             playSound(this, SoundEffect.Death);
             // slowmo effect
-            this.physics.world.timeScale = 2;
-            this.time.timeScale = 0.5;
-            this.tweens.timeScale = 0.5;
+            this.setTimescale(0.4);
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],
