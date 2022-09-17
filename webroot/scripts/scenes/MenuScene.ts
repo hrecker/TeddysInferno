@@ -143,7 +143,7 @@ export class MenuScene extends Phaser.Scene {
         lifetimeStatsGroup.setVisible(false);
         howToPlayGroup.setVisible(false);
 
-        //TODO added this for quicker testing - just skips the main menu scene and opens the game scene
+        //For quicker testing - just skips the main menu scene and opens the game scene
         //this.handleButtonClick("playButton");
     }
 

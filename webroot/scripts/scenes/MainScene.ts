@@ -44,7 +44,6 @@ let spawnRegions: Phaser.Math.Vector2[][] = [];
 
 let bombRepelRemainingMs = 0;
 let finalPlayerPos : Phaser.Math.Vector2;
-//TODO remove in prod build
 let graphics;
 
 let gameResult: GameResult;

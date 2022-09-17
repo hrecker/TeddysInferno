@@ -12,7 +12,6 @@ var config: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 640,
     // NOTE - With hardware acceleration disabled in Chrome, WEBGL causes enormous CPU usage on my desktop.
-    // Will want to test on some other devices to see if there are performance issues.
     type: Phaser.WEBGL,
     physics: {
         default: 'arcade',

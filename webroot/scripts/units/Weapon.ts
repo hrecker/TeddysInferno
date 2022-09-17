@@ -86,7 +86,6 @@ function randomBulletAngle(base, spread) {
 
 /** Create a bullet in the scene */
 function createBullet(scene: Phaser.Scene, group: Phaser.Physics.Arcade.Group, position: Phaser.Math.Vector2, angle: number) {
-    //TODO object pool for bullets rather than destroying them and creating new ones?
     let bullet = scene.physics.add.image(position.x, position.y, "bullet");
     group.add(bullet);
     bullet.setData("isBullet", true);
@@ -100,7 +99,6 @@ function createBullet(scene: Phaser.Scene, group: Phaser.Physics.Arcade.Group, p
 
 /** Create an explosion in the scene */
 export function createExplosion(scene: Phaser.Scene, group: Phaser.Physics.Arcade.Group, position: Phaser.Math.Vector2) {
-    //TODO object pool for explosions rather than destroying them and creating new ones?
     let explosion = scene.physics.add.image(position.x, position.y, "explosion");
     group.add(explosion);
     explosion.setData("isBullet", true);
