@@ -184,7 +184,7 @@
     },
     "stealer2": {
         "name": "stealer2",
-        "health": 350,
+        "health": 325,
         "bodySize": 128,
         "gemsDropped": 25,
         "weaponDelayMs": 4000,
