@@ -10,8 +10,11 @@
     "build": "parcel build webroot/index.html"
   },
   "devDependencies": {
+    "cssnano": "^5.1.13",
+    "parcel": "^2.7.0",
     "phaser": "^3.55.2",
-    "typescript": "^4.6.3",
-    "phaser3-rex-plugins": "^1.1.72"
+    "phaser3-rex-plugins": "^1.1.72",
+    "postcss": "^8.4.16",
+    "typescript": "^4.6.3"
   }
 }
