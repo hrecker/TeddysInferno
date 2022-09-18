@@ -12,7 +12,8 @@ export enum MovementState {
 
 /** Move the player unit for a frame based on inputs */
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
-                               thrustActive: boolean, leftActive: boolean, rightActive: boolean, scene: MainScene, delta: number) {
+                               thrustActive: boolean, leftActive: boolean, rightActive: boolean, slowTurnActive: boolean,
+                               scene: MainScene, delta: number) {
     let canQuickTurn = true;
     if (player.state.quickTurnCooldownRemainingMs > 0) {
         player.state.quickTurnCooldownRemainingMs -= delta;
@@ -49,10 +50,10 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         scene.explodeParticlesColor(player.color, player.gameObj[0].body.center);
     } else {
         if (leftActive && !rightActive) {
-            player.gameObj[0].setRotation(player.gameObj[0].rotation - config()["playerRotationSpeed"]);
+            player.gameObj[0].setRotation(player.gameObj[0].rotation - getPlayerTurnSpeed(slowTurnActive));
         }
         if (!leftActive && rightActive) {
-            player.gameObj[0].setRotation(player.gameObj[0].rotation + config()["playerRotationSpeed"]);
+            player.gameObj[0].setRotation(player.gameObj[0].rotation + getPlayerTurnSpeed(slowTurnActive));
         }
     }
 
@@ -101,6 +102,11 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         
         clampUnitSpeed(player);
     }
+}
+
+/** Get the speed that the player should turn. */
+function getPlayerTurnSpeed(slowTurnActive: boolean) {
+    return slowTurnActive ? config()["playerSlowRotationSpeed"] : config()["playerRotationSpeed"];
 }
 
 /** Move a non-player unit for one frame (call each frame in the update method of a scene) */

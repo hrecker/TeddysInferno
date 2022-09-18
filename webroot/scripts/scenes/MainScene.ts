@@ -31,6 +31,7 @@ let gemPhysicsGroup : Phaser.Physics.Arcade.Group;
 let thrustKey : Phaser.Input.Keyboard.Key;
 let leftTurnKey : Phaser.Input.Keyboard.Key;
 let rightTurnKey : Phaser.Input.Keyboard.Key;
+let slowTurnKey : Phaser.Input.Keyboard.Key;
 let streamWeaponKey : Phaser.Input.Keyboard.Key;
 let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 let quickTurnKey : Phaser.Input.Keyboard.Key;
@@ -181,6 +182,7 @@ export class MainScene extends Phaser.Scene {
         thrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         leftTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         rightTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        slowTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
         streamWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
         shotgunWeaponKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         quickTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
@@ -625,7 +627,7 @@ export class MainScene extends Phaser.Scene {
             this.moveGems();
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
-                thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, this, delta);
+                thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, slowTurnKey.isDown, this, delta);
             if (isOutsideBounds(player.gameObj[0].body.center, killZoneTopLeft, killZoneBottomRight)) {
                 this.destroyPlayer();
             } else {
