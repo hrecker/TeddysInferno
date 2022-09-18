@@ -1,4 +1,5 @@
 import { config } from "../model/Config";
+import { GameResult } from "../model/GameResult";
 import { playSound, SoundEffect } from "../model/Sound";
 import { getGameResults, getLifetimeStats } from "../state/GameResultState";
 import { getSettings, setMusicEnabled, setSfxEnabled } from "../state/Settings";
@@ -15,6 +16,7 @@ let howToPlayGroup: Phaser.GameObjects.Group;
 
 // Stats texts
 let timeSurvivedText: Phaser.GameObjects.Text;
+let averageTimeSurvivedText: Phaser.GameObjects.Text;
 let gemsCollectedText: Phaser.GameObjects.Text;
 let enemiesKilledText: Phaser.GameObjects.Text;
 let shotsFiredText: Phaser.GameObjects.Text;
@@ -47,6 +49,10 @@ export class MenuScene extends Phaser.Scene {
             return this.getSfxButtonTexture();
         }
         return buttonName;
+    }
+
+    getAverageTimeSurvived(lifetimeStats: GameResult): number {
+        return lifetimeStats.score / lifetimeStats.deaths;
     }
 
     create() {
@@ -122,19 +128,22 @@ export class MenuScene extends Phaser.Scene {
         let lifetimeStats = getLifetimeStats();
 
         let statsMargin = 60;
-        let statsAnchor = titleY + 100;
-        lifetimeStatsGroup.add(this.add.text(centerX, titleY, "Statistics", config()["titleStyle"]).setOrigin(0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 320, statsAnchor, "Time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 320, statsAnchor + statsMargin, "Gems collected", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 320, statsAnchor + statsMargin * 2, "Enemies killed", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 320, statsAnchor + statsMargin * 3, "Shots fired", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 320, statsAnchor + statsMargin * 4, "Deaths", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        timeSurvivedText = this.add.text(centerX + 320, statsAnchor, lifetimeStats.score.toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        gemsCollectedText = this.add.text(centerX + 320, statsAnchor + statsMargin, lifetimeStats.gemsCollected.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        enemiesKilledText = this.add.text(centerX + 320, statsAnchor + statsMargin * 2, lifetimeStats.enemiesKilled.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        shotsFiredText = this.add.text(centerX + 320, statsAnchor + statsMargin * 3, lifetimeStats.shotsFired.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        deathsText = this.add.text(centerX + 320, statsAnchor + statsMargin * 4, lifetimeStats.deaths.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        let statsAnchor = titleY + 50;
+        lifetimeStatsGroup.add(this.add.text(centerX, titleY - 50, "Statistics", config()["titleStyle"]).setOrigin(0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor, "Time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin, "Average time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 2, "Gems collected", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 3, "Enemies killed", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 4, "Shots fired", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 5, "Deaths", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        timeSurvivedText = this.add.text(centerX + 360, statsAnchor, lifetimeStats.score.toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        averageTimeSurvivedText = this.add.text(centerX + 360, statsAnchor + statsMargin, this.getAverageTimeSurvived(lifetimeStats).toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        gemsCollectedText = this.add.text(centerX + 360, statsAnchor + statsMargin * 2, lifetimeStats.gemsCollected.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        enemiesKilledText = this.add.text(centerX + 360, statsAnchor + statsMargin * 3, lifetimeStats.enemiesKilled.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        shotsFiredText = this.add.text(centerX + 360, statsAnchor + statsMargin * 4, lifetimeStats.shotsFired.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        deathsText = this.add.text(centerX + 360, statsAnchor + statsMargin * 5, lifetimeStats.deaths.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
         lifetimeStatsGroup.add(timeSurvivedText);
+        lifetimeStatsGroup.add(averageTimeSurvivedText);
         lifetimeStatsGroup.add(gemsCollectedText);
         lifetimeStatsGroup.add(enemiesKilledText);
         lifetimeStatsGroup.add(shotsFiredText);
