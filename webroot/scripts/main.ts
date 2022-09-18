@@ -9,8 +9,12 @@ import { MenuScene } from './scenes/MenuScene';
 import GlowFilterPipelinePlugin from 'phaser3-rex-plugins/plugins/glowfilterpipeline-plugin.js';
 
 var config: Phaser.Types.Core.GameConfig = {
-    width: 960,
-    height: 640,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 960,
+        height: 640,
+    },
     // NOTE - With hardware acceleration disabled in Chrome, WEBGL causes enormous CPU usage on my desktop.
     type: Phaser.WEBGL,
     physics: {
