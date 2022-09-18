@@ -118,8 +118,8 @@
     "flameBodyOffset": 7,
 
     "playerRotationSpeed": 0.10,
-    "playerQuickturnCooldownMs": 1500,
-    "playerBoostCooldownMs": 2000,
+    "playerQuickturnCooldownMs": 1000,
+    "playerBoostCooldownMs": 1500,
     "playerBoostDurationMs": 150,
     "playerBoostSpeed": 1000,
 
