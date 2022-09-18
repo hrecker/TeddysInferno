@@ -21,7 +21,7 @@
         "color": "#FFF7E4"
     },
     "howToStyle": { 
-        "font": "30px Verdana",
+        "font": "26px Verdana",
         "align": "center",
         "shadow": {
             "offsetX": 1,

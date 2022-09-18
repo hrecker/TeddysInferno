@@ -96,7 +96,7 @@ export class MenuScene extends Phaser.Scene {
         let howToPlayAnchor = titleY + 50;
         howToPlayGroup.add(this.add.text(centerX, titleY - 50, "How To Play", config()["titleStyle"]).setOrigin(0.5));
         howToPlayGroup.add(this.add.text(centerX, howToPlayAnchor, "Survive as long as possible.", { ...config()["howToStyle"], font: "bold 40px Verdana" }).setOrigin(0.5));
-        howToPlayGroup.add(this.add.text(centerX, howToPlayAnchor + howToPlayMargin, "Enemies drop Gems.\nCollect Gems to upgrade your weapon and earn Bombs.\nGems fly towards you when you stop firing your weapon.", config()["howToStyle"]).setOrigin(0.5));
+        howToPlayGroup.add(this.add.text(centerX, howToPlayAnchor + howToPlayMargin, "Enemies drop Gems.\nCollect Gems to increase the speed of your weapon and earn Bombs.\nGems fly towards you when you stop firing your weapon.", config()["howToStyle"]).setOrigin(0.5));
         
         // Example images
         howToPlayGroup.add(this.add.image(centerX - 100, howToPlayAnchor + howToPlayMargin * 2 + 15, "howToPlayExample1").setScale(0.5));
