@@ -3,8 +3,11 @@
         "3": [
             "spawner1"
         ],
-        "15": [
+        "10": [
             "spawner1"
+        ],
+        "15": [
+            "worm"
         ],
         "20": [
             "spawner1"
@@ -18,164 +21,166 @@
         "42": [
             "spawner2"
         ],
-        "57": [
+        "52": [
             "spawner2",
             "stealer1"
         ],
-        "70": [
+        "62": [
             "spawner1",
+            "spawner2"
+        ],
+        "70": [
+            "worm",
             "spawner2"
         ],
         "80": [
-            "worm",
-            "spawner2"
-        ],
-        "95": [
             "looper",
             "looper",
-            "looper"
+            "spawner1"
         ],
-        "105": [
+        "85": [
             "stealer1",
             "worm"
         ],
-        "110": [
+        "92": [
             "spawner1"
         ],
-        "115": [
+        "97": [
             "spawner2"
         ],
-        "120": [
+        "102": [
             "spawner1",
             "spawner2"
         ],
-        "135": [
+        "110": [
             "spawner3"
         ],
-        "145": [
-            "bomber"
+        "118": [
+            "bomber",
+            "spawner1"
         ],
-        "146": [
-            "bomber"
+        "125": [
+            "bomber",
+            "spawner1"
         ],
-        "155": [
+        "126": [
+            "bomber",
+            "looper"
+        ],
+        "135": [
             "looper",
+            "worm"
+        ],
+        "140": [
+            "stealer1",
+            "spawner1",
+            "spawner2"
+        ],
+        "145": [
+            "spawner3"
+        ],
+        "150": [
+            "spawner1",
+            "stealer1"
+        ],
+        "160": [
+            "worm",
+            "worm",
             "worm"
         ],
         "165": [
-            "stealer1",
-            "spawner1",
-            "spawner2"
-        ],
-        "175": [
-            "spawner1",
             "stealer1"
+        ],
+        "172": [
+            "spawner1",
+            "looper",
+            "bomber"
+        ],
+        "179": [
+            "spawner2",
+            "looper",
+            "bomber"
         ],
         "185": [
-            "spawner3"
-        ],
-        "200": [
-            "worm",
-            "worm",
-            "worm"
-        ],
-        "205": [
-            "stealer1"
-        ],
-        "210": [
-            "spawner1",
-            "looper",
-            "looper"
-        ],
-        "215": [
-            "spawner2",
-            "looper",
-            "looper"
-        ],
-        "230": [
             "spawner3",
-            "looper",
-            "looper"
-        ],
-        "237": [
             "bomber"
         ],
-        "245": [
-            "bomber"
-        ],
-        "246": [
-            "bomber"
-        ],
-        "255": [
+        "195": [
             "spawner1",
             "stealer1"
         ],
-        "260": [
+        "202": [
             "spawner1",
             "spawner3"
         ],
-        "265": [
+        "209": [
             "spawner2",
             "spawner2"
         ],
-        "275": [
-            "spawner3",
+        "215": [
             "spawner3"
         ],
-        "285": [
+        "225": [
+            "worm",
             "worm",
             "worm"
         ],
-        "300": [
+        "240": [
             "stealer2"
         ],
-        "305": [
+        "245": [
             "spawner1",
             "spawner1"
         ],
-        "310": [
+        "252": [
             "spawner2",
             "spawner2"
         ],
-        "317": [
+        "259": [
             "spawner3",
             "spawner3"
         ],
-        "330": [
+        "265": [
             "worm",
             "worm",
             "worm"
         ],
-        "337": [
+        "270": [
             "bomber",
-            "looper",
             "looper"
         ],
-        "342": [
+        "275": [
             "bomber",
-            "looper",
             "looper"
         ],
-        "355": [
+        "285": [
             "stealer1",
             "spawner1",
             "spawner2",
             "spawner3"
         ],
-        "370": [
+        "292": [
+            "stealer1",
+            "worm"
+        ],
+        "300": [
             "loop"
         ]
     },
-    "loopInterval": 15,
+    "loopInterval": 10,
     "loopSpeedMultiplier": 0.9,
     "loopSpawnTimes": {
         "0": [
             "spawner1",
             "spawner1"
         ],
-        "7": [
+        "5": [
             "spawner2",
             "spawner2"
+        ],
+        "10": [
+            "spawner1",
+            "spawner1"
         ],
         "15": [
             "spawner3",

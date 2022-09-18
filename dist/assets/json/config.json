@@ -109,7 +109,7 @@
     "gemMaxSpeedToStealer": 100,
     "gemDrag": 200,
     "gemSpawnSpeed": 150,
-    "gemLifetimeMs": 10000,
+    "gemLifetimeMs": 8000,
     "gemFlashStartMs": 5000,
 
     "bulletBodyRadius": 6,
