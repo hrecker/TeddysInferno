@@ -73,6 +73,8 @@ function collectGemPlayer(player: Unit, scene: MainScene) {
             player.state.weaponLevel++;
             weaponLevelEvent(player.state.weaponLevel);
             scene.explodeParticlesColor(parseInt(config()["weaponUpgradeProgressColor"], 16), player.gameObj[0].body.center, 100);
+            // Add bombs for leveling up
+            setBombs(player, player.state.bombCount + config()["bombsAddedOnLevelUp"]);
         } else {
             // Add bomb
             setBombs(player, player.state.bombCount + 1);

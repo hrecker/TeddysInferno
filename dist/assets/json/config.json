@@ -167,6 +167,7 @@
     "bombRepelSpeed": 600,
     "bombDamage": 1,
     "startingBombCount": 2,
+    "bombsAddedOnLevelUp": 2,
 
     "defaultMusicVolume": 0.6,
     "defaultSfxVolume": {
