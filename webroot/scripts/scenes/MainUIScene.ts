@@ -39,6 +39,9 @@ let selectedButton: string;
 let menuButton: Phaser.GameObjects.Image;
 let retryButton: Phaser.GameObjects.Image;
 
+let retryKey: Phaser.Input.Keyboard.Key;
+let isRetryStarted = false;
+
 /** UI displayed over MainScene */
 export class MainUIScene extends Phaser.Scene {
     constructor() {
@@ -97,6 +100,7 @@ export class MainUIScene extends Phaser.Scene {
     playerSpawnListener(scene: MainUIScene) {
         levelProgress.clear();
         scene.setLeaderboardVisible(false);
+        isRetryStarted = false;
     }
 
     playerDeathListener(scene: MainUIScene) {
@@ -255,9 +259,16 @@ export class MainUIScene extends Phaser.Scene {
                 break;
             case "retry":
                 // Restart game scene
-                this.scene.get("MainScene").scene.restart();
-                this.resetUIElements();
+                this.retry();
                 break;
+        }
+    }
+
+    retry() {
+        if (! isRetryStarted) {
+            this.scene.get("MainScene").scene.restart();
+            this.resetUIElements();
+            isRetryStarted = true;
         }
     }
 
@@ -324,5 +335,13 @@ export class MainUIScene extends Phaser.Scene {
 
         boostIcon.setMask(boostIconMask.createGeometryMask());
         quickTurnIcon.setMask(quickTurnIconMask.createGeometryMask());
+        
+        retryKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    }
+
+    update() {
+        if (retryButton.visible && retryKey.isDown) {
+            this.retry();
+        }
     }
 }

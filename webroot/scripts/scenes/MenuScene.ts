@@ -115,8 +115,8 @@ export class MenuScene extends Phaser.Scene {
         howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin, "W to activate thrust", config()["controlsStyle"]).setOrigin(0, 0.5));
         howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 2, "A and D to turn left and right", config()["controlsStyle"]).setOrigin(0, 0.5));
         howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 3, "Shift (hold) to turn slowly", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 4, "O or left click to fire stream of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 5, "P or right click to fire blasts of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
+        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 4, "O or Left Click to fire stream of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
+        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 5, "P or Right Click to fire blasts of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
         howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 6, "Q to Quickturn", config()["controlsStyle"]).setOrigin(0, 0.5));
         howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 7, "E to Boost", config()["controlsStyle"]).setOrigin(0, 0.5));
         howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 8, "Space to activate Bomb", config()["controlsStyle"]).setOrigin(0, 0.5));
