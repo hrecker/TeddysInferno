@@ -12,6 +12,7 @@ import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
 import { flashSprite, getRandomArrayElements, isOutsideBounds } from "../util/Util";
 import { getSound, loadSounds, playSound, SoundEffect } from "../model/Sound";
+import { setBombs } from "../units/UnitStatus";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -369,6 +370,7 @@ export class MainScene extends Phaser.Scene {
     createPlayerUnit() {
         let spawn = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
         player = createUnit("player", spawn, this);
+        setBombs(player, config()["startingBombCount"]);
         this.explodeParticlesColor(player.color, spawn);
     }
 

@@ -75,9 +75,8 @@ function collectGemPlayer(player: Unit, scene: MainScene) {
             scene.explodeParticlesColor(parseInt(config()["weaponUpgradeProgressColor"], 16), player.gameObj[0].body.center, 100);
         } else {
             // Add bomb
-            player.state.bombCount++;
+            setBombs(player, player.state.bombCount + 1);
             player.state.bombsEarned++;
-            bombCountEvent(player.state.bombCount);
             scene.explodeParticlesColor(parseInt(config()["bombProgressColor"], 16), player.gameObj[0].body.center, 50);
         }
         // Common effects for bomb and level ups
@@ -85,6 +84,12 @@ function collectGemPlayer(player: Unit, scene: MainScene) {
         flashSprite(player.gameObj[0], 100, scene);
     }
     gemCountEvent(player.state.gemCount, getPreviousUpgradeThreshold(player), getNextUpgradeThreshold(player));
+}
+
+/** Set the number of bombs the player has. */
+export function setBombs(player: Unit, numBombs: number) {
+    player.state.bombCount = numBombs;
+    bombCountEvent(player.state.bombCount);
 }
 
 /** Collect a powerup gem for a unit */

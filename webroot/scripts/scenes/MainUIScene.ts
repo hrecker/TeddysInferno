@@ -264,7 +264,6 @@ export class MainUIScene extends Phaser.Scene {
     resetUIElements() {
         progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
         weaponLevelText.setText("Level 1");
-        bombCountText.setText("");
     }
 
     create() {
@@ -274,7 +273,7 @@ export class MainUIScene extends Phaser.Scene {
         progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
 
         weaponLevelText = this.add.text(8, 40, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
-        bombCountText = this.add.text(8, 80, "", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
+        bombCountText = this.add.text(8, 80, "Bombs: " + config()["startingBombCount"], config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         // Level progress outline
         levelProgressOutline = this.add.image(240, 40, "progressOutline").setAlpha(0.75);
         levelProgress = this.add.graphics().setAlpha(0.75);

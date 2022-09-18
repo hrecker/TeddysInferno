@@ -1,9 +1,8 @@
-import { bombCountEvent } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
-import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage } from "./UnitStatus";
+import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage, setBombs } from "./UnitStatus";
 
 /** Fire player weapon for one frame. Return the number of bullets fired this frame. */
 export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean): number {
@@ -64,8 +63,7 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
             }
         });
         player.state.bombCooldownRemainingMs = config()["bombCooldownMs"];
-        player.state.bombCount--;
-        bombCountEvent(player.state.bombCount);
+        setBombs(player, player.state.bombCount - 1);
         scene.shake(config()["bombRepelDurationMs"], 0.008);
         scene.cameras.main.flash(config()["bombRepelDurationMs"], 100, 100, 100);
         playSound(scene, SoundEffect.PlayerBomb);
