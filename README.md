@@ -5,7 +5,7 @@ Teddy's Inferno is a top-down shooter game built using [Phaser 3.55.2](https://p
 You can play Teddy's Inferno on itch.io! A link will be added when it is available.
 
 # Game Overview
-![MainGame](screenshots/chaotic.png?raw=true)
+![MainGame](screenshots/boost.png?raw=true)
 
 Teddy's Inferno is a top-down shooter that faces the player with an increasingly-frantic endless wave of enemies. The player can use a stream of bullets or slower blasts of bullets to defeat enemies, which will drop upgrade gems when destroyed. The player can collect these gems to upgrade their weapon, and eventually convert those gems into bombs that can save the player in tough situations. Gems will float to the player when they are not firing their weapon.
 
