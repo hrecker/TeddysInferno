@@ -2,7 +2,7 @@
 Teddy's Inferno is a top-down shooter game built using [Phaser 3.55.2](https://phaser.io/). Survive as long as possible and reach a new high score!
 
 # Try the game!
-You can play Teddy's Inferno on itch.io! A link will be added when it is available.
+[Play Teddy's Inferno on itch.io!](https://robocrow.itch.io/teddys-inferno)
 
 # Game Overview
 ![MainGame](screenshots/boost.png?raw=true)
@@ -12,6 +12,8 @@ Teddy's Inferno is a top-down shooter that faces the player with an increasingly
 ![High Scores](screenshots/highscores.png?raw=true)
 
 High scores and statistics are tracked. Each run uses the same enemy spawn timings, so each high score recorded is directly comparable.
+
+The game also features a few challenge modes that make modifications to the main game.
 
 # Running the game yourself
 [Parcel](https://parceljs.org/getting_started.html) is used to serve and build the files for the game. Run
