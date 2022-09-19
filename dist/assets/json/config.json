@@ -97,6 +97,7 @@
 
     "gameAreaWidth": 800,
     "gameAreaHeight": 800,
+    "shaderWidth": 3850,
 
     "unitDrag": 250,
     "unitSpawnDurationMs": 2000,

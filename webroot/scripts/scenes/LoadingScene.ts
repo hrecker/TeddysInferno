@@ -3,6 +3,8 @@ import { loadSpawnset } from "../model/Spawnset";
 import { loadUnitJson } from "../model/Units";
 import { loadSavedSettings } from "../state/Settings";
 
+let loadingText: Phaser.GameObjects.Text;
+
 /** Load json and assets */
 export class LoadingScene extends Phaser.Scene {
     constructor() {
@@ -11,15 +13,25 @@ export class LoadingScene extends Phaser.Scene {
         });
     }
 
+    /** Adjust any UI elements that need to change position based on the canvas size */
+    resize(force?: boolean) {
+        if (! this.scene.isActive() && ! force) {
+            return;
+        }
+        loadingText.setPosition(this.game.renderer.width / 2, this.game.renderer.height / 2);
+    }
+
     preload() {
         // Loading message
         // Have to hard-code this because the config isn't loaded yet
         this.cameras.main.setBackgroundColor("#28282e");
-        this.add.text(this.game.renderer.width / 2, this.game.renderer.height / 2, "Loading...",
+        loadingText = this.add.text(0, 0, "Loading...",
             { font: "bold 64px Verdana",
             stroke: "black",
             strokeThickness: 3,
             color: "#FFF7E4" }).setOrigin(0.5, 0.5);
+        this.resize(true);
+        this.scale.on("resize", this.resize, this);
 
         // Load sprites
         let baseUnitSprites = [ 
@@ -96,6 +108,7 @@ export class LoadingScene extends Phaser.Scene {
 
         // Load background
         this.load.image("background", "assets/sprites/background.png");
+        this.load.image("enemyKillBarrier", "assets/sprites/enemykillbarrier.png");
         this.load.image("shaderTexture", "assets/sprites/shaderTexture.png");
 
         // Shaders

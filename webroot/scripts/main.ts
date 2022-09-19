@@ -10,7 +10,8 @@ import GlowFilterPipelinePlugin from 'phaser3-rex-plugins/plugins/glowfilterpipe
 
 var config: Phaser.Types.Core.GameConfig = {
     scale: {
-        mode: Phaser.Scale.FIT,
+        parent: "game-div",
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 960,
         height: 640,

@@ -25,6 +25,28 @@ let deathsText: Phaser.GameObjects.Text;
 // Whether to show how to play page when play is clicked
 let showHowToPlay: boolean;
 
+let titleText: Phaser.GameObjects.Text;
+let tunnelShader: Phaser.GameObjects.Shader;
+
+let playButton: Phaser.GameObjects.Image;
+let howToPlayButton: Phaser.GameObjects.Image;
+let statsButton: Phaser.GameObjects.Image;
+let statsBackButton: Phaser.GameObjects.Image;
+let howToPlayBackButton: Phaser.GameObjects.Image;
+let howToPlayPlayButton: Phaser.GameObjects.Image;
+let musicControlButton: Phaser.GameObjects.Image;
+let sfxControlButton: Phaser.GameObjects.Image;
+
+let howToPlayTitle: Phaser.GameObjects.Text;
+let howToPlayTexts: Phaser.GameObjects.Text[];
+let statsTitle: Phaser.GameObjects.Text;
+let statsTexts: Phaser.GameObjects.Text[];
+let controlsTitle: Phaser.GameObjects.Text;
+let controlsTexts: Phaser.GameObjects.Text[];
+let creditsText: Phaser.GameObjects.Text;
+
+let howToPlayExamples: Phaser.GameObjects.Image[];
+
 /** Main Menu scene */
 export class MenuScene extends Phaser.Scene {
     constructor() {
@@ -55,6 +77,72 @@ export class MenuScene extends Phaser.Scene {
         return lifetimeStats.score / lifetimeStats.deaths;
     }
 
+    /** Adjust any UI elements that need to change position based on the canvas size */
+    resize(force?: boolean) {
+        if (! this.scene.isActive() && ! force) {
+            return;
+        }
+
+        console.log("Resizing! (" + this.game.renderer.width + ", " + this.game.renderer.height + ")");
+        let centerX = this.game.renderer.width / 2;
+        let centerY = this.game.renderer.height / 2;
+        let titleY = this.game.renderer.height / 6;
+        tunnelShader.setPosition(centerX, centerY);
+        titleText.setPosition(centerX, titleY);
+
+        // Buttons
+        let buttonMargin = 100;
+        let buttonYAnchor = titleY + buttonMargin + 50;
+        playButton.setPosition(centerX, buttonYAnchor);
+        howToPlayButton.setPosition(centerX, buttonYAnchor + buttonMargin);
+        statsButton.setPosition(centerX, buttonYAnchor + buttonMargin * 2);
+        statsBackButton.setPosition(centerX, buttonYAnchor + buttonMargin * 3 - 25);
+        howToPlayBackButton.setPosition(centerX + 275, buttonYAnchor + buttonMargin * 3 - 25);
+        howToPlayPlayButton.setPosition(centerX + 275, buttonYAnchor + buttonMargin * 2 - 25);
+        
+        // Audio control buttons
+        musicControlButton.setPosition(5, this.game.renderer.height - 60);
+        sfxControlButton.setPosition(5, this.game.renderer.height - 5);
+
+        // How to play page
+        let howToPlayMargin = 75;
+        let howToPlayAnchor = titleY + 50;
+        howToPlayTitle.setPosition(centerX, titleY - 50);
+        for (let i = 0; i < howToPlayTexts.length; i++) {
+            howToPlayTexts[i].setPosition(centerX, howToPlayAnchor + (i * howToPlayMargin));
+        }
+        
+        // Example images
+        howToPlayExamples[0].setPosition(centerX - 100, howToPlayAnchor + howToPlayMargin * 2 + 15);
+        howToPlayExamples[1].setPosition(centerX, howToPlayAnchor + howToPlayMargin * 2 + 15);
+        howToPlayExamples[2].setPosition(centerX + 100, howToPlayAnchor + howToPlayMargin * 2 + 15);
+
+        // Controls
+        let controlsMargin = 30;
+        let controlsYAnchor = howToPlayAnchor + howToPlayMargin * 3 - 10;
+        controlsTitle.setPosition(centerX - 400, controlsYAnchor - 5);
+        for (let i = 0; i < controlsTexts.length; i++) {
+            controlsTexts[i].setPosition(centerX - 400, controlsYAnchor + ((i + 1) * controlsMargin));
+        }
+
+        // Credits
+        creditsText.setPosition(this.game.renderer.width - 115, this.game.renderer.height - 40);
+
+        // Lifetime stats
+        let statsMargin = 60;
+        let statsAnchor = titleY + 50;
+        statsTitle.setPosition(centerX, titleY - 50);
+        for (let i = 0; i < statsTexts.length; i++) {
+            statsTexts[i].setPosition(centerX - 360, statsAnchor + (i * statsMargin));
+        }
+        timeSurvivedText.setPosition(centerX + 360, statsAnchor);
+        averageTimeSurvivedText.setPosition(centerX + 360, statsAnchor + statsMargin);
+        gemsCollectedText.setPosition(centerX + 360, statsAnchor + statsMargin * 2);
+        enemiesKilledText.setPosition(centerX + 360, statsAnchor + statsMargin * 3);
+        shotsFiredText.setPosition(centerX + 360, statsAnchor + statsMargin * 4);
+        deathsText.setPosition(centerX + 360, statsAnchor + statsMargin * 5);
+    }
+
     create() {
         showHowToPlay = getGameResults().length == 0;
 
@@ -62,22 +150,18 @@ export class MenuScene extends Phaser.Scene {
         lifetimeStatsGroup = this.add.group();
         howToPlayGroup = this.add.group();
 
-        let centerX = this.game.renderer.width / 2;
-        let centerY = this.game.renderer.height / 2;
-        let titleY = this.game.renderer.height / 6;
-        this.add.shader("Tunnel",  centerX, centerY, 
-                this.game.renderer.width * 2, this.game.renderer.height * 3, ["shaderTexture"]);
-        mainMenuGroup.add(this.add.text(centerX, titleY, "Teddy's Inferno", config()["titleStyle"]).setOrigin(0.5));
+        tunnelShader = this.add.shader("Tunnel", 0, 0, 1, 1, ["shaderTexture"]);
+        tunnelShader.setScale(config()["shaderWidth"], config()["shaderWidth"]);
+        titleText = this.add.text(0, 0, "Teddy's Inferno", config()["titleStyle"]).setOrigin(0.5);
+        mainMenuGroup.add(titleText);
 
         // Buttons
-        let buttonMargin = 100;
-        let buttonYAnchor = titleY + buttonMargin + 50;
-        let playButton = this.add.image(centerX, buttonYAnchor, "playButton").setScale(1.5);
-        let howToPlayButton = this.add.image(centerX, buttonYAnchor + buttonMargin, "howToPlayButton").setScale(1.5);
-        let statsButton = this.add.image(centerX, buttonYAnchor + buttonMargin * 2, "statsButton").setScale(1.5);
-        let statsBackButton = this.add.image(centerX, buttonYAnchor + buttonMargin * 3 - 25, "backButton").setScale(1.5);
-        let howToPlayBackButton = this.add.image(centerX + 275, buttonYAnchor + buttonMargin * 3 - 25, "backButton").setScale(1.5);
-        let howToPlayPlayButton = this.add.image(centerX + 275, buttonYAnchor + buttonMargin * 2 - 25, "playButton").setScale(1.5);
+        playButton = this.add.image(0, 0, "playButton").setScale(1.5);
+        howToPlayButton = this.add.image(0, 0, "howToPlayButton").setScale(1.5);
+        statsButton = this.add.image(0, 0, "statsButton").setScale(1.5);
+        statsBackButton = this.add.image(0, 0, "backButton").setScale(1.5);
+        howToPlayBackButton = this.add.image(0, 0, "backButton").setScale(1.5);
+        howToPlayPlayButton = this.add.image(0, 0, "playButton").setScale(1.5);
         this.configureButton(playButton, "playButton");
         this.configureButton(howToPlayButton, "howToPlayButton");
         this.configureButton(statsButton, "statsButton");
@@ -92,57 +176,71 @@ export class MenuScene extends Phaser.Scene {
         howToPlayGroup.add(howToPlayPlayButton);
         
         // Audio control buttons
-        let musicControlButton = this.add.image(5, this.game.renderer.height - 60, this.getMusicButtonTexture()).setOrigin(0, 1);
+        musicControlButton = this.add.image(0, 0, this.getMusicButtonTexture()).setOrigin(0, 1);
         this.configureButton(musicControlButton, musicControlButtonName);
-        let sfxControlButton = this.add.image(5, this.game.renderer.height - 5, this.getSfxButtonTexture()).setOrigin(0, 1);
+        sfxControlButton = this.add.image(0, 0, this.getSfxButtonTexture()).setOrigin(0, 1);
         this.configureButton(sfxControlButton, sfxControlButtonName);
 
         // How to play page
-        let howToPlayMargin = 75;
-        let howToPlayAnchor = titleY + 50;
-        howToPlayGroup.add(this.add.text(centerX, titleY - 50, "How To Play", config()["titleStyle"]).setOrigin(0.5));
-        howToPlayGroup.add(this.add.text(centerX, howToPlayAnchor, "Survive as long as possible.", { ...config()["howToStyle"], font: "bold 40px Verdana" }).setOrigin(0.5));
-        howToPlayGroup.add(this.add.text(centerX, howToPlayAnchor + howToPlayMargin, "Enemies drop Gems.\nCollect Gems to increase the speed of your weapon and earn Bombs.\nGems fly towards you when you stop firing your weapon.", config()["howToStyle"]).setOrigin(0.5));
-        
-        // Example images
-        howToPlayGroup.add(this.add.image(centerX - 100, howToPlayAnchor + howToPlayMargin * 2 + 15, "howToPlayExample1").setScale(0.5));
-        howToPlayGroup.add(this.add.image(centerX, howToPlayAnchor + howToPlayMargin * 2 + 15, "howToPlayExample2").setScale(0.5));
-        howToPlayGroup.add(this.add.image(centerX + 100, howToPlayAnchor + howToPlayMargin * 2 + 15, "howToPlayExample3").setScale(0.5));
+        howToPlayTitle = this.add.text(0, 0, "How To Play", config()["titleStyle"]).setOrigin(0.5);
+        howToPlayTexts = [];
+        howToPlayTexts.push(this.add.text(0, 0, "Survive as long as possible.", { ...config()["howToStyle"], font: "bold 40px Verdana" }).setOrigin(0.5));
+        howToPlayTexts.push(this.add.text(0, 0, "Enemies drop Gems.\nCollect Gems to increase the speed of your weapon and earn Bombs.\nGems fly towards you when you stop firing your weapon.", config()["howToStyle"]).setOrigin(0.5));
+        howToPlayGroup.add(howToPlayTitle);
+        howToPlayTexts.forEach(text => {
+            howToPlayGroup.add(text);
+        });
 
-        let controlsMargin = 30;
-        let controlsYAnchor = howToPlayAnchor + howToPlayMargin * 3 - 10;
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor - 5, "Controls:", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin, "W to activate thrust", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 2, "A and D to turn left and right", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 3, "Shift (hold) to turn slowly", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 4, "O or Left Click to fire stream of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 5, "P or Right Click to fire blasts of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 6, "Q to Quickturn", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 7, "E to Boost", config()["controlsStyle"]).setOrigin(0, 0.5));
-        howToPlayGroup.add(this.add.text(centerX - 400, controlsYAnchor + controlsMargin * 8, "Space to activate Bomb", config()["controlsStyle"]).setOrigin(0, 0.5));
+        // Example images
+        howToPlayExamples = [];
+        howToPlayExamples.push(this.add.image(0, 0, "howToPlayExample1").setScale(0.5));
+        howToPlayExamples.push(this.add.image(0, 0, "howToPlayExample2").setScale(0.5));
+        howToPlayExamples.push(this.add.image(0, 0, "howToPlayExample3").setScale(0.5));
+        howToPlayExamples.forEach(image => {
+            howToPlayGroup.add(image);
+        });
+
+        controlsTitle = this.add.text(0, 0, "Controls:", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5);
+        controlsTexts = [];
+        controlsTexts.push(this.add.text(0, 0, "W to activate thrust", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "A and D to turn left and right", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "Shift (hold) to turn slowly", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "O or Left Click to fire stream of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "P or Right Click to fire blasts of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "Q to Quickturn", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "E to Boost", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "Space to activate Bomb", config()["controlsStyle"]).setOrigin(0, 0.5));
+        howToPlayGroup.add(controlsTitle);
+        controlsTexts.forEach(text => {
+            howToPlayGroup.add(text);
+        });
 
         // Credits
-        mainMenuGroup.add(this.add.text(this.game.renderer.width - 115, this.game.renderer.height - 40, "Music by Eric Matyas\nwww.soundimage.org",
-                { ...config()["controlsStyle"], font: "20px Verdana" }).setOrigin(0.5));
+        creditsText = this.add.text(0, 0, "Music by Eric Matyas\nwww.soundimage.org",
+                { ...config()["controlsStyle"], font: "20px Verdana" }).setOrigin(0.5);
+        mainMenuGroup.add(creditsText);
 
         // Lifetime stats
         let lifetimeStats = getLifetimeStats();
 
-        let statsMargin = 60;
-        let statsAnchor = titleY + 50;
-        lifetimeStatsGroup.add(this.add.text(centerX, titleY - 50, "Statistics", config()["titleStyle"]).setOrigin(0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor, "Time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin, "Average time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 2, "Gems collected", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 3, "Enemies killed", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 4, "Shots fired", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        lifetimeStatsGroup.add(this.add.text(centerX - 360, statsAnchor + statsMargin * 5, "Deaths", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
-        timeSurvivedText = this.add.text(centerX + 360, statsAnchor, lifetimeStats.score.toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        averageTimeSurvivedText = this.add.text(centerX + 360, statsAnchor + statsMargin, this.getAverageTimeSurvived(lifetimeStats).toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        gemsCollectedText = this.add.text(centerX + 360, statsAnchor + statsMargin * 2, lifetimeStats.gemsCollected.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        enemiesKilledText = this.add.text(centerX + 360, statsAnchor + statsMargin * 3, lifetimeStats.enemiesKilled.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        shotsFiredText = this.add.text(centerX + 360, statsAnchor + statsMargin * 4, lifetimeStats.shotsFired.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
-        deathsText = this.add.text(centerX + 360, statsAnchor + statsMargin * 5, lifetimeStats.deaths.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        statsTitle = this.add.text(0, 0, "Statistics", config()["titleStyle"]).setOrigin(0.5);
+        statsTexts = [];
+        statsTexts.push(this.add.text(0, 0, "Time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        statsTexts.push(this.add.text(0, 0, "Average time survived", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        statsTexts.push(this.add.text(0, 0, "Gems collected", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        statsTexts.push(this.add.text(0, 0, "Enemies killed", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        statsTexts.push(this.add.text(0, 0, "Shots fired", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        statsTexts.push(this.add.text(0, 0, "Deaths", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5));
+        timeSurvivedText = this.add.text(0, 0, lifetimeStats.score.toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        averageTimeSurvivedText = this.add.text(0, 0, this.getAverageTimeSurvived(lifetimeStats).toFixed(1), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        gemsCollectedText = this.add.text(0, 0, lifetimeStats.gemsCollected.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        enemiesKilledText = this.add.text(0, 0, lifetimeStats.enemiesKilled.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        shotsFiredText = this.add.text(0, 0, lifetimeStats.shotsFired.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        deathsText = this.add.text(0, 0, lifetimeStats.deaths.toString(), { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(1, 0.5);
+        lifetimeStatsGroup.add(statsTitle);
+        statsTexts.forEach(text => {
+            lifetimeStatsGroup.add(text);
+        });
         lifetimeStatsGroup.add(timeSurvivedText);
         lifetimeStatsGroup.add(averageTimeSurvivedText);
         lifetimeStatsGroup.add(gemsCollectedText);
@@ -152,6 +250,9 @@ export class MenuScene extends Phaser.Scene {
 
         lifetimeStatsGroup.setVisible(false);
         howToPlayGroup.setVisible(false);
+
+        this.resize(true);
+        this.scale.on("resize", this.resize, this);
 
         //For quicker testing - just skips the main menu scene and opens the game scene
         //this.handleButtonClick("playButton");

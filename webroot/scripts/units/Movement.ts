@@ -432,7 +432,8 @@ function moveSpawnerUnit(unit: Unit, scene: MainScene) {
 
     if (outDistance.length() > 0) {
         // Move towards the center of the stage
-        let center = new Phaser.Math.Vector2(scene.game.renderer.width / 2, scene.game.renderer.height / 2);
+        let bottomRight = scene.getKillZoneBottomRight();
+        let center = new Phaser.Math.Vector2(bottomRight.x / 2, bottomRight.y / 2);
         let velocity = center.subtract(pos).scale(unit.maxSpeed);
         unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
         unit.state.movementState = MovementState.Recovering;

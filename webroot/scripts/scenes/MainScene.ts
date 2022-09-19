@@ -155,13 +155,16 @@ export class MainScene extends Phaser.Scene {
         playerSpawnEvent();
         this.cameras.main.setBackgroundColor(config()["backgroundColor"]);
         this.add.shader("Tunnel", config()["gameAreaWidth"] / 2, config()["gameAreaHeight"] / 2,
-                this.game.renderer.width * 2, this.game.renderer.height * 3, ["shaderTexture"]);
+                1, 1, ["shaderTexture"]).setScale(config()["shaderWidth"], config()["shaderWidth"]);
         let background = this.add.image(0, 0, "background").setOrigin(0, 0).setAlpha(0.7);
         background.setScale(config()["gameAreaWidth"] / background.width, config()["gameAreaHeight"] / background.height);
         killZoneTopLeft = background.getTopLeft();
         killZoneBottomRight = background.getBottomRight();
-        enemyKillZoneTopLeft = new Phaser.Math.Vector2(killZoneTopLeft.x - this.game.renderer.width / 2, killZoneTopLeft.y - this.game.renderer.height / 2);
-        enemyKillZoneBottomRight = new Phaser.Math.Vector2(killZoneBottomRight.x + this.game.renderer.width / 2, killZoneBottomRight.y + this.game.renderer.height / 2);
+        let enemyKillBarrier = this.add.image(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2, "enemyKillBarrier").setAlpha(0.7);
+        enemyKillBarrier.setScale(config()["gameAreaWidth"] / background.width, config()["gameAreaHeight"] / background.height);
+        enemyKillZoneTopLeft = enemyKillBarrier.getTopLeft();
+        enemyKillZoneBottomRight = enemyKillBarrier.getBottomRight();
+
 
         // Create nine spawn regions. Used when units spawn at the same time to prevent spawning
         // on top of each other.
