@@ -342,8 +342,10 @@ export class MenuScene extends Phaser.Scene {
     configureButton(button: Phaser.GameObjects.Image, textureName: string) {
         button.setInteractive();
         button.on('pointerout', () => {
-            button.setTexture(this.getDefaultTexture(textureName)); 
-            selectedButton = null;
+            if (button.visible) {
+                button.setTexture(this.getDefaultTexture(textureName)); 
+                selectedButton = null;
+            }
         });
         button.on('pointerdown', () => {
             button.setTexture(this.getDefaultTexture(textureName) + "Down"); 
