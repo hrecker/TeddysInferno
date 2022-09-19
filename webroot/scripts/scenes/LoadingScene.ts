@@ -30,6 +30,8 @@ export class LoadingScene extends Phaser.Scene {
             stroke: "black",
             strokeThickness: 3,
             color: "#FFF7E4" }).setOrigin(0.5, 0.5);
+        // Ensure the canvas is the right size
+        this.scale.refresh();
         this.resize(true);
         this.scale.on("resize", this.resize, this);
 
