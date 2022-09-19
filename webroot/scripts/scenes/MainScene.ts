@@ -13,6 +13,7 @@ import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventM
 import { flashSprite, getRandomArrayElements, isOutsideBounds } from "../util/Util";
 import { getSound, loadSounds, playSound, SoundEffect } from "../model/Sound";
 import { setBombs } from "../units/UnitStatus";
+import { getCurrentChallenge } from "../state/ChallengeState";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};

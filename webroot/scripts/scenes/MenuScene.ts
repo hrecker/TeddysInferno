@@ -1,7 +1,8 @@
 import { config } from "../model/Config";
 import { GameResult } from "../model/GameResult";
 import { playSound, SoundEffect } from "../model/Sound";
-import { getGameResults, getLifetimeStats } from "../state/GameResultState";
+import { Challenge, getChallengeDisplayName, resetChallenge, setChallenge } from "../state/ChallengeState";
+import { getLifetimeStats } from "../state/GameResultState";
 import { getSettings, setMusicEnabled, setSfxEnabled } from "../state/Settings";
 
 // Currently selected button
@@ -11,8 +12,9 @@ const sfxControlButtonName = "sfxControlButton";
 
 // Groups to allow easily showing and hiding multiple UI elements
 let mainMenuGroup: Phaser.GameObjects.Group;
-let lifetimeStatsGroup: Phaser.GameObjects.Group;
 let howToPlayGroup: Phaser.GameObjects.Group;
+let challengesGroup: Phaser.GameObjects.Group;
+let lifetimeStatsGroup: Phaser.GameObjects.Group;
 
 // Stats texts
 let timeSurvivedText: Phaser.GameObjects.Text;
@@ -30,6 +32,8 @@ let tunnelShader: Phaser.GameObjects.Shader;
 
 let playButton: Phaser.GameObjects.Image;
 let howToPlayButton: Phaser.GameObjects.Image;
+let challengesButton: Phaser.GameObjects.Image;
+let challengesBackButton: Phaser.GameObjects.Image;
 let statsButton: Phaser.GameObjects.Image;
 let statsBackButton: Phaser.GameObjects.Image;
 let howToPlayBackButton: Phaser.GameObjects.Image;
@@ -39,6 +43,10 @@ let sfxControlButton: Phaser.GameObjects.Image;
 
 let howToPlayTitle: Phaser.GameObjects.Text;
 let howToPlayTexts: Phaser.GameObjects.Text[];
+let challengesTitle: Phaser.GameObjects.Text;
+let challengesNames: Phaser.GameObjects.Text[];
+let challengesDescriptions: Phaser.GameObjects.Text[];
+let challengesButtons: Phaser.GameObjects.Image[];
 let statsTitle: Phaser.GameObjects.Text;
 let statsTexts: Phaser.GameObjects.Text[];
 let controlsTitle: Phaser.GameObjects.Text;
@@ -83,7 +91,6 @@ export class MenuScene extends Phaser.Scene {
             return;
         }
 
-        console.log("Resizing! (" + this.game.renderer.width + ", " + this.game.renderer.height + ")");
         let centerX = this.game.renderer.width / 2;
         let centerY = this.game.renderer.height / 2;
         let titleY = this.game.renderer.height / 6;
@@ -92,13 +99,15 @@ export class MenuScene extends Phaser.Scene {
 
         // Buttons
         let buttonMargin = 100;
-        let buttonYAnchor = titleY + buttonMargin + 50;
+        let buttonYAnchor = titleY + buttonMargin + 20;
         playButton.setPosition(centerX, buttonYAnchor);
         howToPlayButton.setPosition(centerX, buttonYAnchor + buttonMargin);
-        statsButton.setPosition(centerX, buttonYAnchor + buttonMargin * 2);
-        statsBackButton.setPosition(centerX, buttonYAnchor + buttonMargin * 3 - 25);
-        howToPlayBackButton.setPosition(centerX + 275, buttonYAnchor + buttonMargin * 3 - 25);
-        howToPlayPlayButton.setPosition(centerX + 275, buttonYAnchor + buttonMargin * 2 - 25);
+        challengesButton.setPosition(centerX, buttonYAnchor + buttonMargin * 2);
+        challengesBackButton.setPosition(centerX, buttonYAnchor + buttonMargin * 3 + 45);
+        statsButton.setPosition(centerX, buttonYAnchor + buttonMargin * 3);
+        statsBackButton.setPosition(centerX, buttonYAnchor + buttonMargin * 3);
+        howToPlayBackButton.setPosition(centerX + 275, buttonYAnchor + buttonMargin * 3);
+        howToPlayPlayButton.setPosition(centerX + 275, buttonYAnchor + buttonMargin * 2);
         
         // Audio control buttons
         musicControlButton.setPosition(5, this.game.renderer.height - 60);
@@ -128,6 +137,19 @@ export class MenuScene extends Phaser.Scene {
         // Credits
         creditsText.setPosition(this.game.renderer.width - 115, this.game.renderer.height - 40);
 
+        // Challenges
+        let challengesMargin = 30;
+        let challengesDescMargin = 16;
+        challengesTitle.setPosition(centerX, titleY - 50);
+        let lastChallengeBottomY = titleY;
+        for (let i = 0; i < challengesNames.length; i++) {
+            let nameY = lastChallengeBottomY + challengesMargin;
+            challengesNames[i].setPosition(centerX - 400, nameY);
+            challengesDescriptions[i].setPosition(centerX - 400, nameY + challengesDescMargin);
+            challengesButtons[i].setPosition(centerX + 300, challengesDescriptions[i].getTopRight().y);
+            lastChallengeBottomY = challengesDescriptions[i].getBottomRight().y;
+        }
+
         // Lifetime stats
         let statsMargin = 60;
         let statsAnchor = titleY + 50;
@@ -144,11 +166,13 @@ export class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        showHowToPlay = getGameResults().length == 0;
+        showHowToPlay = getLifetimeStats().deaths == 0;
+        resetChallenge();
 
         mainMenuGroup = this.add.group();
         lifetimeStatsGroup = this.add.group();
         howToPlayGroup = this.add.group();
+        challengesGroup = this.add.group();
 
         tunnelShader = this.add.shader("Tunnel", 0, 0, 1, 1, ["shaderTexture"]);
         tunnelShader.setScale(config()["shaderWidth"], config()["shaderWidth"]);
@@ -156,29 +180,35 @@ export class MenuScene extends Phaser.Scene {
         mainMenuGroup.add(titleText);
 
         // Buttons
-        playButton = this.add.image(0, 0, "playButton").setScale(1.5);
-        howToPlayButton = this.add.image(0, 0, "howToPlayButton").setScale(1.5);
-        statsButton = this.add.image(0, 0, "statsButton").setScale(1.5);
-        statsBackButton = this.add.image(0, 0, "backButton").setScale(1.5);
-        howToPlayBackButton = this.add.image(0, 0, "backButton").setScale(1.5);
-        howToPlayPlayButton = this.add.image(0, 0, "playButton").setScale(1.5);
+        playButton = this.add.image(0, 0, "playButton").setScale(1.5).setName("playButton");
+        howToPlayButton = this.add.image(0, 0, "howToPlayButton").setScale(1.5).setName("howToPlayButton");
+        challengesButton = this.add.image(0, 0, "challengesButton").setScale(1.5).setName("challengesButton");
+        challengesBackButton = this.add.image(0, 0, "backButton").setScale(1.5).setName("backButton");
+        statsButton = this.add.image(0, 0, "statsButton").setScale(1.5).setName("statsButton");
+        statsBackButton = this.add.image(0, 0, "backButton").setScale(1.5).setName("backButton");
+        howToPlayBackButton = this.add.image(0, 0, "backButton").setScale(1.5).setName("backButton");
+        howToPlayPlayButton = this.add.image(0, 0, "playButton").setScale(1.5).setName("playButton");
         this.configureButton(playButton, "playButton");
         this.configureButton(howToPlayButton, "howToPlayButton");
+        this.configureButton(challengesButton, "challengesButton");
+        this.configureButton(challengesBackButton, "backButton");
         this.configureButton(statsButton, "statsButton");
         this.configureButton(statsBackButton, "backButton");
         this.configureButton(howToPlayBackButton, "backButton");
         this.configureButton(howToPlayPlayButton, "playButton");
         mainMenuGroup.add(playButton);
         mainMenuGroup.add(howToPlayButton);
+        mainMenuGroup.add(challengesButton);
         mainMenuGroup.add(statsButton);
-        lifetimeStatsGroup.add(statsBackButton);
         howToPlayGroup.add(howToPlayBackButton);
         howToPlayGroup.add(howToPlayPlayButton);
+        challengesGroup.add(challengesBackButton);
+        lifetimeStatsGroup.add(statsBackButton);
         
         // Audio control buttons
-        musicControlButton = this.add.image(0, 0, this.getMusicButtonTexture()).setOrigin(0, 1);
+        musicControlButton = this.add.image(0, 0, this.getMusicButtonTexture()).setOrigin(0, 1).setName(musicControlButtonName);
         this.configureButton(musicControlButton, musicControlButtonName);
-        sfxControlButton = this.add.image(0, 0, this.getSfxButtonTexture()).setOrigin(0, 1);
+        sfxControlButton = this.add.image(0, 0, this.getSfxButtonTexture()).setOrigin(0, 1).setName(sfxControlButtonName);
         this.configureButton(sfxControlButton, sfxControlButtonName);
 
         // How to play page
@@ -220,6 +250,56 @@ export class MenuScene extends Phaser.Scene {
                 { ...config()["controlsStyle"], font: "20px Verdana" }).setOrigin(0.5);
         mainMenuGroup.add(creditsText);
 
+        // Challenges
+        challengesNames = [];
+        challengesDescriptions = [];
+        challengesButtons = [];
+        challengesTitle = this.add.text(0, 0, "Challenges", config()["titleStyle"]).setOrigin(0.5);
+
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.Chaos), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.Pacifism), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.SpeedKills), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.InReverse), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.EngineFailure), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
+
+        challengesDescriptions.push(this.add.text(0, 0,
+            "Delay between enemy spawns is cut in half.", config()["challengeDescriptionStyle"]));
+        challengesDescriptions.push(this.add.text(0, 0,
+            "Your ship no longer has any way to damage enemies.", config()["challengeDescriptionStyle"]));
+        challengesDescriptions.push(this.add.text(0, 0,
+            "Everything moves much faster.", config()["challengeDescriptionStyle"]));
+        challengesDescriptions.push(this.add.text(0, 0,
+            "You can only move backwards - Use the S key instead of W to move.", config()["challengeDescriptionStyle"]));
+        challengesDescriptions.push(this.add.text(0, 0,
+            "Your ship can't move aside from rotation and abilities. Abilities have reduced cooldowns.", config()["challengeDescriptionStyle"]));
+
+        let chaosPlayButton = this.add.image(0, 0, "playButton").setName("chaosPlayButton");
+        let pacifismPlayButton = this.add.image(0, 0, "playButton").setName("pacifismPlayButton");
+        let speedKillsPlayButton = this.add.image(0, 0, "playButton").setName("speedKillsPlayButton");
+        let inReversePlayButton = this.add.image(0, 0, "playButton").setName("inReversePlayButton");
+        let engineFailurePlayButton = this.add.image(0, 0, "playButton").setName("engineFailurePlayButton");
+        this.configureButton(chaosPlayButton, "playButton");
+        this.configureButton(pacifismPlayButton, "playButton");
+        this.configureButton(speedKillsPlayButton, "playButton");
+        this.configureButton(inReversePlayButton, "playButton");
+        this.configureButton(engineFailurePlayButton, "playButton");
+        challengesButtons.push(chaosPlayButton);
+        challengesButtons.push(pacifismPlayButton);
+        challengesButtons.push(speedKillsPlayButton);
+        challengesButtons.push(inReversePlayButton);
+        challengesButtons.push(engineFailurePlayButton);
+
+        challengesGroup.add(challengesTitle);
+        challengesNames.forEach(name => {
+            challengesGroup.add(name);
+        });
+        challengesDescriptions.forEach(desc => {
+            challengesGroup.add(desc);
+        });
+        challengesButtons.forEach(button => {
+            challengesGroup.add(button);
+        });
+
         // Lifetime stats
         let lifetimeStats = getLifetimeStats();
 
@@ -248,8 +328,9 @@ export class MenuScene extends Phaser.Scene {
         lifetimeStatsGroup.add(shotsFiredText);
         lifetimeStatsGroup.add(deathsText);
 
-        lifetimeStatsGroup.setVisible(false);
         howToPlayGroup.setVisible(false);
+        challengesGroup.setVisible(false);
+        lifetimeStatsGroup.setVisible(false);
 
         this.resize(true);
         this.scale.on("resize", this.resize, this);
@@ -258,22 +339,22 @@ export class MenuScene extends Phaser.Scene {
         //this.handleButtonClick("playButton");
     }
 
-    configureButton(button: Phaser.GameObjects.Image, buttonName: string) {
+    configureButton(button: Phaser.GameObjects.Image, textureName: string) {
         button.setInteractive();
         button.on('pointerout', () => {
-            button.setTexture(this.getDefaultTexture(buttonName)); 
+            button.setTexture(this.getDefaultTexture(textureName)); 
             selectedButton = null;
         });
         button.on('pointerdown', () => {
-            button.setTexture(this.getDefaultTexture(buttonName) + "Down"); 
-            selectedButton = buttonName;
+            button.setTexture(this.getDefaultTexture(textureName) + "Down"); 
+            selectedButton = button.name;
             playSound(this, SoundEffect.ButtonClick);
         });
         button.on('pointerup', () => {
-            if (selectedButton === buttonName) {
-                this.handleButtonClick(buttonName);
+            if (selectedButton === button.name) {
+                this.handleButtonClick(button.name);
             }
-            button.setTexture(this.getDefaultTexture(buttonName)); 
+            button.setTexture(this.getDefaultTexture(textureName)); 
             selectedButton = null;
         });
     }
@@ -284,13 +365,20 @@ export class MenuScene extends Phaser.Scene {
                 // Back to the main menu from the stats or how to play menu
                 mainMenuGroup.setVisible(true);
                 howToPlayGroup.setVisible(false);
+                challengesGroup.setVisible(false);
                 lifetimeStatsGroup.setVisible(false);
                 break;
             case "howToPlayButton":
                 // Show how to play
+                challengesGroup.setVisible(false);
                 mainMenuGroup.setVisible(false);
                 howToPlayGroup.setVisible(true);
                 showHowToPlay = false;
+                break;
+            case "challengesButton":
+                // Show challenges
+                mainMenuGroup.setVisible(false);
+                challengesGroup.setVisible(true);
                 break;
             case "playButton":
                 if (showHowToPlay) {
@@ -302,6 +390,26 @@ export class MenuScene extends Phaser.Scene {
                             .start("MainUIScene")
                             .stop();
                 }
+                break;
+            case "chaosPlayButton":
+                setChallenge(Challenge.Chaos);
+                this.handleButtonClick("playButton");
+                break;
+            case "pacifismPlayButton":
+                setChallenge(Challenge.Pacifism);
+                this.handleButtonClick("playButton");
+                break;
+            case "speedKillsPlayButton":
+                setChallenge(Challenge.SpeedKills);
+                this.handleButtonClick("playButton");
+                break;
+            case "inReversePlayButton":
+                setChallenge(Challenge.InReverse);
+                this.handleButtonClick("playButton");
+                break;
+            case "engineFailurePlayButton":
+                setChallenge(Challenge.EngineFailure);
+                this.handleButtonClick("playButton");
                 break;
             case musicControlButtonName:
                 // Toggle music

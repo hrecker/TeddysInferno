@@ -1,7 +1,8 @@
 import { config } from "../model/Config";
 import { GameResult } from "../model/GameResult";
+import { getCurrentChallenge } from "./ChallengeState";
 
-const resultsKey = "gameResults";
+const baseResultsKey = "GameResults";
 const lifetimeStatsKey = "lifetimeStats";
 let latestGameResultIndex = -1;
 let latestGameResult: GameResult;
@@ -34,14 +35,15 @@ export function saveGameResult(gameResult: GameResult): GameResult[] {
     lifetimeStats.enemiesKilled += latestGameResult.enemiesKilled;
     lifetimeStats.shotsFired += latestGameResult.shotsFired;
     lifetimeStats.deaths += latestGameResult.deaths;
-    localStorage.setItem(resultsKey, JSON.stringify(currentResults));
+    localStorage.setItem(getResultsKey(), JSON.stringify(currentResults));
+    // Add all stats from all game modes to the same lifetimestats object
     localStorage.setItem(lifetimeStatsKey, JSON.stringify(lifetimeStats));
     return currentResults;
 }
 
 /** Get the current high score list for the player */
 export function getGameResults(): GameResult[] {
-    let results = localStorage.getItem(resultsKey)
+    let results = localStorage.getItem(getResultsKey())
     if (! results) {
         return [];
     }
@@ -51,6 +53,11 @@ export function getGameResults(): GameResult[] {
         gameResults.push(parseGameResult(gameResult));
     });
     return gameResults;
+}
+
+/** Get the key for results for the currently selected challenge (or the main game mode) */
+function getResultsKey() {
+    return getCurrentChallenge() + baseResultsKey;
 }
 
 /** Parse a game result from an object, setting default values for anything undefined */

@@ -2,6 +2,7 @@ import { Ability, addAbilityListener, addBombCountListener, addGemCountListener,
          addPlayerDeathListener, addPlayerSpawnListener, addTimerListener, addWeaponLevelListener, clearListeners } from "../events/EventMessenger";
 import { config } from "../model/Config";
 import { getSound, playSound, SoundEffect } from "../model/Sound";
+import { Challenge, getChallengeDisplayName, getCurrentChallenge } from "../state/ChallengeState";
 import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from "../state/GameResultState";
 
 let timerText: Phaser.GameObjects.BitmapText;
@@ -28,6 +29,7 @@ type LeaderboardRow = {
 };
 
 let leaderboardTitle: Phaser.GameObjects.Text;
+let challengeLabel: Phaser.GameObjects.Text;
 let leaderboardNumbers: Phaser.GameObjects.Text[];
 let leaderboardRows: LeaderboardRow[];
 const leaderboardColumnMargin = 50;
@@ -216,6 +218,9 @@ export class MainUIScene extends Phaser.Scene {
             return;
         }
         leaderboardTitle.setVisible(isVisible);
+        if (challengeLabel) {
+            challengeLabel.setVisible(isVisible);
+        }
         this.setRowVisible(leaderboardRows[0], isVisible);
         for (let i = 1; i < leaderboardRows.length; i++) {
             // Don't show 0 second scores
@@ -297,6 +302,9 @@ export class MainUIScene extends Phaser.Scene {
         
         timerText.setPosition(this.game.renderer.width / 2, 32);
         leaderboardTitle.setPosition(this.game.renderer.width / 2, 95);
+        if (challengeLabel) {
+            challengeLabel.setX(this.game.renderer.width / 2);
+        }
         menuButton.setPosition(this.game.renderer.width / 2 - 120, buttonY);
         retryButton.setPosition(this.game.renderer.width / 2 + 120, buttonY);
         boostIcon.setPosition(this.game.renderer.width - 112, 40);
@@ -305,7 +313,6 @@ export class MainUIScene extends Phaser.Scene {
         boostIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 144, 8, 64, 64);
         quickTurnIconMask.clear();
         quickTurnIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 72, 8, 64, 64);
-
         this.repositionLeaderboard();
     }
 
@@ -322,19 +329,27 @@ export class MainUIScene extends Phaser.Scene {
         levelProgress = this.add.graphics().setAlpha(0.75);
 
         leaderboardTitle = this.add.text(0, 0, "High Scores", config()["leaderboardTitleStyle"]).setOrigin(0.5);
+        
+        let leaderboardBaseY = 185;
+        if (getCurrentChallenge() != Challenge.MainGame) {
+            challengeLabel = this.add.text(0, 160, "Challenge: " + getChallengeDisplayName(getCurrentChallenge()),
+                config()["weaponUpgradeStatusFontStyle"]).setOrigin(0.5);
+            leaderboardBaseY += 40;
+        }
+
         leaderboardNumbers = [];
         leaderboardRows = [];
         let labelRow = {
-            seconds: this.add.text(0, 185, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
-            gems: this.add.text(0, 185, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
-            kills: this.add.text(0, 185, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
-            shots: this.add.text(0, 185, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            seconds: this.add.text(0, leaderboardBaseY, "Seconds", config()["leaderboardRowStyle"]).setOrigin(1, 1),
+            gems: this.add.text(0, leaderboardBaseY, "Gems", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            kills: this.add.text(0, leaderboardBaseY, "Kills", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
+            shots: this.add.text(0, leaderboardBaseY, "Shots", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
         };
         leaderboardRows.push(labelRow);
         let y;
         // Add one row under leaderboard count to show result of most recent game
         for (let i = 0; i < config()["leaderboardCount"] + 1; i++) {
-            y = 230 + (i * 55);
+            y = leaderboardBaseY + 45 + (i * 55);
             leaderboardNumbers.push(this.add.text(0, y, (i + 1).toString(), config()["leaderboardRowStyle"]).setOrigin(0, 1));
             leaderboardRows.push({
                 seconds: this.add.text(0, y, "0.000", config()["leaderboardRowStyle"]).setOrigin(1, 1),
@@ -343,7 +358,7 @@ export class MainUIScene extends Phaser.Scene {
                 shots: this.add.text(0, y, "0", config()["leaderboardSmallRowStyle"]).setOrigin(1, 1),
             });
         }
-        buttonY = y + 50;
+        buttonY = y + 40;
         menuButton = this.add.image(0, buttonY, "menuButton");
         retryButton = this.add.image(0, buttonY, "retryButton");
         this.configureButton(menuButton, "menu", "menuButton", "menuButtonDown");
@@ -366,7 +381,7 @@ export class MainUIScene extends Phaser.Scene {
 
         boostIcon.setMask(boostIconMask.createGeometryMask());
         quickTurnIcon.setMask(quickTurnIconMask.createGeometryMask());
-        
+
         retryKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         
         this.resize(true);

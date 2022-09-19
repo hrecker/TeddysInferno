@@ -46,6 +46,23 @@
         },
         "color": "#FFF7E4"
     },
+    "challengeDescriptionStyle": { 
+        "font": "22px Verdana",
+        "align": "left",
+        "wordWrap": { 
+            "width": 600,
+            "useAdvancedWrap": true
+        },
+        "shadow": {
+            "offsetX": 1,
+            "offsetY": 1,
+            "color": "#000",
+            "blur": 3,
+            "stroke": true,
+            "fill": true
+        },
+        "color": "#FFF7E4"
+    },
     "leaderboardTitleStyle": { 
         "font": "80px Verdana",
         "shadow": {
