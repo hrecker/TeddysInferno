@@ -221,5 +221,9 @@
         "stealer1": 2,
         "spawner3": 3,
         "stealer2": 4
-    }
+    },
+
+    "chaosChallengeSpawnDelayFactor": 0.5,
+    "speedKillsChallengeSpeedMultiplier": 1.7,
+    "engineFailureChallengeAbilityCooldownFactor": 0.5
 }

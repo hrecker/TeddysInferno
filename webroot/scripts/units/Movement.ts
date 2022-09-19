@@ -3,6 +3,7 @@ import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { Challenge, getCurrentChallenge } from "../state/ChallengeState";
 import { isOutsideBounds } from "../util/Util";
 
 export enum MovementState {
@@ -27,8 +28,8 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
 
     if (quickTurnActive && canQuickTurn) {
         player.gameObj[0].setRotation(player.gameObj[0].rotation + Math.PI);
-        player.state.quickTurnCooldownRemainingMs= config()["playerQuickturnCooldownMs"];
-        abilityEvent(Ability.QuickTurn, config()["playerQuickturnCooldownMs"]);
+        player.state.quickTurnCooldownRemainingMs = getAbilityCooldown(Ability.QuickTurn);;
+        abilityEvent(Ability.QuickTurn, player.state.quickTurnCooldownRemainingMs);
         playSound(scene, SoundEffect.Ability);
         // Draw some echo images implying the turn and spawn some particles
         for (let i = 2; i >= 1; i--) {
@@ -82,19 +83,19 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
 
     if (boostActive && canBoost) {
         player.state.activeBoostRemainingMs = config()["playerBoostDurationMs"];
-        player.state.boostCooldownRemainingMs = config()["playerBoostCooldownMs"];
+        player.state.boostCooldownRemainingMs = getAbilityCooldown(Ability.Boost);
         isBoosting = true;
         player.gameObj[0].setAcceleration(0, 0);
-        let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation).scale(config()["playerBoostSpeed"]);
-        player.state.boostDirection = dir;
-        player.gameObj[0].setVelocity(dir.x, dir.y);
-        abilityEvent(Ability.Boost, config()["playerBoostCooldownMs"]);
+        let velocity = getPlayerForwardDirection(player).scale(adjustSpeed(config()["playerBoostSpeed"]));
+        player.state.boostDirection = velocity;
+        player.gameObj[0].setVelocity(velocity.x, velocity.y);
+        abilityEvent(Ability.Boost, player.state.boostCooldownRemainingMs);
         playSound(scene, SoundEffect.Ability);
     }
 
     if (!isBoosting) {
         if (thrustActive) {
-            let dir = Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation);
+            let dir = getPlayerForwardDirection(player);
             player.gameObj[0].setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
         } else {
             player.gameObj[0].setAcceleration(0, 0);
@@ -102,6 +103,31 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         
         clampUnitSpeed(player);
     }
+}
+
+/** Get cooldown for the given ability. */
+function getAbilityCooldown(ability: Ability): number {
+    let cooldown = 0;
+    switch (ability) {
+        case Ability.Boost:
+            cooldown = config()["playerBoostCooldownMs"];
+            break;
+        case Ability.QuickTurn:
+            cooldown = config()["playerQuickturnCooldownMs"];
+            break;
+    }
+    if (getCurrentChallenge() == Challenge.EngineFailure) {
+        return cooldown * config()["engineFailureChallengeAbilityCooldownFactor"];
+    }
+    return cooldown;
+}
+
+/** Get the current forward direction for the player, as a normalized vector. */
+function getPlayerForwardDirection(player: Unit) {
+    if (getCurrentChallenge() == Challenge.InReverse) {
+        return Phaser.Math.Vector2.LEFT.clone().rotate(player.gameObj[0].rotation);
+    }
+    return Phaser.Math.Vector2.RIGHT.clone().rotate(player.gameObj[0].rotation);
 }
 
 /** Get the speed that the player should turn. */
@@ -186,9 +212,9 @@ export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, s
     }
     if (isHomingOnStealer) {
         // Move gems towards stealers more slowly to give more time for the player to react
-        clampSpeed(gem, config()["gemMaxSpeedToStealer"]);
+        clampSpeed(gem, adjustSpeed(config()["gemMaxSpeedToStealer"]));
     } else {
-        clampSpeed(gem, config()["gemMaxSpeed"]);
+        clampSpeed(gem, adjustSpeed(config()["gemMaxSpeed"]));
     }
 }
 
@@ -203,9 +229,22 @@ export function recordPlayerPosition(player: Unit) {
     }
 }
 
+/** Get speed based on a default, adjusting for challenges if necessary. */
+export function adjustSpeed(defaultSpeed: number) {
+    if (getCurrentChallenge() == Challenge.SpeedKills) {
+        defaultSpeed *= config()["speedKillsChallengeSpeedMultiplier"];
+    }
+    return defaultSpeed;
+}
+
+/** Get max speed for a unit. */
+export function getUnitMaxSpeed(unit: Unit) {
+    return adjustSpeed(unit.maxSpeed);
+}
+
 /** Prevent unit from going over max speed */
 function clampUnitSpeed(unit: Unit) {
-    clampSpeed(unit.gameObj[0], unit.maxSpeed);
+    clampSpeed(unit.gameObj[0], getUnitMaxSpeed(unit));
 }
 
 /** Prevent a GameObject from going over a max speed */
@@ -312,7 +351,7 @@ function moveLoopUnit(unit: Unit, debugGraphics: Phaser.GameObjects.Graphics, de
     // Set desired velocity to be tangent along the circle being traveled
     let targetRotationAngle = clampTargetAngle(unit.gameObj[0].body.center.clone().subtract(center).rotate(Math.PI / 2).angle());
     unit.gameObj[0].setRotation(Phaser.Math.Angle.RotateTo(unit.gameObj[0].rotation, targetRotationAngle, unit.maxAngularSpeed * delta * 0.001));
-    let vel = Phaser.Math.Vector2.RIGHT.clone().rotate(unit.gameObj[0].rotation).scale(unit.maxSpeed);
+    let vel = Phaser.Math.Vector2.RIGHT.clone().rotate(unit.gameObj[0].rotation).scale(getUnitMaxSpeed(unit));
     unit.gameObj[0].setVelocity(vel.x, vel.y);
     // Draw line being rotated towards
     if (debugGraphics) {
@@ -421,7 +460,7 @@ function moveBomberUnit(unit: Unit, scene: MainScene) {
     unit.gameObj[0].setRotation(moveAngle + (Math.PI / 2));
     unit.state.moveAngle = moveAngle;
 
-    let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.state.moveAngle).scale(unit.maxSpeed);
+    let velocity = new Phaser.Math.Vector2(1, 0).rotate(unit.state.moveAngle).scale(getUnitMaxSpeed(unit));
     unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
 }
 
@@ -434,7 +473,7 @@ function moveSpawnerUnit(unit: Unit, scene: MainScene) {
         // Move towards the center of the stage
         let bottomRight = scene.getKillZoneBottomRight();
         let center = new Phaser.Math.Vector2(bottomRight.x / 2, bottomRight.y / 2);
-        let velocity = center.subtract(pos).scale(unit.maxSpeed);
+        let velocity = center.subtract(pos).scale(getUnitMaxSpeed(unit));
         unit.gameObj[0].body.setVelocity(velocity.x, velocity.y);
         unit.state.movementState = MovementState.Recovering;
     } else if (outDistance.length() <= 0 && unit.state.movementState == MovementState.Recovering) {

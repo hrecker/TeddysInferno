@@ -4,6 +4,7 @@ import { config } from "../model/Config";
 import { getSound, playSound, SoundEffect } from "../model/Sound";
 import { Challenge, getChallengeDisplayName, getCurrentChallenge } from "../state/ChallengeState";
 import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from "../state/GameResultState";
+import { getStartingBombCount } from "../units/UnitStatus";
 
 let timerText: Phaser.GameObjects.BitmapText;
 
@@ -323,7 +324,7 @@ export class MainUIScene extends Phaser.Scene {
         progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
 
         weaponLevelText = this.add.text(8, 40, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
-        bombCountText = this.add.text(8, 80, "Bombs: " + config()["startingBombCount"], config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
+        bombCountText = this.add.text(8, 80, "Bombs: " + getStartingBombCount(), config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         // Level progress outline
         levelProgressOutline = this.add.image(240, 40, "progressOutline").setAlpha(0.75);
         levelProgress = this.add.graphics().setAlpha(0.75);

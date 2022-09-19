@@ -12,8 +12,8 @@ import { GameResult } from "../model/GameResult";
 import { playerDeathEvent, playerSpawnEvent, timerEvent } from "../events/EventMessenger";
 import { flashSprite, getRandomArrayElements, isOutsideBounds } from "../util/Util";
 import { getSound, loadSounds, playSound, SoundEffect } from "../model/Sound";
-import { setBombs } from "../units/UnitStatus";
-import { getCurrentChallenge } from "../state/ChallengeState";
+import { getStartingBombCount, setBombs } from "../units/UnitStatus";
+import { Challenge, getCurrentChallenge } from "../state/ChallengeState";
 
 // Units
 let enemyUnits: { [id: number]: Unit } = {};
@@ -30,6 +30,7 @@ let gemPhysicsGroup : Phaser.Physics.Arcade.Group;
 
 // Input
 let thrustKey : Phaser.Input.Keyboard.Key;
+let reverseThrustKey : Phaser.Input.Keyboard.Key;
 let leftTurnKey : Phaser.Input.Keyboard.Key;
 let rightTurnKey : Phaser.Input.Keyboard.Key;
 let slowTurnKey : Phaser.Input.Keyboard.Key;
@@ -184,6 +185,7 @@ export class MainScene extends Phaser.Scene {
         //graphics = this.add.graphics();
 
         thrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        reverseThrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         leftTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         rightTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         slowTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
@@ -268,8 +270,6 @@ export class MainScene extends Phaser.Scene {
         //this.addUnit("looper", new Phaser.Math.Vector2(200, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(500, 400));
         //this.addUnit("spawner3", new Phaser.Math.Vector2(700, 400));
-
-
         //this.addUnit("bomber", new Phaser.Math.Vector2(700, 400));
         //this.addUnit("bomber", new Phaser.Math.Vector2(900, 400));
         //this.addUnit("spawner1", new Phaser.Math.Vector2(600, 400));
@@ -376,7 +376,7 @@ export class MainScene extends Phaser.Scene {
     createPlayerUnit() {
         let spawn = new Phaser.Math.Vector2(killZoneBottomRight.x / 2, killZoneBottomRight.y / 2);
         player = createUnit("player", spawn, this);
-        setBombs(player, config()["startingBombCount"]);
+        setBombs(player, getStartingBombCount());
         this.explodeParticlesColor(player.color, spawn);
     }
 
@@ -577,6 +577,20 @@ export class MainScene extends Phaser.Scene {
         return shotgunWeaponKey.isDown || this.input.activePointer.rightButtonDown();
     }
 
+    getThrustKey(): Phaser.Input.Keyboard.Key {
+        if (getCurrentChallenge() == Challenge.InReverse) {
+            return reverseThrustKey;
+        }
+        return thrustKey;
+    }
+
+    isThrustKeyDown(): boolean {
+        if (getCurrentChallenge() == Challenge.EngineFailure) {
+            return false;
+        }
+        return this.getThrustKey().isDown;
+    }
+
     drawPlayerTrail() {
         if (player.gameObj[0] && player.state.lastPositions.length > 1 && player.gameObj[0].body.velocity.length() > 0) {
             let newGraphics = this.add.graphics();
@@ -631,7 +645,7 @@ export class MainScene extends Phaser.Scene {
             this.moveGems();
             // Player movement
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
-                thrustKey.isDown, leftTurnKey.isDown, rightTurnKey.isDown, slowTurnKey.isDown, this, delta);
+                this.isThrustKeyDown(), leftTurnKey.isDown, rightTurnKey.isDown, slowTurnKey.isDown, this, delta);
             if (isOutsideBounds(player.gameObj[0].body.center, killZoneTopLeft, killZoneBottomRight)) {
                 this.destroyPlayer();
             } else {

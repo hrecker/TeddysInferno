@@ -265,7 +265,7 @@ export class MenuScene extends Phaser.Scene {
         challengesDescriptions.push(this.add.text(0, 0,
             "Delay between enemy spawns is cut in half.", config()["challengeDescriptionStyle"]));
         challengesDescriptions.push(this.add.text(0, 0,
-            "Your ship no longer has any way to damage enemies.", config()["challengeDescriptionStyle"]));
+            "Your ship has no way to damage enemies.", config()["challengeDescriptionStyle"]));
         challengesDescriptions.push(this.add.text(0, 0,
             "Everything moves much faster.", config()["challengeDescriptionStyle"]));
         challengesDescriptions.push(this.add.text(0, 0,

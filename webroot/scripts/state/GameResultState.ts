@@ -62,12 +62,34 @@ function getResultsKey() {
 
 /** Parse a game result from an object, setting default values for anything undefined */
 function parseGameResult(json: any): GameResult {
+    let score = "score" in json ? json.score : 0;
+    let gemsCollected = "gemsCollected" in json ? json.gemsCollected : 0;
+    let enemiesKilled = "enemiesKilled" in json ? json.enemiesKilled : 0;
+    let shotsFired = "shotsFired" in json ? json.shotsFired : 0;
+    let deaths = "deaths" in json ? json.deaths : 0;
+
+    if (typeof score !== "number") {
+        score = 0;
+    }
+    if (typeof gemsCollected !== "number") {
+        gemsCollected = 0;
+    }
+    if (typeof enemiesKilled !== "number") {
+        enemiesKilled = 0;
+    }
+    if (typeof shotsFired !== "number") {
+        shotsFired = 0;
+    }
+    if (typeof deaths !== "number") {
+        deaths = 0;
+    }
+
     return {
-        score: "score" in json ? json.score : 0,
-        gemsCollected: "gemsCollected" in json ? json.gemsCollected : 0,
-        enemiesKilled: "enemiesKilled" in json ? json.enemiesKilled : 0,
-        shotsFired: "shotsFired" in json ? json.shotsFired : 0,
-        deaths: "deaths" in json ? json.deaths : 0
+        score: score,
+        gemsCollected: gemsCollected,
+        enemiesKilled: enemiesKilled,
+        shotsFired: shotsFired,
+        deaths: deaths
     };
 }
 

@@ -2,10 +2,16 @@ import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { Challenge, getCurrentChallenge } from "../state/ChallengeState";
+import { adjustSpeed, getUnitMaxSpeed } from "./Movement";
 import { getStreamCooldownMs, getShotgunCooldownMs, takeDamage, setBombs } from "./UnitStatus";
 
 /** Fire player weapon for one frame. Return the number of bullets fired this frame. */
 export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade.Group, delta: number, player: Unit, streamWeaponKeyDown: boolean, shotgunWeaponKeyDown: boolean): number {
+    if (getCurrentChallenge() == Challenge.Pacifism) {
+        return 0;
+    }
+    
     if (player.state.weaponCooldownRemainingMs > 0) {
         player.state.weaponCooldownRemainingMs -= delta;
         return 0;
@@ -39,6 +45,10 @@ export function fireWeapon(scene: MainScene, physicsGroup: Phaser.Physics.Arcade
 
 /** Activate player bomb for one frame. Return true if bomb was activated this frame. */
 export function activateBomb(scene: MainScene, delta: number, player: Unit, bombKeyDown: boolean): boolean {
+    if (getCurrentChallenge() == Challenge.Pacifism) {
+        return false;
+    }
+    
     if (player.state.bombCooldownRemainingMs > 0) {
         player.state.bombCooldownRemainingMs -= delta;
         return false;
@@ -55,9 +65,9 @@ export function activateBomb(scene: MainScene, delta: number, player: Unit, bomb
         });
         scene.getEnemyUnits().forEach(unit => {
             let health = takeDamage(scene, unit, config()["bombDamage"]);
-            if (health > 0 && unit.maxSpeed > 0) {
+            if (health > 0 && getUnitMaxSpeed(unit) > 0) {
                 // Repel unit
-                let repelVelocity = unit.gameObj[0].body.center.clone().subtract(player.gameObj[0].body.center).normalize().scale(config()["bombRepelSpeed"]);
+                let repelVelocity = unit.gameObj[0].body.center.clone().subtract(player.gameObj[0].body.center).normalize().scale(adjustSpeed(config()["bombRepelSpeed"]));
                 unit.gameObj[0].setVelocity(repelVelocity.x, repelVelocity.y);
                 unit.gameObj[0].setAcceleration(0);
             }

@@ -3,6 +3,7 @@ import { config } from "../model/Config";
 import { playSound, SoundEffect } from "../model/Sound";
 import { Unit } from "../model/Units";
 import { MainScene } from "../scenes/MainScene";
+import { Challenge, getCurrentChallenge } from "../state/ChallengeState";
 import { flashSprite } from "../util/Util";
 
 let upgradeGemCountCache: { [upgradesComplete: number]: number } = {};
@@ -88,8 +89,19 @@ function collectGemPlayer(player: Unit, scene: MainScene) {
     gemCountEvent(player.state.gemCount, getPreviousUpgradeThreshold(player), getNextUpgradeThreshold(player));
 }
 
+/** Get the starting bomb count for the player. */
+export function getStartingBombCount() {
+    if (getCurrentChallenge() == Challenge.Pacifism) {
+        return 0;
+    }
+    return config()["startingBombCount"];
+}
+
 /** Set the number of bombs the player has. */
 export function setBombs(player: Unit, numBombs: number) {
+    if (getCurrentChallenge() == Challenge.Pacifism) {
+        return;
+    }
     player.state.bombCount = numBombs;
     bombCountEvent(player.state.bombCount);
 }

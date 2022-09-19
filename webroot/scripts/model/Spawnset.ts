@@ -1,3 +1,6 @@
+import { Challenge, getCurrentChallenge } from "../state/ChallengeState";
+import { config } from "./Config";
+
 let spawnTimes: number[] = [];
 let spawnUnits: string[][] = [];
 let loopSpawnTimes: number[] = [];
@@ -36,7 +39,7 @@ export function loadSpawnset(spawnsetJson) {
 /** Get spawns that should begin now based on the game time */
 export function getSpawns(gameTime: number): string[] {
     let toSpawn = [];
-    while (!loopActive && currentSpawnIndex < spawnTimes.length && (gameTime / 1000.0) >= spawnTimes[currentSpawnIndex]) {
+    while (!loopActive && currentSpawnIndex < spawnTimes.length && (gameTime / 1000.0) >= getSpawnTime(spawnTimes[currentSpawnIndex])) {
         let toSpawnNow = spawnUnits[currentSpawnIndex];
         let loopIndex = toSpawnNow.indexOf("loop");
         if (loopIndex > -1) {
@@ -66,7 +69,15 @@ export function getSpawns(gameTime: number): string[] {
 }
 
 /** Get the actual spawn time of the given index in the loop */
-function getLoopSpawnTime(spawnIndex: number) {
-    return loopStartTime + (loopSpawnTimes[spawnIndex] * currentLoopSpeedMultiplier);
+function getLoopSpawnTime(spawnIndex: number): number {
+    return getSpawnTime(loopStartTime + (loopSpawnTimes[spawnIndex] * currentLoopSpeedMultiplier));
+}
+
+/** Apply challenge modifier to spawn time if necessary. */
+function getSpawnTime(defaultSpawnTime: number): number {
+    if (getCurrentChallenge() == Challenge.Chaos) {
+        return defaultSpawnTime * config()["chaosChallengeSpawnDelayFactor"];
+    }
+    return defaultSpawnTime;
 }
 
