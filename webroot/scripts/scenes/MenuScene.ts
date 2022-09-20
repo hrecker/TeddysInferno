@@ -235,8 +235,8 @@ export class MenuScene extends Phaser.Scene {
         controlsTexts.push(this.add.text(0, 0, "W to activate thrust", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "A and D to turn left and right", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "Shift (hold) to turn slowly", config()["controlsStyle"]).setOrigin(0, 0.5));
-        controlsTexts.push(this.add.text(0, 0, "O or Left Click to fire stream of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
-        controlsTexts.push(this.add.text(0, 0, "P or Right Click to fire blasts of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "O to fire stream of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "P to fire blasts of bullets", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "Q to Quickturn", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "E to Boost", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "Space to activate Bomb", config()["controlsStyle"]).setOrigin(0, 0.5));
