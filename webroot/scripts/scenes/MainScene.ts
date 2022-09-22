@@ -40,7 +40,7 @@ let streamWeaponKey : Phaser.Input.Keyboard.Key;
 let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 let quickTurnKey : Phaser.Input.Keyboard.Key;
 let boostKey : Phaser.Input.Keyboard.Key;
-let bombKey: Phaser.Input.Keyboard.Key;
+let bombKey : Phaser.Input.Keyboard.Key;
 
 // Reticule for twin-stick mode
 let reticule: Phaser.GameObjects.Image;

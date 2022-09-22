@@ -7,6 +7,8 @@ import { getGameResults, getLatestGameResult, getLatestGameResultIndex } from ".
 import { getStartingBombCount } from "../units/UnitStatus";
 
 let timerText: Phaser.GameObjects.BitmapText;
+let pausedText: Phaser.GameObjects.Text;
+let pausedSubtitle: Phaser.GameObjects.Text;
 
 // Ability icons and masks for cooldown
 let boostIcon: Phaser.GameObjects.Image;
@@ -117,6 +119,8 @@ export class MainUIScene extends Phaser.Scene {
     playerDeathListener(scene: MainUIScene) {
         scene.updateLeaderboard();
         scene.setLeaderboardVisible(true);
+        // Ensure nothing is paused
+        scene.resume();
     }
 
     /** Start tween for cooldown on ability icons */
@@ -317,6 +321,34 @@ export class MainUIScene extends Phaser.Scene {
         boostIconMask.clear();
         boostIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 72, 8, 64, 64);
         this.repositionLeaderboard();
+        pausedText.setPosition(this.game.renderer.width / 2, this.game.renderer.height / 2 - 30);
+        pausedSubtitle.setPosition(this.game.renderer.width / 2, this.game.renderer.height / 2 + 30);
+    }
+
+    togglePause() {
+        if (this.scene.isPaused("MainScene")) {
+            this.resume();
+        } else {
+            this.pause();
+        }
+    }
+
+    pause() {
+        // Don't allow pausing on the high score page
+        if (leaderboardTitle.visible) {
+            return;
+        }
+        this.scene.pause("MainScene");
+        this.tweens.timeScale = 0;
+        pausedText.setVisible(true);
+        pausedSubtitle.setVisible(true);
+    }
+
+    resume() {
+        this.scene.resume("MainScene");
+        this.tweens.timeScale = 1;
+        pausedText.setVisible(false);
+        pausedSubtitle.setVisible(false);
     }
 
     create() {
@@ -324,6 +356,17 @@ export class MainUIScene extends Phaser.Scene {
         timerText.setOrigin(0.5);
         timerText.alpha = 0.75;
         progressColor = parseInt(config()["weaponUpgradeProgressColor"], 16);
+
+        pausedText = this.add.text(0, 0, "Paused", { font: "bold 64px Verdana",
+            stroke: "black",
+            strokeThickness: 3,
+            color: "#FFF7E4" }).setOrigin(0.5).setAlpha(0.5);
+        pausedSubtitle = this.add.text(0, 0, "Press F to resume", { font: "bold 48px Verdana",
+            stroke: "black",
+            strokeThickness: 3,
+            color: "#FFF7E4" }).setOrigin(0.5).setAlpha(0.5);
+        pausedText.setVisible(false);
+        pausedSubtitle.setVisible(false);
 
         weaponLevelText = this.add.text(8, 40, "Level 1", config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
         bombCountText = this.add.text(8, 80, "Bombs: " + getStartingBombCount(), config()["weaponUpgradeStatusFontStyle"]).setOrigin(0, 0.5).setAlpha(0.75);
@@ -387,6 +430,10 @@ export class MainUIScene extends Phaser.Scene {
         }
 
         retryKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        // Pause key is F
+        this.input.keyboard.on('keydown-F', function (event) {
+            this.togglePause();
+        }, this);
         
         this.resize(true);
         this.scale.on("resize", this.resize, this);

@@ -127,8 +127,8 @@ export class MenuScene extends Phaser.Scene {
         howToPlayExamples[2].setPosition(centerX + 100, howToPlayAnchor + howToPlayMargin * 2 + 15);
 
         // Controls
-        let controlsMargin = 30;
-        let controlsYAnchor = howToPlayAnchor + howToPlayMargin * 3 - 10;
+        let controlsMargin = 26;
+        let controlsYAnchor = howToPlayAnchor + howToPlayMargin * 3 - 20;
         controlsTitle.setPosition(centerX - 400, controlsYAnchor - 5);
         for (let i = 0; i < controlsTexts.length; i++) {
             controlsTexts[i].setPosition(centerX - 400, controlsYAnchor + ((i + 1) * controlsMargin));
@@ -231,7 +231,7 @@ export class MenuScene extends Phaser.Scene {
             howToPlayGroup.add(image);
         });
 
-        controlsTitle = this.add.text(0, 0, "Controls:", { ...config()["controlsStyle"], font: "bold 40px Verdana" }).setOrigin(0, 0.5);
+        controlsTitle = this.add.text(0, 0, "Controls:", { ...config()["controlsStyle"], font: "bold 34px Verdana" }).setOrigin(0, 0.5);
         controlsTexts = [];
         controlsTexts.push(this.add.text(0, 0, "W to activate thrust", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "A and D to turn left and right", config()["controlsStyle"]).setOrigin(0, 0.5));
@@ -241,6 +241,7 @@ export class MenuScene extends Phaser.Scene {
         controlsTexts.push(this.add.text(0, 0, "Q to Quickturn", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "E to Boost", config()["controlsStyle"]).setOrigin(0, 0.5));
         controlsTexts.push(this.add.text(0, 0, "Space to activate Bomb", config()["controlsStyle"]).setOrigin(0, 0.5));
+        controlsTexts.push(this.add.text(0, 0, "F to pause", config()["controlsStyle"]).setOrigin(0, 0.5));
         howToPlayGroup.add(controlsTitle);
         controlsTexts.forEach(text => {
             howToPlayGroup.add(text);
