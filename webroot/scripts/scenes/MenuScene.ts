@@ -138,15 +138,15 @@ export class MenuScene extends Phaser.Scene {
         creditsText.setPosition(this.game.renderer.width - 115, this.game.renderer.height - 40);
 
         // Challenges
-        let challengesMargin = 30;
-        let challengesDescMargin = 16;
+        let challengesMargin = 22;
+        let challengesDescMargin = 14;
         challengesTitle.setPosition(centerX, titleY - 50);
         let lastChallengeBottomY = titleY;
         for (let i = 0; i < challengesNames.length; i++) {
             let nameY = lastChallengeBottomY + challengesMargin;
             challengesNames[i].setPosition(centerX - 400, nameY);
             challengesDescriptions[i].setPosition(centerX - 400, nameY + challengesDescMargin);
-            challengesButtons[i].setPosition(centerX + 300, challengesDescriptions[i].getTopRight().y);
+            challengesButtons[i].setPosition(centerX + 330, challengesDescriptions[i].getTopRight().y);
             lastChallengeBottomY = challengesDescriptions[i].getBottomRight().y;
         }
 
@@ -168,6 +168,7 @@ export class MenuScene extends Phaser.Scene {
     create() {
         showHowToPlay = getLifetimeStats().deaths == 0;
         resetChallenge();
+        this.input.setDefaultCursor("default");
 
         mainMenuGroup = this.add.group();
         lifetimeStatsGroup = this.add.group();
@@ -256,12 +257,15 @@ export class MenuScene extends Phaser.Scene {
         challengesButtons = [];
         challengesTitle = this.add.text(0, 0, "Challenges", config()["titleStyle"]).setOrigin(0.5);
 
-        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.Chaos), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
-        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.Pacifism), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
-        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.SpeedKills), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
-        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.InReverse), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
-        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.EngineFailure), { ...config()["controlsStyle"], font: "bold 32px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.TwinStick), { ...config()["controlsStyle"], font: "bold 26px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.Chaos), { ...config()["controlsStyle"], font: "bold 26px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.Pacifism), { ...config()["controlsStyle"], font: "bold 26px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.SpeedKills), { ...config()["controlsStyle"], font: "bold 26px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.InReverse), { ...config()["controlsStyle"], font: "bold 26px Verdana" }).setOrigin(0, 0.5));
+        challengesNames.push(this.add.text(0, 0, getChallengeDisplayName(Challenge.EngineFailure), { ...config()["controlsStyle"], font: "bold 26px Verdana" }).setOrigin(0, 0.5));
 
+        challengesDescriptions.push(this.add.text(0, 0,
+            "Traditional twin-stick controls - move with WASD, aim and shoot with the mouse (left and right click).", config()["challengeDescriptionStyle"]));
         challengesDescriptions.push(this.add.text(0, 0,
             "Delay between enemy spawns is cut in half.", config()["challengeDescriptionStyle"]));
         challengesDescriptions.push(this.add.text(0, 0,
@@ -273,16 +277,19 @@ export class MenuScene extends Phaser.Scene {
         challengesDescriptions.push(this.add.text(0, 0,
             "Your ship can't move aside from rotation and abilities. Abilities have reduced cooldowns.", config()["challengeDescriptionStyle"]));
 
-        let chaosPlayButton = this.add.image(0, 0, "playButton").setName("chaosPlayButton");
-        let pacifismPlayButton = this.add.image(0, 0, "playButton").setName("pacifismPlayButton");
-        let speedKillsPlayButton = this.add.image(0, 0, "playButton").setName("speedKillsPlayButton");
-        let inReversePlayButton = this.add.image(0, 0, "playButton").setName("inReversePlayButton");
-        let engineFailurePlayButton = this.add.image(0, 0, "playButton").setName("engineFailurePlayButton");
+        let twinStickPlayButton = this.add.image(0, 0, "playButton").setName("twinStickPlayButton").setScale(0.9);
+        let chaosPlayButton = this.add.image(0, 0, "playButton").setName("chaosPlayButton").setScale(0.9);
+        let pacifismPlayButton = this.add.image(0, 0, "playButton").setName("pacifismPlayButton").setScale(0.9);
+        let speedKillsPlayButton = this.add.image(0, 0, "playButton").setName("speedKillsPlayButton").setScale(0.9);
+        let inReversePlayButton = this.add.image(0, 0, "playButton").setName("inReversePlayButton").setScale(0.9);
+        let engineFailurePlayButton = this.add.image(0, 0, "playButton").setName("engineFailurePlayButton").setScale(0.9);
+        this.configureButton(twinStickPlayButton, "playButton");
         this.configureButton(chaosPlayButton, "playButton");
         this.configureButton(pacifismPlayButton, "playButton");
         this.configureButton(speedKillsPlayButton, "playButton");
         this.configureButton(inReversePlayButton, "playButton");
         this.configureButton(engineFailurePlayButton, "playButton");
+        challengesButtons.push(twinStickPlayButton);
         challengesButtons.push(chaosPlayButton);
         challengesButtons.push(pacifismPlayButton);
         challengesButtons.push(speedKillsPlayButton);
@@ -392,6 +399,10 @@ export class MenuScene extends Phaser.Scene {
                             .start("MainUIScene")
                             .stop();
                 }
+                break;
+            case "twinStickPlayButton":
+                setChallenge(Challenge.TwinStick);
+                this.handleButtonClick("playButton");
                 break;
             case "chaosPlayButton":
                 setChallenge(Challenge.Chaos);

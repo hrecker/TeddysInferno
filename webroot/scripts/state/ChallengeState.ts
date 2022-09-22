@@ -1,6 +1,7 @@
 /** Enum for available game modes */
 export enum Challenge {
     MainGame = "MainGame",
+    TwinStick = "TwinStick",
     Chaos = "Chaos",
     Pacifism = "Pacifism",
     SpeedKills = "SpeedKills",
@@ -13,6 +14,8 @@ export function getChallengeDisplayName(challenge: Challenge): string {
     switch (challenge) {
         case Challenge.MainGame:
             return "Main Game";
+        case Challenge.TwinStick:
+            return "Twin-Stick";
         case Challenge.Chaos:
             return "Chaos";
         case Challenge.Pacifism:

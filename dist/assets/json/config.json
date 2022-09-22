@@ -47,10 +47,10 @@
         "color": "#FFF7E4"
     },
     "challengeDescriptionStyle": { 
-        "font": "22px Verdana",
+        "font": "18px Verdana",
         "align": "left",
         "wordWrap": { 
-            "width": 600,
+            "width": 630,
             "useAdvancedWrap": true
         },
         "shadow": {

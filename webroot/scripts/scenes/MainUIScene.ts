@@ -308,12 +308,14 @@ export class MainUIScene extends Phaser.Scene {
         }
         menuButton.setPosition(this.game.renderer.width / 2 - 120, buttonY);
         retryButton.setPosition(this.game.renderer.width / 2 + 120, buttonY);
-        boostIcon.setPosition(this.game.renderer.width - 112, 40);
-        quickTurnIcon.setPosition(this.game.renderer.width - 40, 40);
+        if (getCurrentChallenge() != Challenge.TwinStick) {
+            quickTurnIcon.setPosition(this.game.renderer.width - 112, 40);
+            quickTurnIconMask.clear();
+            quickTurnIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 144, 8, 64, 64);
+        }
+        boostIcon.setPosition(this.game.renderer.width - 40, 40);
         boostIconMask.clear();
-        boostIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 144, 8, 64, 64);
-        quickTurnIconMask.clear();
-        quickTurnIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 72, 8, 64, 64);
+        boostIconMask.fillStyle(0xffffff).fillRect(this.game.renderer.width - 72, 8, 64, 64);
         this.repositionLeaderboard();
     }
 
@@ -375,13 +377,14 @@ export class MainUIScene extends Phaser.Scene {
         addPlayerDeathListener(this.playerDeathListener, this);
 
         boostIcon = this.add.image(0, 0, "boostIcon").setAlpha(0.8);
-        quickTurnIcon = this.add.image(0, 0, "quickTurnIcon").setAlpha(0.8);
-
         boostIconMask = this.add.graphics().setVisible(false).setAlpha(0.8);
-        quickTurnIconMask = this.add.graphics().setVisible(false).setAlpha(0.8);
-
         boostIcon.setMask(boostIconMask.createGeometryMask());
-        quickTurnIcon.setMask(quickTurnIconMask.createGeometryMask());
+
+        if (getCurrentChallenge() != Challenge.TwinStick) {
+            quickTurnIcon = this.add.image(0, 0, "quickTurnIcon").setAlpha(0.8);
+            quickTurnIconMask = this.add.graphics().setVisible(false).setAlpha(0.8);
+            quickTurnIcon.setMask(quickTurnIconMask.createGeometryMask());
+        }
 
         retryKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         

@@ -13,10 +13,12 @@ export enum MovementState {
 
 /** Move the player unit for a frame based on inputs */
 export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActive: boolean,
-                               thrustActive: boolean, leftActive: boolean, rightActive: boolean, slowTurnActive: boolean,
-                               scene: MainScene, delta: number) {
+                               thrustActive: boolean, leftActive: boolean, rightActive: boolean,
+                               upActive: boolean, downActive: boolean, slowTurnActive: boolean,
+                               reticuleX: number, reticuleY: number, scene: MainScene, delta: number) {
     let canQuickTurn = true;
-    if (player.state.quickTurnCooldownRemainingMs > 0) {
+    // Quick turning is pointless in twin-stick mode, so disable it there
+    if (getCurrentChallenge() == Challenge.TwinStick || player.state.quickTurnCooldownRemainingMs > 0) {
         player.state.quickTurnCooldownRemainingMs -= delta;
         canQuickTurn = false;
     }
@@ -49,6 +51,10 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
             });
         }
         scene.explodeParticlesColor(player.color, player.gameObj[0].body.center);
+    } else if (getCurrentChallenge() == Challenge.TwinStick) {
+        let facingDirection = new Phaser.Math.Vector2(reticuleX, reticuleY).subtract(player.gameObj[0].body.center);
+        player.gameObj[0].setRotation(facingDirection.angle());
+        console.log(player.gameObj[0].body.velocity);
     } else {
         if (leftActive && !rightActive) {
             player.gameObj[0].setRotation(player.gameObj[0].rotation - getPlayerTurnSpeed(slowTurnActive));
@@ -94,13 +100,23 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
     }
 
     if (!isBoosting) {
-        if (thrustActive) {
-            let dir = getPlayerForwardDirection(player);
-            player.gameObj[0].setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
-        } else {
-            player.gameObj[0].setAcceleration(0, 0);
+        let dir = Phaser.Math.Vector2.ZERO.clone();
+        if (getCurrentChallenge() == Challenge.TwinStick) {
+            if (upActive) {
+                dir.y = -1;
+            } else if (downActive) {
+                dir.y = 1;
+            }
+            if (rightActive) {
+                dir.x = 1;
+            } else if (leftActive) {
+                dir.x = -1
+            }
+            dir.normalize();
+        } else if (thrustActive) {
+            dir = getPlayerForwardDirection(player);
         }
-        
+        player.gameObj[0].setAcceleration(dir.x * player.maxAcceleration, dir.y * player.maxAcceleration);
         clampUnitSpeed(player);
     }
     applyUnitDrag(player);
@@ -279,9 +295,12 @@ function applyDrag(image: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, drag
         return;
     }
 
-    let dragVector = image.body.velocity.clone().negate()
-            .normalize().scale(drag);
-    let newVelocity = dragVector.add(image.body.velocity);
+    let newVelocity = Phaser.Math.Vector2.ZERO;
+    if (drag < image.body.velocity.length()) {
+        let dragVector = image.body.velocity.clone().negate()
+                .normalize().scale(drag);
+        newVelocity = dragVector.add(image.body.velocity);
+    }
     image.body.setVelocity(newVelocity.x, newVelocity.y);
 }
 

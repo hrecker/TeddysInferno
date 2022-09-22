@@ -33,12 +33,17 @@ let thrustKey : Phaser.Input.Keyboard.Key;
 let reverseThrustKey : Phaser.Input.Keyboard.Key;
 let leftTurnKey : Phaser.Input.Keyboard.Key;
 let rightTurnKey : Phaser.Input.Keyboard.Key;
+let upKey : Phaser.Input.Keyboard.Key;
+let downKey : Phaser.Input.Keyboard.Key;
 let slowTurnKey : Phaser.Input.Keyboard.Key;
 let streamWeaponKey : Phaser.Input.Keyboard.Key;
 let shotgunWeaponKey : Phaser.Input.Keyboard.Key;
 let quickTurnKey : Phaser.Input.Keyboard.Key;
 let boostKey : Phaser.Input.Keyboard.Key;
 let bombKey: Phaser.Input.Keyboard.Key;
+
+// Reticule for twin-stick mode
+let reticule: Phaser.GameObjects.Image;
 
 // Map bounds
 let killZoneTopLeft, killZoneBottomRight;
@@ -151,6 +156,7 @@ export class MainScene extends Phaser.Scene {
             shotsFired: 0,
             deaths: 0
         };
+        this.input.setDefaultCursor("none");
         this.resetTimer();
         resetSpawnset();
         resetSpawns();
@@ -185,7 +191,9 @@ export class MainScene extends Phaser.Scene {
         //graphics = this.add.graphics();
 
         thrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        upKey = thrustKey;
         reverseThrustKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        downKey = reverseThrustKey;
         leftTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         rightTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         slowTurnKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
@@ -264,6 +272,10 @@ export class MainScene extends Phaser.Scene {
         this.createPlayerUnit();
         playerPhysicsGroup.add(player.gameObj[0]);
         this.cameras.main.startFollow(player.gameObj[0]);
+
+        if (getCurrentChallenge() == Challenge.TwinStick) {
+            reticule = this.add.image(-100, -100, "reticule");
+        }
 
         // For debugging
         //this.addUnit("worm", new Phaser.Math.Vector2(100, 400));
@@ -523,6 +535,11 @@ export class MainScene extends Phaser.Scene {
             playSound(this, SoundEffect.Death);
             // slowmo effect
             this.setTimescale(0.4);
+            // Show the mouse again
+            this.input.setDefaultCursor("default");
+            if (getCurrentChallenge() == Challenge.TwinStick) {
+                reticule.destroy();
+            }
         }
         if (config()["automaticRestart"]["enabled"]) {
             this.time.delayedCall(config()["automaticRestart"]["restartTime"],
@@ -644,8 +661,18 @@ export class MainScene extends Phaser.Scene {
             // Gem movement
             this.moveGems();
             // Player movement
+            let reticuleX = 0;
+            let reticuleY = 0;
+            if (getCurrentChallenge() == Challenge.TwinStick) {
+                let reticulePos = this.cameras.main.getWorldPoint(this.input.mousePointer.x, this.input.mousePointer.y)
+                reticule.setPosition(reticulePos.x, reticulePos.y);
+                reticuleX = reticule.x;
+                reticuleY = reticule.y;
+            }
             movePlayerUnit(player, quickTurnKey.isDown, boostKey.isDown,
-                this.isThrustKeyDown(), leftTurnKey.isDown, rightTurnKey.isDown, slowTurnKey.isDown, this, delta);
+                this.isThrustKeyDown(), leftTurnKey.isDown, rightTurnKey.isDown,
+                upKey.isDown, downKey.isDown, slowTurnKey.isDown,
+                reticuleX, reticuleY, this, delta);
             if (isOutsideBounds(player.gameObj[0].body.center, killZoneTopLeft, killZoneBottomRight)) {
                 this.destroyPlayer();
             } else {
