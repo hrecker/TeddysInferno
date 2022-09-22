@@ -119,7 +119,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
 
     // Create the actual Phaser ImageWithDynamicBody
     let unitId = getNewId();
-    let unitImage = createUnitImage(unitJson, name, unitId, location, scene, ! unit.disableDrag, rotation);
+    let unitImage = createUnitImage(unitJson, name, unitId, location, scene, rotation);
 
     unit.id = unitId;
     unit.gameObj = [unitImage];
@@ -127,7 +127,7 @@ export function createUnit(name: string, location: Phaser.Types.Math.Vector2Like
     // For worm units, need to create the body pieces
     if (name == "worm") {
         getWormSegmentLocations(location, rotation).forEach(segmentLocation => {
-            let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene, ! unit.disableDrag);
+            let segment = createUnitImage(unitJson, "wormsegment", unitId, segmentLocation, scene);
             unit.gameObj.push(segment);
         });
     }
@@ -164,7 +164,7 @@ export function getWormSegmentLocations(location: Phaser.Types.Math.Vector2Like,
 }
 
 /** Create the Phaser ImageWithDynamicBody for the Unit */
-function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene, shouldDrag: boolean, rotation?: number) {
+function createUnitImage(unitJson, name: string, unitId: number, location: Phaser.Types.Math.Vector2Like, scene: Phaser.Scene, rotation?: number) {
     let unitImage = scene.physics.add.image(location.x, location.y, name);
     unitImage.setData("id", unitId);
     unitImage.setName(name);
@@ -173,11 +173,7 @@ function createUnitImage(unitJson, name: string, unitId: number, location: Phase
     } else { // Default to square
         unitImage.setBodySize(unitJson["bodySize"], unitJson["bodySize"]);
     }
-    if (shouldDrag) {
-        unitImage.setDrag(config()["unitDrag"]);
-    } else {
-        unitImage.setDrag(0);
-    }
+    unitImage.setDrag(0);
     if (rotation && unitJson["randomSpawnRotation"]) {
         unitImage.setRotation(rotation);
     }

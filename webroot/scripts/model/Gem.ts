@@ -8,7 +8,6 @@ export function createGem(location: Phaser.Types.Math.Vector2Like, scene: MainSc
     let gemImage = scene.physics.add.image(location.x, location.y, "gem");
     gemImage.setData("id", gemId);
     gemImage.setName("gem");
-    gemImage.setDrag(config()["gemDrag"]);
 
     // Start flashing after a time to indicate the gem will disappear soon
     scene.time.delayedCall(config()["gemFlashStartMs"], () => {

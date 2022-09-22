@@ -103,6 +103,7 @@ export function movePlayerUnit(player: Unit, quickTurnActive: boolean, boostActi
         
         clampUnitSpeed(player);
     }
+    applyUnitDrag(player);
 }
 
 /** Get cooldown for the given ability. */
@@ -175,6 +176,7 @@ export function moveUnit(unit: Unit, targetPos: Phaser.Math.Vector2, debugGraphi
             break;
     }
     clampUnitSpeed(unit);
+    applyUnitDrag(unit);
 }
 
 /** Move a powerup gem for one frame - homing in on the player, a stealer unit, or not moving */
@@ -216,6 +218,7 @@ export function moveGem(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, s
     } else {
         clampSpeed(gem, adjustSpeed(config()["gemMaxSpeed"]));
     }
+    applyGemDrag(gem);
 }
 
 /** Update the track of player movement */
@@ -253,6 +256,33 @@ function clampSpeed(obj: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, maxSp
         let newVel = obj.body.velocity.normalize().scale(maxSpeed);
         obj.setVelocity(newVel.x, newVel.y);
     }
+}
+
+/** Apply a drag force to a unit. */
+function applyUnitDrag(unit: Unit) {
+    if (unit.disableDrag) {
+        return;
+    }
+    unit.gameObj.forEach(image => {
+        applyDrag(image, config()["unitDrag"]);
+    })
+}
+
+/** Apply a drag force to a gem. */
+function applyGemDrag(gem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody) {
+    applyDrag(gem, config()["gemDrag"])
+}
+
+/** Apply a drag force to the given body if it isn't accelerating */
+function applyDrag(image: Phaser.Types.Physics.Arcade.ImageWithDynamicBody, drag: number) {
+    if (image.body.acceleration.length() != 0 || image.body.velocity.length() == 0) {
+        return;
+    }
+
+    let dragVector = image.body.velocity.clone().negate()
+            .normalize().scale(drag);
+    let newVelocity = dragVector.add(image.body.velocity);
+    image.body.setVelocity(newVelocity.x, newVelocity.y);
 }
 
 /** Convert an angle to be within Phaser's expected [-PI, PI] range to prevent issues with jerky rotation.

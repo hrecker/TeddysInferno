@@ -116,7 +116,7 @@
     "gameAreaHeight": 800,
     "shaderWidth": 3850,
 
-    "unitDrag": 250,
+    "unitDrag": 4.5,
     "unitSpawnDurationMs": 2000,
     "unitSpawnTweenLoopMs": 500,
     "wormSegmentCount": 9,
@@ -125,7 +125,7 @@
     "gemAcceleration": 800,
     "gemMaxSpeed": 400,
     "gemMaxSpeedToStealer": 100,
-    "gemDrag": 200,
+    "gemDrag": 3.6,
     "gemSpawnSpeed": 150,
     "gemLifetimeMs": 8000,
     "gemFlashStartMs": 5000,
